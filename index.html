@@ -2,27 +2,72 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>zdarkovq — terminal</title>
+<title>blublublu</title>
 
 <style>
     body {
-        background: #0d0d0d;
+        background: #0b0b0b;
+        margin: 0;
         height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0;
         font-family: "Courier New", monospace;
+        overflow: hidden;
+    }
+
+    /* soft CRT flicker */
+    @keyframes crtFlicker {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.97; }
+        70% { opacity: 0.94; }
+    }
+
+    /* terminal container fade-in */
+    @keyframes popIn {
+        0% { transform: scale(0.85); opacity: 0; filter: blur(8px); }
+        100% { transform: scale(1); opacity: 1; filter: blur(0); }
+    }
+
+    /* scanlines */
+    .scanlines {
+        pointer-events: none;
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: repeating-linear-gradient(
+            to bottom,
+            rgba(255, 182, 193, 0.07) 0px,
+            rgba(255, 182, 193, 0.07) 1px,
+            transparent 2px,
+            transparent 3px
+        );
+        mix-blend-mode: overlay;
+        animation: crtFlicker 3s infinite;
     }
 
     .terminal {
         background: #1a1a1a;
-        width: 500px;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 0 25px #ffb6c1;
+        width: 520px;
+        padding: 26px;
+        border-radius: 12px;
         border: 2px solid #333;
+        box-shadow: 0 0 40px #ffb6c15d, inset 0 0 25px #000;
         color: #ffb6c1;
+        position: relative;
+        animation: popIn 0.8s ease-out forwards;
+    }
+
+    /* reflection on top */
+    .terminal::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%;
+        height: 30px;
+        background: linear-gradient(to bottom, #ffffff15, transparent);
+        border-radius: 12px 12px 0 0;
+        pointer-events: none;
     }
 
     .title {
@@ -30,9 +75,9 @@
         padding: 8px;
         border-radius: 6px;
         margin-bottom: 15px;
-        text-align: left;
         font-size: 14px;
         color: #ffb6c1;
+        box-shadow: inset 0 0 12px #000;
     }
 
     /* typing effect */
@@ -41,66 +86,77 @@
         border-right: 2px solid #ffb6c1;
         white-space: nowrap;
         width: 0;
-        animation: typing 2.5s steps(40, end) forwards;
+        animation: typing 2.5s steps(40, end) forwards, cursorBlink 0.7s step-end infinite;
         font-size: 16px;
     }
 
     @keyframes typing {
-        from { width: 0 }
-        to { width: 100% }
+        from { width: 0; }
+        to { width: 100%; }
     }
 
+    @keyframes cursorBlink {
+        50% { border-color: transparent; }
+    }
+
+    /* buttons slide in */
     .buttons {
         display: none;
         text-align: center;
         margin-top: 25px;
+        animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .btn {
         display: block;
-        width: 200px;
-        padding: 12px;
-        margin: 10px auto;
+        width: 220px;
+        padding: 13px;
+        margin: 12px auto;
         background: #ffb6c1;
         color: #1a1a1a;
         text-decoration: none;
-        border-radius: 6px;
+        border-radius: 7px;
         font-weight: bold;
-        box-shadow: 0 0 12px #ffb6c1;
-        transition: 0.2s;
+        box-shadow: 0 0 15px #ffb6c1;
+        transition: 0.25s ease;
     }
 
     .btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 0 18px #ffc2cf;
+        transform: scale(1.07);
+        box-shadow: 0 0 25px #ffc9d5;
+        letter-spacing: 1px;
     }
-
 </style>
 </head>
 
 <body>
 
+<div class="scanlines"></div>
+
 <div class="terminal">
-    <div class="title">retro-terminal</div>
+    <div class="title">blublublu</div>
 
     <div id="command"></div>
 
-    <div class="buttons" id="social-buttons">
+    <div class="buttons" id="socials">
         <a class="btn" href="https://instagram.com/zdarkovq" target="_blank">Instagram</a>
-        <a class="btn" href="https://open.spotify.com/user/elpmo" target="_blank">Spotify</a>
+        <a class="btn" href="https://www.tiktok.com/@zdarkovqq" target="_blank">TikTok</a>
     </div>
 </div>
 
 <script>
-    const text = 'openProfile("instagram", "spotify");';
-    const commandDiv = document.getElementById("command");
+    const text = 'access --user --services';
+    const cmd = document.getElementById("command");
 
-    // set full text BEFORE animation so it types correctly
-    commandDiv.textContent = text;
+    cmd.textContent = text;
 
-    // Show buttons after typing finishes (2.5s + small delay)
     setTimeout(() => {
-        document.getElementById("social-buttons").style.display = "block";
+        document.getElementById("socials").style.display = "block";
     }, 3000);
 </script>
 
