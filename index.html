@@ -1,44 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>My Personal Site</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f9f9ff;
-            text-align: center;
-            padding: 40px;
-        }
-        .card {
-            max-width: 400px;
-            margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        }
-        a {
-            display: block;
-            margin: 10px 0;
-            font-size: 18px;
-            color: #6a5acd;
-            text-decoration: none;
-        }
-    </style>
+<meta charset="UTF-8">
+<title>terminal</title>
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        background: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: "Courier New", monospace;
+    }
+
+    .terminal {
+        width: 80%;
+        max-width: 700px;
+        background: #0a0a0a;
+        border-radius: 8px;
+        box-shadow: 0 0 25px rgba(0, 255, 0, 0.2);
+        padding: 20px;
+        color: #00ff66;
+        font-size: 18px;
+        line-height: 1.4;
+        border: 1px solid #003300;
+        position: relative;
+    }
+
+    .titlebar {
+        height: 25px;
+        background: #111;
+        border-bottom: 1px solid #003300;
+        color: #00ff66;
+        font-size: 14px;
+        padding-left: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    #text {
+        white-space: pre-wrap;
+        overflow: hidden;
+    }
+
+    .cursor {
+        display: inline-block;
+        width: 10px;
+        background: #00ff66;
+        margin-left: 3px;
+        animation: blink 0.7s infinite;
+    }
+
+    @keyframes blink {
+        0%, 50% { opacity: 1; }
+        50.1%, 100% { opacity: 0; }
+    }
+</style>
+
 </head>
 <body>
 
-<div class="card">
-    <h1>Hello, I'm [Your Name]</h1>
-    <p>Welcome to my personal site ✨</p>
-
-    <h2>My Socials</h2>
-    <a href="https://instagram.com/YOURUSERNAME">Instagram</a>
-    <a href="https://x.com/YOURUSERNAME">X / Twitter</a>
-    <a href="https://tiktok.com/@YOURUSERNAME">TikTok</a>
+<div class="terminal">
+    <div class="titlebar">terminal</div>
+    <div id="text"></div><span class="cursor"></span>
 </div>
+
+<script>
+    const content = 
+`welcome.
+
+loading profile...
+done.
+
+socials:
+ - instagram: https://instagram.com/zdarkovq
+ - spotify: https://open.spotify.com/user/elpmo
+
+have a nice day.`;
+
+    let i = 0;
+    const speed = 40; // typing speed
+
+    function type() {
+        if (i < content.length) {
+            document.getElementById("text").textContent += content.charAt(i);
+            i++;
+            setTimeout(type, speed);
+        }
+    }
+
+    type();
+</script>
 
 </body>
 </html>
-
