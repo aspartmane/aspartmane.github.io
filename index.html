@@ -91,9 +91,10 @@
     <div class="right-col">
       <div class="panel small scanlines" id="rightTop">
         <h1>penguin</h1>
-        <pre class="ascii" id="penguinAnim">( >`·.¸
-(  =  )
-(\___/)
+        <pre class="ascii" id="penguinAnim">  _~_
+ (o o)
+ / V \
+/--m-m-
 </pre>
       </div>
 
@@ -122,7 +123,8 @@
       'Attempting graceful recover... [FAIL]',
       'Forcing fallback renderer (soft) ... [OK]',
       'Welcome to welcome — type HELP for commands or click the icons below.',
-      '\n\u001b[1;31mNOTICE:\u001b[0m Some modules reported unusual behavior (simulated).'
+      '
+[1;31mNOTICE:[0m Some modules reported unusual behavior (simulated).'
     ];
 
     // small variations to feel authentic
@@ -179,11 +181,17 @@
     }
     document.addEventListener('click', startSequence);
 
-    // ASCII Penguin animation frames
+    // ASCII Penguin animation frames (use template literals to avoid escaping issues)
     const frames = [
-`  _~_\n (o o)\n / V \\ \n/--m-m-\`,
-`  _~_\n (o_o)\n / V \\ \n/--m-m-\`,
-`  _~_\n (O O)\n / V \\ \n/--m-m-\`
+`  _~_
+ (o o)
+ / V \n/--m-m-`,
+`  _~_
+ (o_o)
+ / V \n/--m-m-`,
+`  _~_
+ (O O)
+ / V \n/--m-m-`
     ];
     let f=0; setInterval(()=>{
       const el = document.getElementById('penguinAnim');
@@ -191,7 +199,17 @@
     },400);
 
     // small penguin idle animation
-    const smallFrames = ['(._.)\n( : )\n/| |\\','(o_o)\n( : )\n/| |\\','(>_<)\n( : )\n/| |\\'];
+    const smallFrames = [
+`(._.)
+( : )
+/| |\`,
+`(o_o)
+( : )
+/| |\`,
+`(>_<)
+( : )
+/| |\`
+];
     let sf=0; setInterval(()=>{
       document.getElementById('penguinSmall').textContent = smallFrames[sf%smallFrames.length]; sf++;
     },600);
