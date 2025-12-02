@@ -3,250 +3,242 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>blublublu — terminal neon experience</title>
+  <title>welcome — pastel terminal</title>
+  <!-- Pixel / "minecraft-like" font from Google Fonts (Press Start 2P) -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
     :root{
-      --bg:#06060a;
-      --panel:#0f0f12;
-      --accent:#ff66b2;
-      --accent-2:#7af0ff;
-      --muted:rgba(255,255,255,0.06);
-      --glass: rgba(255,255,255,0.03);
-      --mono: "Courier New", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+      --bg1:#ffeef6; /* pastel pink */
+      --panel:#fff7fb;
+      --accent:#ffb6d5;
+      --glow: rgba(255, 182, 213, 0.45);
+      --text:#2b0b12;
     }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:var(--mono);background:var(--bg);color:#eaeef3}
+    html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg1),#fff);font-family:'Press Start 2P',monospace;color:var(--text)}
+    /* fullscreen grid: left large, right stacked */
+    .wrap{display:grid;grid-template-columns:1fr 420px;grid-template-rows:1fr;gap:28px;height:100vh;padding:28px;box-sizing:border-box}
 
-    /* full-screen neon starfield + gradient */
-    .stage{
-      position:fixed;inset:0;overflow:hidden;display:grid;place-items:center;padding:48px;
-      background: radial-gradient(1200px 600px at 10% 20%, rgba(122,240,255,0.04), transparent 8%),
-                  radial-gradient(900px 500px at 90% 80%, rgba(255,102,178,0.04), transparent 8%),
-                  linear-gradient(180deg,#040408 0%, #0b0b0f 60%);
-    }
+    .panel{background:linear-gradient(180deg,var(--panel),#fff);border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(11,6,9,0.08), inset 0 1px 0 rgba(255,255,255,0.6);border:1px solid rgba(43,11,18,0.06);position:relative;overflow:hidden}
 
-    /* subtle animated nebula */
-    .nebula{
-      position:absolute;inset:-20%;filter:blur(30px) saturate(1.2) contrast(1.05);opacity:0.55;mix-blend-mode:screen;
-      background: conic-gradient(from 120deg at 40% 30%, rgba(255,102,178,0.12), rgba(122,240,255,0.12), transparent 40%);
-      transform:translateZ(0);
-      animation: drift 18s infinite linear;
-      pointer-events:none;
-    }
-    @keyframes drift{ 0%{transform:translateX(-6%) translateY(-2%) rotate(0)} 50%{transform:translateX(6%) translateY(2%) rotate(2deg)} 100%{transform:translateX(-6%) translateY(-2%) rotate(0)} }
+    /* left terminal large */
+    .terminal{height:100%;display:flex;flex-direction:column;gap:12px}
+    .term-screen{flex:1;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(0,0,0,0.02));border-radius:8px;padding:18px;overflow:auto;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.02)}
 
-    /* glowing grid */
-    .grid{
-      position:absolute;inset:0;background-image:linear-gradient(transparent 92%, rgba(255,255,255,0.02) 92%),linear-gradient(90deg, transparent 92%, rgba(255,255,255,0.02) 92%);
-      background-size: 120px 120px, 120px 120px;opacity:0.25;mix-blend-mode:overlay;pointer-events:none;transform:translateZ(0);
-      animation: gridFloat 10s linear infinite;
-    }
-    @keyframes gridFloat{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+    /* simulated glass overlay with scanlines */
+    .scanlines:after{content:'';position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);background-size:100% 4px;mix-blend-mode:overlay}
 
-    /* center interface */
-    .ui{
-      width:min(960px,94vw);max-width:1100px;display:grid;grid-template-columns:480px 1fr;gap:32px;z-index:3;align-items:stretch;
-    }
+    /* right column split */
+    .right-col{display:flex;flex-direction:column;gap:18px;height:100%}
+    .small{height:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
 
-    /* left: holographic terminal */
-    .term{
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-      border-radius:16px;padding:22px;border:1px solid rgba(255,255,255,0.04);backdrop-filter: blur(6px);
-      box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 80px rgba(255,102,178,0.04) inset;min-height:420px;position:relative;overflow:hidden;
-    }
-    .term .topbar{display:flex;gap:8px;align-items:center}
-    .dot{width:12px;height:12px;border-radius:50%;background:var(--muted);box-shadow:0 0 8px rgba(0,0,0,0.5);}
-    .dot.r{background:linear-gradient(180deg,#ff6aa8,#ff3b8e);box-shadow:0 6px 18px rgba(255,90,150,0.12)}
-    .dot.y{background:linear-gradient(180deg,#ffd37a,#ffb54f)}
-    .dot.g{background:linear-gradient(180deg,#7affc6,#2fff9b)}
-
-    .term .title{margin-left:auto;color:rgba(255,255,255,0.6);font-size:13px}
-
-    /* terminal screen */
-    .screen{margin-top:18px;background:linear-gradient(180deg,#06060a 0%, #0c0c0f 100%);border-radius:10px;padding:18px;height:320px;overflow:auto;color:var(--accent);font-size:15px;line-height:1.4;border:1px solid rgba(122,240,255,0.03)}
-    .screen .line{white-space:pre-wrap;font-family:var(--mono)}
-    .screen .out{color:#bfefff}
-    .screen .accent{color:var(--accent)}
-    .screen .muted{color:rgba(255,255,255,0.22)}
-
-    /* fancy cursor */
-    .cursor{display:inline-block;width:10px;height:18px;background:var(--accent);margin-left:6px;vertical-align:bottom;animation: blink 1s steps(2) infinite}
+    /* typed text style */
+    .log{font-size:12px;line-height:1.45;white-space:pre-wrap;color:var(--text)}
+    .cursor{display:inline-block;width:10px;background:var(--accent);margin-left:6px;animation:blink 1s steps(2) infinite}
     @keyframes blink{50%{opacity:0}}
 
-    /* right: profile card */
-    .card{background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:22px;border:1px solid rgba(255,255,255,0.03);box-shadow: 0 12px 60px rgba(0,0,0,0.6)}
-    .profile{display:flex;gap:18px;align-items:center}
-    .avatar{width:96px;height:96px;border-radius:16px;background:linear-gradient(180deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-size:28px;font-weight:700;color:#08121a;box-shadow:0 8px 30px rgba(122,240,255,0.06)}
-    .meta h1{margin:0;font-size:20px;letter-spacing:0.6px}
-    .meta p{margin:6px 0 0 0;color:rgba(255,255,255,0.6);font-size:13px}
+    /* ascii icons row */
+    .icons{display:flex;gap:14px;padding-top:10px;align-items:center}
+    .icon-btn{font-family:monospace;background:transparent;border:2px solid rgba(43,11,18,0.06);padding:10px 12px;border-radius:8px;cursor:pointer;backdrop-filter: blur(4px);box-shadow:0 6px 18px var(--glow);transition:transform .22s ease, box-shadow .22s ease}
+    .icon-btn:active{transform:translateY(2px) scale(.995)}
+    .icon-btn.anim{animation:pop .5s ease}
+    @keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
 
-    .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
-    .chip{padding:10px 14px;border-radius:999px;background:var(--glass);border:1px solid rgba(255,255,255,0.03);font-weight:700;cursor:pointer;transition:transform .12s}
-    .chip:hover{transform:translateY(-4px)}
+    /* social ping animation */
+    .pulse{position:relative}
+    .pulse:after{content:'';position:absolute;inset:-6px;border-radius:10px;opacity:0;box-shadow:0 0 40px rgba(255,182,213,0.22);animation:rpulse .9s ease forwards}
+    @keyframes rpulse{0%{opacity:.9;transform:scale(.9)}100%{opacity:0;transform:scale(1.6)}}
 
-    /* footer controls */
-    .controls{display:flex;gap:10px;margin-top:18px;align-items:center}
-    .btn{padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#08121a;font-weight:800;border:none;cursor:pointer;box-shadow:0 8px 30px rgba(122,240,255,0.08)}
-    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.8)}
+    /* penguin ascii styling */
+    .ascii{font-family:monospace;line-height:1;margin:0;padding:12px;background:transparent;border-radius:8px}
 
     /* responsive */
-    @media (max-width:880px){
-      .ui{grid-template-columns:1fr;gap:18px}
-      .screen{height:300px}
+    @media (max-width:980px){
+      .wrap{grid-template-columns:1fr;grid-template-rows:1fr 360px;padding:16px}
+      .right-col{flex-direction:row;height:auto}
+      .small{height:100%;width:50%}
     }
 
-    /* small helper animations */
-    .sparkle{position:absolute;inset:0;pointer-events:none}
-    .sparkle .dot{position:absolute;border-radius:50%;opacity:0.12}
+    /* subtle neon glow for headers */
+    h1{font-size:14px;margin:0 0 6px 0;color:var(--text);text-shadow:0 2px 8px rgba(255,182,213,0.35)}
 
-    /* tiny terminal prompt area */
-    .prompt{display:flex;gap:10px;align-items:center;margin-top:14px}
-    .prompt input{flex:1;background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,0.06);padding:8px 10px;color:inherit;font-family:var(--mono);outline:none}
-    .prompt input::placeholder{color:rgba(255,255,255,0.2)}
-
+    /* fake window controls */
+    .win-controls{position:absolute;top:12px;left:12px;display:flex;gap:8px}
+    .dot{width:12px;height:12px;border-radius:50%;background:#fff;opacity:.8;box-shadow:0 1px 0 rgba(0,0,0,0.05)}
+    .dot.close{background:#ff6b8a}
+    .dot.min{background:#ffd3ea}
+    .dot.max{background:#ffffff}
   </style>
 </head>
 <body>
-  <div class="stage" id="stage">
-    <div class="nebula" aria-hidden></div>
-    <canvas id="stars" style="position:absolute;inset:0;z-index:0;pointer-events:none"></canvas>
-    <div class="grid" aria-hidden></div>
-
-    <div class="ui" role="main" aria-labelledby="site-title">
-      <div class="term" aria-label="Holographic terminal">
-        <div class="topbar" aria-hidden>
-          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
-          <div class="title" id="site-title">blublublu — systems ready</div>
-        </div>
-
-        <div class="screen" id="screen" tabindex="0" aria-live="polite"></div>
-
-        <div class="prompt" style="position:relative">
-          <input id="cmdInput" placeholder="type a command — try 'help'" autocomplete="off" spellcheck="false" aria-label="Command input"/>
-          <button class="btn ghost" id="runBtn">RUN</button>
-        </div>
+  <div class="wrap">
+    <div class="panel terminal scanlines" id="left">
+      <div class="win-controls"><div class="dot close"></div><div class="dot min"></div><div class="dot max"></div></div>
+      <h1>welcome</h1>
+      <div class="term-screen" id="mainTerm" aria-live="polite"></div>
+      <div class="icons" id="iconRow">
+        <!-- ASCII minimal icons - clickable, no URLs (placeholders for later) -->
+        <button class="icon-btn" data-social="instagram">[IG]
+        </button>
+        <button class="icon-btn" data-social="tiktok">[TT]
+        </button>
+        <button class="icon-btn" data-social="x">[X]
+        </button>
+        <button class="icon-btn" data-social="github">[GH]
+        </button>
       </div>
-
-      <aside class="card" aria-label="Profile card">
-        <div class="profile">
-          <div class="avatar">B</div>
-          <div class="meta">
-            <h1>blublublu</h1>
-            <p>terminal interface • neon vibes • professional chaos</p>
-            <div style="height:8px"></div>
-            <div style="width:220px;height:6px;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:6px;box-shadow:0 6px 30px rgba(122,240,255,0.06)"></div>
-          </div>
-        </div>
-
-        <div class="links" role="navigation" aria-label="social links">
-          <div class="chip" data-link="https://instagram.com/zdarkovq">Instagram</div>
-          <div class="chip" data-link="https://www.tiktok.com/@zdarkovqq">TikTok</div>
-          <div class="chip" data-link="https://github.com/">GitHub</div>
-          <div class="chip" id="copyCmd">Copy invite</div>
-        </div>
-
-        <div class="controls">
-          <button class="btn" id="showTheme">Toggle Theme</button>
-          <button class="btn ghost" id="download">Download Card</button>
-        </div>
-
-        <div style="margin-top:14px;color:rgba(255,255,255,0.45);font-size:13px">Pro tip: try commands like <span class="accent">help</span>, <span class="accent">socials</span>, <span class="accent">about</span>, <span class="accent">glow</span></div>
-      </aside>
     </div>
 
-    <div class="sparkle" id="sparkle" aria-hidden></div>
+    <div class="right-col">
+      <div class="panel small scanlines" id="rightTop">
+        <h1>penguin</h1>
+        <pre class="ascii" id="penguinAnim">( >`·.¸
+(  =  )
+(\___/)
+</pre>
+      </div>
+
+      <div class="panel small scanlines" id="rightBottom">
+        <h1>status</h1>
+        <pre class="ascii" id="penguinSmall">(._.)
+( : )
+/| |\
+</pre>
+      </div>
+    </div>
   </div>
 
   <script>
-    /* ===== stars particle background ===== */
-    const canvas = document.getElementById('stars');
-    const ctx = canvas.getContext('2d');
-    let w = canvas.width = innerWidth;
-    let h = canvas.height = innerHeight;
-    const stars = [];
-    const STAR_COUNT = Math.round((w*h)/40000);
+    // Utility: typing effect for eDEX-like boot
+    const main = document.getElementById('mainTerm');
+    const logs = [
+      'BOOTING: welcomeOS v0.9.3',
+      'Initializing kernel modules... [OK]',
+      'Loading interface: pastel-terminal-driver... [OK]',
+      'Mounting virtual filesystems... [OK]',
+      'Starting services: net.sys, audio.svc, gfx.pulse... [OK]',
+      'Probing devices: gpu0, input1, tty0... [OK]',
+      'Security check: signature mismatch on /usr/bin/slay.exe',
+      "ERROR: syntax fault at line 42 in /init/shipments.conf -> 'unclosed-<tag>'",
+      'Attempting graceful recover... [FAIL]',
+      'Forcing fallback renderer (soft) ... [OK]',
+      'Welcome to welcome — type HELP for commands or click the icons below.',
+      '\n\u001b[1;31mNOTICE:\u001b[0m Some modules reported unusual behavior (simulated).'
+    ];
 
-    function rand(min,max){return Math.random()*(max-min)+min}
-    function initStars(){stars.length=0;for(let i=0;i<STAR_COUNT;i++){stars.push({x:Math.random()*w,y:Math.random()*h,z:rand(0.2,1),r:rand(0.3,1.4)})}}
-    function drawStars(){ctx.clearRect(0,0,w,h);for(const s of stars){const g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*8);g.addColorStop(0,'rgba(255,255,255,'+ (0.9*s.z) +')');g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill()}}
-    function tickStars(){for(const s of stars){s.x += (s.x - w/2)*0.0006; s.y += (s.y - h/2)*0.0006; s.z += Math.sin(Date.now()/2000 + s.r) * 0.0008; if(s.x<0 || s.x>w || s.y<0 || s.y>h){s.x=Math.random()*w; s.y=Math.random()*h}}}
-    function loop(){tickStars();drawStars();requestAnimationFrame(loop)}
-    addEventListener('resize',()=>{w=canvas.width=innerWidth;h=canvas.height=innerHeight;initStars()});
-    initStars();loop();
+    // small variations to feel authentic
+    function randChance(n){return Math.random()<n}
 
-    /* ===== sparkles layer ===== */
-    const sparkle = document.getElementById('sparkle');
-    for(let i=0;i<18;i++){const d=document.createElement('div');d.className='dot';d.style.width=(5+Math.random()*40)+'px';d.style.height=d.style.width;d.style.left=Math.random()*100+'%';d.style.top=Math.random()*100+'%';d.style.background='radial-gradient(circle, rgba(255,255,255,'+(0.06+Math.random()*0.08)+') 0%, transparent 60%)';sparkle.appendChild(d)}
-
-    /* ===== terminal behavior ===== */
-    const screen = document.getElementById('screen');
-    const input = document.getElementById('cmdInput');
-    const runBtn = document.getElementById('runBtn');
-
-    function write(line, cls){const el=document.createElement('div');el.className='line '+(cls||'');el.textContent=line;screen.appendChild(el);screen.scrollTop = screen.scrollHeight}
-
-    function typeLike(text, speed=12){return new Promise(resolve=>{
-      const el=document.createElement('div');el.className='line out';screen.appendChild(el);
-      let i=0;const t=setInterval(()=>{el.textContent = text.slice(0,i)+ (i%2? '▌':'' ); i++; screen.scrollTop = screen.scrollHeight; if(i>text.length){clearInterval(t); el.textContent=text; resolve()} }, 1000/speed)
-    })}
-
-    async function bootSequence(){await typeLike('booting blublublu kernel...');await typeLike('initializing neon drivers...');await typeLike('establishing secure connections...');await typeLike('welcome. type "help" for commands')}
-    bootSequence();
-
-    const commands = {
-      help: async ()=>{
-        write('available commands:', 'muted');
-        write('  help       — show this help');
-        write('  socials    — show socials as links');
-        write('  about      — quick about blublublu');
-        write('  glow       — flash the UI glow');
-        write('  clr        — clear the terminal');
-        write('  download   — download a tiny profile card');
-      },
-      socials: ()=>{
-        write('instagram: https://instagram.com/zdarkovq', 'out');
-        write('tiktok:    https://www.tiktok.com/@zdarkovqq', 'out');
-      },
-      about: ()=>{
-        write('blublublu — maker of neon terminals and inconvenient truths', 'out');
-        write('location: cybernetic outskirts • contact: via socials', 'muted');
-      },
-      glow: ()=>{document.querySelector('.term').animate([{boxShadow:'0 8px 40px rgba(255,102,178,0.18), 0 0 140px rgba(122,240,255,0.08) inset'},{boxShadow:'0 8px 40px rgba(255,102,178,0.04), 0 0 80px rgba(122,240,255,0.02) inset'}],{duration:600,iterations:2}) ; write('glow pulse sent', 'out')},
-      clr: ()=>{screen.innerHTML=''; write('cleared. type "help" to start again','muted')},
-      download: ()=>{triggerDownload()}
+    // Sound using WebAudio
+    const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    function beep(freq=880, time=0.04, type='sine', vol=0.06){
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type=type;o.frequency.value=freq;g.gain.value=vol;
+      o.connect(g);g.connect(audioCtx.destination);
+      o.start();
+      o.stop(audioCtx.currentTime+time);
     }
 
-    function runCommand(raw){const cmd = raw.trim().toLowerCase(); if(!cmd) return; write('> '+raw,'accent'); if(commands[cmd]) commands[cmd](); else write('command not found: '+cmd,'muted') }
+    function clickSound(){beep(600,0.06,'square',0.06);beep(900,0.03,'sine',0.03)}
+    function bootBeep(){beep(1200,0.02,'sine',0.04)}
 
-    runBtn.addEventListener('click', ()=>{runCommand(input.value); input.value=''});
-    input.addEventListener('keydown', (e)=>{if(e.key==='Enter'){runCommand(input.value);input.value=''}})
+    // Typing one line with occasional simulated errors
+    async function typeLine(text, speed=6){
+      const line = document.createElement('div');
+      line.className='log';
+      main.appendChild(line);
+      for(let i=0;i<text.length;i++){
+        line.textContent += text[i];
+        if(randChance(0.08)) bootBeep();
+        await new Promise(r => setTimeout(r, speed + Math.random()*10));
+        main.scrollTop = main.scrollHeight;
+      }
+      // mimic occasional inline error highlight
+      if(text.includes('ERROR')||text.includes('syntax')){
+        const err = document.createElement('div'); err.className='log'; err.style.color='#9b1032'; err.textContent = 'TRACE: stack@0x7ff.. -> recover? (y/n)';
+        main.appendChild(err);
+      }
+    }
 
-    /* chips open links */
-    document.querySelectorAll('.chip[data-link]').forEach(c=>c.addEventListener('click',()=>window.open(c.dataset.link,'_blank')));
-    document.getElementById('copyCmd').addEventListener('click',()=>{navigator.clipboard.writeText('connect blublublu');alert('Copied invite: connect blublublu')})
+    async function runBoot(){
+      for(const l of logs){
+        await typeLine(l);
+        await new Promise(r=>setTimeout(r,180 + Math.random()*250));
+      }
+      // final prompt
+      const prompt = document.createElement('div'); prompt.className='log'; prompt.innerHTML='guest@welcome:~$ <span id="promptCursor" class="cursor"></span>';
+      main.appendChild(prompt);
+      main.scrollTop = main.scrollHeight;
+    }
 
-    /* download card as simple vcard/text */
-    function triggerDownload(){const txt = `blublublu - neon terminal\nInstagram: https://instagram.com/zdarkovq\nTikTok: https://www.tiktok.com/@zdarkovqq\n`;
-      const blob = new Blob([txt],{type:'text/plain'}); const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'blublublu-card.txt'; a.click(); URL.revokeObjectURL(url); write('download started','out') }
-    document.getElementById('download').addEventListener('click', triggerDownload);
+    // Start boot sequence on user gesture due to audio policy
+    function startSequence(){
+      document.removeEventListener('click', startSequence);
+      audioCtx.resume();
+      runBoot();
+    }
+    document.addEventListener('click', startSequence);
 
-    /* theme toggle */
-    let alt=false;document.getElementById('showTheme').addEventListener('click',()=>{document.documentElement.style.setProperty('--accent', alt? '#ff66b2':'#7af0ff');document.documentElement.style.setProperty('--accent-2', alt? '#7af0ff':'#ff66b2');alt=!alt});
+    // ASCII Penguin animation frames
+    const frames = [
+`  _~_\n (o o)\n / V \\ \n/--m-m-\`,
+`  _~_\n (o_o)\n / V \\ \n/--m-m-\`,
+`  _~_\n (O O)\n / V \\ \n/--m-m-\`
+    ];
+    let f=0; setInterval(()=>{
+      const el = document.getElementById('penguinAnim');
+      el.textContent = frames[f%frames.length]; f++;
+    },400);
 
-    /* keyboard focus shortcut: press ~ to focus input */
-    addEventListener('keydown',(e)=>{ if(e.key==='`' || e.key==='~'){ e.preventDefault(); input.focus(); input.select(); } });
+    // small penguin idle animation
+    const smallFrames = ['(._.)\n( : )\n/| |\\','(o_o)\n( : )\n/| |\\','(>_<)\n( : )\n/| |\\'];
+    let sf=0; setInterval(()=>{
+      document.getElementById('penguinSmall').textContent = smallFrames[sf%smallFrames.length]; sf++;
+    },600);
 
-    /* subtle mouse parallax */
-    const stage = document.getElementById('stage'); stage.addEventListener('mousemove', (ev)=>{
-      const x = (ev.clientX / innerWidth - 0.5) * 18; const y = (ev.clientY / innerHeight - 0.5) * 18;
-      document.querySelector('.nebula').style.transform = `translate(${x*0.6}px, ${y*0.3}px) rotate(${x/8}deg)`;
-      document.querySelector('.grid').style.transform = `translate(${x*0.2}px, ${y*0.1}px)`;
+    // Icon interactions (no URLs yet) -> shows ephemeral window & plays sound
+    const icons = document.querySelectorAll('.icon-btn');
+    icons.forEach(btn=>{
+      btn.addEventListener('click', async (e)=>{
+        const name = btn.dataset.social;
+        btn.classList.add('anim');
+        setTimeout(()=>btn.classList.remove('anim'),500);
+        // visual pulse
+        btn.classList.add('pulse');
+        setTimeout(()=>btn.classList.remove('pulse'),900);
+        clickSound();
+        // show a mock overlayed terminal action
+        const tmp = document.createElement('div'); tmp.className='log'; tmp.style.opacity='.98'; tmp.textContent = `Opening ${name.toUpperCase()}... (simulated)`;
+        main.appendChild(tmp);
+        main.scrollTop = main.scrollHeight;
+        // simulate slight error sometimes
+        if(Math.random()<0.28){
+          await new Promise(r=>setTimeout(r,500));
+          const err = document.createElement('div'); err.className='log'; err.style.color='#9b1032'; err.textContent = `ERR: auth-token missing -> fallback to preview mode`;
+          main.appendChild(err);
+          beep(320,0.06,'sawtooth',0.04);
+        }
+      });
     });
 
-    /* accessibility: focus styles */
-    input.addEventListener('focus', ()=>{document.querySelector('.term').style.outline='2px solid rgba(122,240,255,0.06)'});
-    input.addEventListener('blur', ()=>{document.querySelector('.term').style.outline='none'});
+    // Minimal keyboard: allow typing a few commands (help, open <name>) — but we "pop" hint
+    document.addEventListener('keydown', (e)=>{
+      // show hint prompt once if any key pressed
+      const hint = document.getElementById('helpHint');
+      if(!hint){
+        const h = document.createElement('div'); h.id='helpHint'; h.className='log'; h.style.opacity='.9'; h.textContent='TIP: try typing HELP or OPEN instagram';
+        main.appendChild(h);
+        main.scrollTop = main.scrollHeight;
+      }
+    });
+
+    // Expose small helper so you (or I) can later wire actual URLs into each button easily
+    window.__SOCIAL_BUTTONS_DEFS = Array.from(icons).map(b=>({key:b.dataset.social, node:b}));
+
+    // Accessibility: announce ready once boot is done (fallback timer)
+    setTimeout(()=>{
+      const a = document.createElement('div'); a.className='log'; a.style.opacity='.85'; a.textContent='Interface ready — interactions: click icons or type basic commands.'; main.appendChild(a); main.scrollTop = main.scrollHeight;
+    },6000);
 
   </script>
 </body>
