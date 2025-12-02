@@ -1,127 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>zdarkovq — terminal</title>
-    <style>
-        body {
-            background: #0d0d0d;
-            font-family: "Courier New", monospace;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-        }
+<meta charset="UTF-8">
+<title>zdarkovq — terminal</title>
 
-        .terminal {
-            width: 600px;
-            background: #1a1a1a;
-            border: 2px solid #333;
-            border-radius: 8px;
-            box-shadow: 0px 0px 15px #ffb6c1;
-            color: #ffb6c1;
-            padding: 20px;
-        }
+<style>
+    body {
+        background: #0d0d0d;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0;
+        font-family: "Courier New", monospace;
+    }
 
-        .title-bar {
-            background: #333;
-            padding: 6px 10px;
-            color: #ffb6c1;
-            font-size: 14px;
-            border-radius: 6px 6px 0 0;
-        }
+    .terminal {
+        background: #1a1a1a;
+        width: 500px;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 0 25px #ffb6c1;
+        border: 2px solid #333;
+        color: #ffb6c1;
+    }
 
-        /* Typing effect */
-        .typing {
-            border-right: 2px solid #ffb6c1;
-            white-space: nowrap;
-            overflow: hidden;
-            width: 0;
-            animation: typing 3s steps(40, end) forwards;
-        }
+    .title {
+        background: #333;
+        padding: 8px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        text-align: left;
+        font-size: 14px;
+        color: #ffb6c1;
+    }
 
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
+    /* typing effect */
+    #command {
+        overflow: hidden;
+        border-right: 2px solid #ffb6c1;
+        white-space: nowrap;
+        width: 0;
+        animation: typing 2.5s steps(40, end) forwards;
+        font-size: 16px;
+    }
 
-        /* Loading spinner */
-        .loader {
-            margin-top: 20px;
-            border: 4px solid #333;
-            border-top: 4px solid #ffb6c1;
-            border-radius: 50%;
-            width: 32px;
-            height: 32px;
-            animation: spin 1s linear infinite;
-            margin-left: auto;
-            margin-right: auto;
-            display: none;
-        }
+    @keyframes typing {
+        from { width: 0 }
+        to { width: 100% }
+    }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg) }
-            100% { transform: rotate(360deg) }
-        }
+    .buttons {
+        display: none;
+        text-align: center;
+        margin-top: 25px;
+    }
 
-        /* Buttons */
-        .links {
-            display: none;
-            margin-top: 25px;
-            text-align: center;
-        }
+    .btn {
+        display: block;
+        width: 200px;
+        padding: 12px;
+        margin: 10px auto;
+        background: #ffb6c1;
+        color: #1a1a1a;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        box-shadow: 0 0 12px #ffb6c1;
+        transition: 0.2s;
+    }
 
-        .button {
-            display: block;
-            margin: 12px auto;
-            width: 200px;
-            padding: 12px;
-            background: #ffb6c1;
-            color: #1a1a1a;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 6px;
-            box-shadow: 0 0 10px #ffb6c1;
-            transition: 0.2s;
-        }
+    .btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 18px #ffc2cf;
+    }
 
-        .button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px #ffc8d4;
-        }
-    </style>
+</style>
 </head>
+
 <body>
 
 <div class="terminal">
-    <div class="title-bar">retro-terminal — v1.0</div>
-    <p id="type" class="typing"></p>
-    <div id="loader" class="loader"></div>
+    <div class="title">retro-terminal</div>
 
-    <div class="links" id="links">
-        <a class="button" href="https://instagram.com/zdarkovq" target="_blank">Instagram</a>
-        <a class="button" href="https://open.spotify.com/user/elpmo" target="_blank">Spotify</a>
+    <div id="command"></div>
+
+    <div class="buttons" id="social-buttons">
+        <a class="btn" href="https://instagram.com/zdarkovq" target="_blank">Instagram</a>
+        <a class="btn" href="https://open.spotify.com/user/elpmo" target="_blank">Spotify</a>
     </div>
 </div>
 
 <script>
-    // The fake command being typed
-    const text = "access --user zdarkovq --services instagram spotify";
+    const text = 'openProfile("instagram", "spotify");';
+    const commandDiv = document.getElementById("command");
 
-    const typeElement = document.getElementById("type");
-    typeElement.textContent = text;
+    // set full text BEFORE animation so it types correctly
+    commandDiv.textContent = text;
 
-    // After typing finishes → show spinner
+    // Show buttons after typing finishes (2.5s + small delay)
     setTimeout(() => {
-        document.getElementById("loader").style.display = "block";
+        document.getElementById("social-buttons").style.display = "block";
     }, 3000);
-
-    // After spinner runs 3 sec → show buttons
-    setTimeout(() => {
-        document.getElementById("loader").style.display = "none";
-        document.getElementById("links").style.display = "block";
-    }, 6000);
 </script>
 
 </body>
