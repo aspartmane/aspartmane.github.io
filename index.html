@@ -1,164 +1,253 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>blublublu</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>blublublu — terminal neon experience</title>
+  <style>
+    :root{
+      --bg:#06060a;
+      --panel:#0f0f12;
+      --accent:#ff66b2;
+      --accent-2:#7af0ff;
+      --muted:rgba(255,255,255,0.06);
+      --glass: rgba(255,255,255,0.03);
+      --mono: "Courier New", ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:var(--mono);background:var(--bg);color:#eaeef3}
 
-<style>
-    body {
-        background: #0b0b0b;
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: "Courier New", monospace;
-        overflow: hidden;
+    /* full-screen neon starfield + gradient */
+    .stage{
+      position:fixed;inset:0;overflow:hidden;display:grid;place-items:center;padding:48px;
+      background: radial-gradient(1200px 600px at 10% 20%, rgba(122,240,255,0.04), transparent 8%),
+                  radial-gradient(900px 500px at 90% 80%, rgba(255,102,178,0.04), transparent 8%),
+                  linear-gradient(180deg,#040408 0%, #0b0b0f 60%);
     }
 
-    /* soft CRT flicker */
-    @keyframes crtFlicker {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.97; }
-        70% { opacity: 0.94; }
+    /* subtle animated nebula */
+    .nebula{
+      position:absolute;inset:-20%;filter:blur(30px) saturate(1.2) contrast(1.05);opacity:0.55;mix-blend-mode:screen;
+      background: conic-gradient(from 120deg at 40% 30%, rgba(255,102,178,0.12), rgba(122,240,255,0.12), transparent 40%);
+      transform:translateZ(0);
+      animation: drift 18s infinite linear;
+      pointer-events:none;
+    }
+    @keyframes drift{ 0%{transform:translateX(-6%) translateY(-2%) rotate(0)} 50%{transform:translateX(6%) translateY(2%) rotate(2deg)} 100%{transform:translateX(-6%) translateY(-2%) rotate(0)} }
+
+    /* glowing grid */
+    .grid{
+      position:absolute;inset:0;background-image:linear-gradient(transparent 92%, rgba(255,255,255,0.02) 92%),linear-gradient(90deg, transparent 92%, rgba(255,255,255,0.02) 92%);
+      background-size: 120px 120px, 120px 120px;opacity:0.25;mix-blend-mode:overlay;pointer-events:none;transform:translateZ(0);
+      animation: gridFloat 10s linear infinite;
+    }
+    @keyframes gridFloat{from{transform:translateY(0)}to{transform:translateY(-8px)}}
+
+    /* center interface */
+    .ui{
+      width:min(960px,94vw);max-width:1100px;display:grid;grid-template-columns:480px 1fr;gap:32px;z-index:3;align-items:stretch;
     }
 
-    /* terminal container fade-in */
-    @keyframes popIn {
-        0% { transform: scale(0.85); opacity: 0; filter: blur(8px); }
-        100% { transform: scale(1); opacity: 1; filter: blur(0); }
+    /* left: holographic terminal */
+    .term{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:16px;padding:22px;border:1px solid rgba(255,255,255,0.04);backdrop-filter: blur(6px);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.7), 0 0 80px rgba(255,102,178,0.04) inset;min-height:420px;position:relative;overflow:hidden;
+    }
+    .term .topbar{display:flex;gap:8px;align-items:center}
+    .dot{width:12px;height:12px;border-radius:50%;background:var(--muted);box-shadow:0 0 8px rgba(0,0,0,0.5);}
+    .dot.r{background:linear-gradient(180deg,#ff6aa8,#ff3b8e);box-shadow:0 6px 18px rgba(255,90,150,0.12)}
+    .dot.y{background:linear-gradient(180deg,#ffd37a,#ffb54f)}
+    .dot.g{background:linear-gradient(180deg,#7affc6,#2fff9b)}
+
+    .term .title{margin-left:auto;color:rgba(255,255,255,0.6);font-size:13px}
+
+    /* terminal screen */
+    .screen{margin-top:18px;background:linear-gradient(180deg,#06060a 0%, #0c0c0f 100%);border-radius:10px;padding:18px;height:320px;overflow:auto;color:var(--accent);font-size:15px;line-height:1.4;border:1px solid rgba(122,240,255,0.03)}
+    .screen .line{white-space:pre-wrap;font-family:var(--mono)}
+    .screen .out{color:#bfefff}
+    .screen .accent{color:var(--accent)}
+    .screen .muted{color:rgba(255,255,255,0.22)}
+
+    /* fancy cursor */
+    .cursor{display:inline-block;width:10px;height:18px;background:var(--accent);margin-left:6px;vertical-align:bottom;animation: blink 1s steps(2) infinite}
+    @keyframes blink{50%{opacity:0}}
+
+    /* right: profile card */
+    .card{background:linear-gradient(135deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:22px;border:1px solid rgba(255,255,255,0.03);box-shadow: 0 12px 60px rgba(0,0,0,0.6)}
+    .profile{display:flex;gap:18px;align-items:center}
+    .avatar{width:96px;height:96px;border-radius:16px;background:linear-gradient(180deg,var(--accent),var(--accent-2));display:grid;place-items:center;font-size:28px;font-weight:700;color:#08121a;box-shadow:0 8px 30px rgba(122,240,255,0.06)}
+    .meta h1{margin:0;font-size:20px;letter-spacing:0.6px}
+    .meta p{margin:6px 0 0 0;color:rgba(255,255,255,0.6);font-size:13px}
+
+    .links{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .chip{padding:10px 14px;border-radius:999px;background:var(--glass);border:1px solid rgba(255,255,255,0.03);font-weight:700;cursor:pointer;transition:transform .12s}
+    .chip:hover{transform:translateY(-4px)}
+
+    /* footer controls */
+    .controls{display:flex;gap:10px;margin-top:18px;align-items:center}
+    .btn{padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#08121a;font-weight:800;border:none;cursor:pointer;box-shadow:0 8px 30px rgba(122,240,255,0.08)}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:rgba(255,255,255,0.8)}
+
+    /* responsive */
+    @media (max-width:880px){
+      .ui{grid-template-columns:1fr;gap:18px}
+      .screen{height:300px}
     }
 
-    /* scanlines */
-    .scanlines {
-        pointer-events: none;
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: repeating-linear-gradient(
-            to bottom,
-            rgba(255, 182, 193, 0.07) 0px,
-            rgba(255, 182, 193, 0.07) 1px,
-            transparent 2px,
-            transparent 3px
-        );
-        mix-blend-mode: overlay;
-        animation: crtFlicker 3s infinite;
-    }
+    /* small helper animations */
+    .sparkle{position:absolute;inset:0;pointer-events:none}
+    .sparkle .dot{position:absolute;border-radius:50%;opacity:0.12}
 
-    .terminal {
-        background: #1a1a1a;
-        width: 520px;
-        padding: 26px;
-        border-radius: 12px;
-        border: 2px solid #333;
-        box-shadow: 0 0 40px #ffb6c15d, inset 0 0 25px #000;
-        color: #ffb6c1;
-        position: relative;
-        animation: popIn 0.8s ease-out forwards;
-    }
+    /* tiny terminal prompt area */
+    .prompt{display:flex;gap:10px;align-items:center;margin-top:14px}
+    .prompt input{flex:1;background:transparent;border:none;border-bottom:1px dashed rgba(255,255,255,0.06);padding:8px 10px;color:inherit;font-family:var(--mono);outline:none}
+    .prompt input::placeholder{color:rgba(255,255,255,0.2)}
 
-    /* reflection on top */
-    .terminal::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%;
-        height: 30px;
-        background: linear-gradient(to bottom, #ffffff15, transparent);
-        border-radius: 12px 12px 0 0;
-        pointer-events: none;
-    }
-
-    .title {
-        background: #333;
-        padding: 8px;
-        border-radius: 6px;
-        margin-bottom: 15px;
-        font-size: 14px;
-        color: #ffb6c1;
-        box-shadow: inset 0 0 12px #000;
-    }
-
-    /* typing effect */
-    #command {
-        overflow: hidden;
-        border-right: 2px solid #ffb6c1;
-        white-space: nowrap;
-        width: 0;
-        animation: typing 2.5s steps(40, end) forwards, cursorBlink 0.7s step-end infinite;
-        font-size: 16px;
-    }
-
-    @keyframes typing {
-        from { width: 0; }
-        to { width: 100%; }
-    }
-
-    @keyframes cursorBlink {
-        50% { border-color: transparent; }
-    }
-
-    /* buttons slide in */
-    .buttons {
-        display: none;
-        text-align: center;
-        margin-top: 25px;
-        animation: fadeInUp 0.6s ease-out forwards;
-    }
-
-    @keyframes fadeInUp {
-        from { opacity: 0; transform: translateY(20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    .btn {
-        display: block;
-        width: 220px;
-        padding: 13px;
-        margin: 12px auto;
-        background: #ffb6c1;
-        color: #1a1a1a;
-        text-decoration: none;
-        border-radius: 7px;
-        font-weight: bold;
-        box-shadow: 0 0 15px #ffb6c1;
-        transition: 0.25s ease;
-    }
-
-    .btn:hover {
-        transform: scale(1.07);
-        box-shadow: 0 0 25px #ffc9d5;
-        letter-spacing: 1px;
-    }
-</style>
+  </style>
 </head>
-
 <body>
+  <div class="stage" id="stage">
+    <div class="nebula" aria-hidden></div>
+    <canvas id="stars" style="position:absolute;inset:0;z-index:0;pointer-events:none"></canvas>
+    <div class="grid" aria-hidden></div>
 
-<div class="scanlines"></div>
+    <div class="ui" role="main" aria-labelledby="site-title">
+      <div class="term" aria-label="Holographic terminal">
+        <div class="topbar" aria-hidden>
+          <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+          <div class="title" id="site-title">blublublu — systems ready</div>
+        </div>
 
-<div class="terminal">
-    <div class="title">blublublu</div>
+        <div class="screen" id="screen" tabindex="0" aria-live="polite"></div>
 
-    <div id="command"></div>
+        <div class="prompt" style="position:relative">
+          <input id="cmdInput" placeholder="type a command — try 'help'" autocomplete="off" spellcheck="false" aria-label="Command input"/>
+          <button class="btn ghost" id="runBtn">RUN</button>
+        </div>
+      </div>
 
-    <div class="buttons" id="socials">
-        <a class="btn" href="https://instagram.com/zdarkovq" target="_blank">Instagram</a>
-        <a class="btn" href="https://www.tiktok.com/@zdarkovqq" target="_blank">TikTok</a>
+      <aside class="card" aria-label="Profile card">
+        <div class="profile">
+          <div class="avatar">B</div>
+          <div class="meta">
+            <h1>blublublu</h1>
+            <p>terminal interface • neon vibes • professional chaos</p>
+            <div style="height:8px"></div>
+            <div style="width:220px;height:6px;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:6px;box-shadow:0 6px 30px rgba(122,240,255,0.06)"></div>
+          </div>
+        </div>
+
+        <div class="links" role="navigation" aria-label="social links">
+          <div class="chip" data-link="https://instagram.com/zdarkovq">Instagram</div>
+          <div class="chip" data-link="https://www.tiktok.com/@zdarkovqq">TikTok</div>
+          <div class="chip" data-link="https://github.com/">GitHub</div>
+          <div class="chip" id="copyCmd">Copy invite</div>
+        </div>
+
+        <div class="controls">
+          <button class="btn" id="showTheme">Toggle Theme</button>
+          <button class="btn ghost" id="download">Download Card</button>
+        </div>
+
+        <div style="margin-top:14px;color:rgba(255,255,255,0.45);font-size:13px">Pro tip: try commands like <span class="accent">help</span>, <span class="accent">socials</span>, <span class="accent">about</span>, <span class="accent">glow</span></div>
+      </aside>
     </div>
-</div>
 
-<script>
-    const text = 'access --user --services';
-    const cmd = document.getElementById("command");
+    <div class="sparkle" id="sparkle" aria-hidden></div>
+  </div>
 
-    cmd.textContent = text;
+  <script>
+    /* ===== stars particle background ===== */
+    const canvas = document.getElementById('stars');
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = innerWidth;
+    let h = canvas.height = innerHeight;
+    const stars = [];
+    const STAR_COUNT = Math.round((w*h)/40000);
 
-    setTimeout(() => {
-        document.getElementById("socials").style.display = "block";
-    }, 3000);
-</script>
+    function rand(min,max){return Math.random()*(max-min)+min}
+    function initStars(){stars.length=0;for(let i=0;i<STAR_COUNT;i++){stars.push({x:Math.random()*w,y:Math.random()*h,z:rand(0.2,1),r:rand(0.3,1.4)})}}
+    function drawStars(){ctx.clearRect(0,0,w,h);for(const s of stars){const g=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,s.r*8);g.addColorStop(0,'rgba(255,255,255,'+ (0.9*s.z) +')');g.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill()}}
+    function tickStars(){for(const s of stars){s.x += (s.x - w/2)*0.0006; s.y += (s.y - h/2)*0.0006; s.z += Math.sin(Date.now()/2000 + s.r) * 0.0008; if(s.x<0 || s.x>w || s.y<0 || s.y>h){s.x=Math.random()*w; s.y=Math.random()*h}}}
+    function loop(){tickStars();drawStars();requestAnimationFrame(loop)}
+    addEventListener('resize',()=>{w=canvas.width=innerWidth;h=canvas.height=innerHeight;initStars()});
+    initStars();loop();
 
+    /* ===== sparkles layer ===== */
+    const sparkle = document.getElementById('sparkle');
+    for(let i=0;i<18;i++){const d=document.createElement('div');d.className='dot';d.style.width=(5+Math.random()*40)+'px';d.style.height=d.style.width;d.style.left=Math.random()*100+'%';d.style.top=Math.random()*100+'%';d.style.background='radial-gradient(circle, rgba(255,255,255,'+(0.06+Math.random()*0.08)+') 0%, transparent 60%)';sparkle.appendChild(d)}
+
+    /* ===== terminal behavior ===== */
+    const screen = document.getElementById('screen');
+    const input = document.getElementById('cmdInput');
+    const runBtn = document.getElementById('runBtn');
+
+    function write(line, cls){const el=document.createElement('div');el.className='line '+(cls||'');el.textContent=line;screen.appendChild(el);screen.scrollTop = screen.scrollHeight}
+
+    function typeLike(text, speed=12){return new Promise(resolve=>{
+      const el=document.createElement('div');el.className='line out';screen.appendChild(el);
+      let i=0;const t=setInterval(()=>{el.textContent = text.slice(0,i)+ (i%2? '▌':'' ); i++; screen.scrollTop = screen.scrollHeight; if(i>text.length){clearInterval(t); el.textContent=text; resolve()} }, 1000/speed)
+    })}
+
+    async function bootSequence(){await typeLike('booting blublublu kernel...');await typeLike('initializing neon drivers...');await typeLike('establishing secure connections...');await typeLike('welcome. type "help" for commands')}
+    bootSequence();
+
+    const commands = {
+      help: async ()=>{
+        write('available commands:', 'muted');
+        write('  help       — show this help');
+        write('  socials    — show socials as links');
+        write('  about      — quick about blublublu');
+        write('  glow       — flash the UI glow');
+        write('  clr        — clear the terminal');
+        write('  download   — download a tiny profile card');
+      },
+      socials: ()=>{
+        write('instagram: https://instagram.com/zdarkovq', 'out');
+        write('tiktok:    https://www.tiktok.com/@zdarkovqq', 'out');
+      },
+      about: ()=>{
+        write('blublublu — maker of neon terminals and inconvenient truths', 'out');
+        write('location: cybernetic outskirts • contact: via socials', 'muted');
+      },
+      glow: ()=>{document.querySelector('.term').animate([{boxShadow:'0 8px 40px rgba(255,102,178,0.18), 0 0 140px rgba(122,240,255,0.08) inset'},{boxShadow:'0 8px 40px rgba(255,102,178,0.04), 0 0 80px rgba(122,240,255,0.02) inset'}],{duration:600,iterations:2}) ; write('glow pulse sent', 'out')},
+      clr: ()=>{screen.innerHTML=''; write('cleared. type "help" to start again','muted')},
+      download: ()=>{triggerDownload()}
+    }
+
+    function runCommand(raw){const cmd = raw.trim().toLowerCase(); if(!cmd) return; write('> '+raw,'accent'); if(commands[cmd]) commands[cmd](); else write('command not found: '+cmd,'muted') }
+
+    runBtn.addEventListener('click', ()=>{runCommand(input.value); input.value=''});
+    input.addEventListener('keydown', (e)=>{if(e.key==='Enter'){runCommand(input.value);input.value=''}})
+
+    /* chips open links */
+    document.querySelectorAll('.chip[data-link]').forEach(c=>c.addEventListener('click',()=>window.open(c.dataset.link,'_blank')));
+    document.getElementById('copyCmd').addEventListener('click',()=>{navigator.clipboard.writeText('connect blublublu');alert('Copied invite: connect blublublu')})
+
+    /* download card as simple vcard/text */
+    function triggerDownload(){const txt = `blublublu - neon terminal\nInstagram: https://instagram.com/zdarkovq\nTikTok: https://www.tiktok.com/@zdarkovqq\n`;
+      const blob = new Blob([txt],{type:'text/plain'}); const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'blublublu-card.txt'; a.click(); URL.revokeObjectURL(url); write('download started','out') }
+    document.getElementById('download').addEventListener('click', triggerDownload);
+
+    /* theme toggle */
+    let alt=false;document.getElementById('showTheme').addEventListener('click',()=>{document.documentElement.style.setProperty('--accent', alt? '#ff66b2':'#7af0ff');document.documentElement.style.setProperty('--accent-2', alt? '#7af0ff':'#ff66b2');alt=!alt});
+
+    /* keyboard focus shortcut: press ~ to focus input */
+    addEventListener('keydown',(e)=>{ if(e.key==='`' || e.key==='~'){ e.preventDefault(); input.focus(); input.select(); } });
+
+    /* subtle mouse parallax */
+    const stage = document.getElementById('stage'); stage.addEventListener('mousemove', (ev)=>{
+      const x = (ev.clientX / innerWidth - 0.5) * 18; const y = (ev.clientY / innerHeight - 0.5) * 18;
+      document.querySelector('.nebula').style.transform = `translate(${x*0.6}px, ${y*0.3}px) rotate(${x/8}deg)`;
+      document.querySelector('.grid').style.transform = `translate(${x*0.2}px, ${y*0.1}px)`;
+    });
+
+    /* accessibility: focus styles */
+    input.addEventListener('focus', ()=>{document.querySelector('.term').style.outline='2px solid rgba(122,240,255,0.06)'});
+    input.addEventListener('blur', ()=>{document.querySelector('.term').style.outline='none'});
+
+  </script>
 </body>
 </html>
