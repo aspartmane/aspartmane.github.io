@@ -1,98 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>terminal</title>
-
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loading...</title>
+  <style>
     body {
-        margin: 0;
-        height: 100vh;
-        background: #000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-family: "Courier New", monospace;
+      background-color: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
     }
 
-    .terminal {
-        width: 80%;
-        max-width: 700px;
-        background: #0a0a0a;
-        border-radius: 8px;
-        box-shadow: 0 0 25px rgba(0, 255, 0, 0.2);
-        padding: 20px;
-        color: #00ff66;
-        font-size: 18px;
-        line-height: 1.4;
-        border: 1px solid #003300;
-        position: relative;
+    .container {
+      text-align: center;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
     }
 
-    .titlebar {
-        height: 25px;
-        background: #111;
-        border-bottom: 1px solid #003300;
-        color: #00ff66;
-        font-size: 14px;
-        padding-left: 10px;
-        display: flex;
-        align-items: center;
+    .visible {
+      opacity: 1;
     }
 
-    #text {
-        white-space: pre-wrap;
-        overflow: hidden;
+    .loader {
+      border: 8px solid #333;
+      border-top: 8px solid white;
+      border-radius: 50%;
+      width: 70px;
+      height: 70px;
+      animation: spin 1.2s linear infinite;
+      margin: 0 auto 20px auto;
     }
 
-    .cursor {
-        display: inline-block;
-        width: 10px;
-        background: #00ff66;
-        margin-left: 3px;
-        animation: blink 0.7s infinite;
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
 
-    @keyframes blink {
-        0%, 50% { opacity: 1; }
-        50.1%, 100% { opacity: 0; }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
     }
-</style>
 
+    a {
+      display: block;
+      color: #4da6ff;
+      font-size: 1.6rem;
+      margin: 10px 0;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    a:hover {
+      color: white;
+      text-shadow: 0 0 10px white;
+    }
+  </style>
 </head>
 <body>
+  <div class="container" id="content">
+    <div class="loader"></div>
+    <h1>Welcome</h1>
+    <a href="https://example.com">Example Link</a>
+    <a href="https://google.com">Google</a>
+    <a href="https://github.com">GitHub</a>
+  </div>
 
-<div class="terminal">
-    <div class="titlebar">terminal</div>
-    <div id="text"></div><span class="cursor"></span>
-</div>
-
-<script>
-    const content = 
-`welcome.
-
-loading profile...
-done.
-
-socials:
- - instagram: https://instagram.com/zdarkovq
- - spotify: https://open.spotify.com/user/elpmo
-
-have a nice day.`;
-
-    let i = 0;
-    const speed = 40; // typing speed
-
-    function type() {
-        if (i < content.length) {
-            document.getElementById("text").textContent += content.charAt(i);
-            i++;
-            setTimeout(type, speed);
-        }
-    }
-
-    type();
-</script>
-
+  <script>
+    // Delay showing the content for dramatic loading effect
+    setTimeout(() => {
+      document.getElementById('content').classList.add('visible');
+    }, 2500); // 2.5 seconds
+  </script>
 </body>
 </html>
