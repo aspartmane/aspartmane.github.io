@@ -3,176 +3,194 @@
 <head>
 <meta charset="UTF-8">
 <title>Minecraft Intro — Loading</title>
-
 <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
-
 <style>
-    body {
-        margin: 0;
-        overflow: hidden;
-        font-family: 'Minecraftia', monospace;
-        image-rendering: pixelated;
-    }
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: 'Minecraftia', monospace;
+    image-rendering: pixelated;
+    background: #000;
+  }
+  .background {
+    position: fixed;
+    width: 200%;
+    height: 200%;
+    background: url("https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/1.20.1/assets/minecraft/textures/block/dirt.png");
+    background-size: 256px;
+    animation: pan 25s linear infinite;
+    filter: brightness(0.68);
+  }
+  @keyframes pan {
+    from { transform: translate(0,0); }
+    to   { transform: translate(-256px, -256px); }
+  }
 
-    /* Dirt background */
-    .background {
-        position: fixed;
-        width: 200%;
-        height: 200%;
-        background: url("https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/1.20.1/assets/minecraft/textures/block/dirt.png");
-        background-size: 256px;
-        animation: pan 25s linear infinite;
-        filter: brightness(0.68);
-    }
+  /* subtle noise overlay */
+  .grain { 
+    pointer-events: none;
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39ra2uRkZGZmZlpaWmXl5dvb29xcXGTk5NnZ2c8TV1mAAAAG3RSTlNAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEAvEOwtAAAFVklEQVR4XpWWB67c2BUFb3g557T/hRo9/WUMZHlgr4Bg8Z4qQgQJlHI4A8SzFVrapvmTF9O7dmYRFZ60YiBhJRCgh1FYhiLAmdvX0CzTOpNE77ME0Zty/nWWzchDtiqrmQDeuv3powQ5ta2eN0FY0InkqDD73lT9c9lEzwUNqgFHs9VQce3TVClFCQrSTfOiYkVJQBmpbq2L6iZavPnAPcoU0dSw0SUTqz/GtrGuXfbyyBniKykOWQWGqwwMA7QiYAxi+IlPdqo+hYHnUt5ZPfnsHJyNiDtnpJyayNBkF6cWoYGAMY92U2hXHF/C1M8uP/ZtYdiuj26UdAdQQSXQErwSOMzt/XWRWAz5GuSBIkwG1H3FabJ2OsUOUhGC6tK4EMtJO0ttC6IBD3kM0ve0tJwMdSfjZo+EEISaeTr9P3wYrGjXqyC1krcKdhMpxEnt5JetoulscpyzhXN5FRpuPHvbeQaKxFAEB6EN+cYN6xD7RYGpXpNndMmZgM5Dcs3YSNFDHUo2LGfZuukSWyUYirJAdYbF3MfqEKmjM+I2EfhA94iG3L7uKrR+GdWD73ydlIB+6hgref1QTlmgmbM3/LeX5GI1Ux1RWpgxpLuZ2+I+IjzZ8wqE4nilvQdkUdfhzI5QDWy+kw5Wgg2pGpeEVeCCA7b85BO3F9DzxB3cdqvBzWcmzbyMiqhzuYqtHRVG2y4x+KOlnyqla8AoWWpuBoYRxzXrfKuILl6SfiWCbjxoZJUaCBj1CjH7GIaDbc9kqBY3W/Rgjda1iqQcOJu2WW+76pZC9QG7M00dffe9hNnseupFL53r8F7YHSwJWUKP2q+k7RdsxyOB11n0xtOvnW4irMMFNV4H0uqwS5ExsmP9AxbDTc9JwgneAT5vTiUSm1E7BSflSt3bfa1tv8Di3R8n3Af7MNWzs49hmauE2wP+ttrq+AsWpFG2awvsuOqbipWHgtuvuaAE+A1Z/7gC9hesnr+7wqCwG8c5yAg3AL1fm8T9AZtp/bbJGwl1pNrE7RuOX7PeMRUERVaPpEs+yqeoSmuOlokqw49pgomjLeh7icHNlG19yjs6XXOMedYm5xH2YxpV2tc0Ro2jJfxC50ApuxGob7lMsxfTbeUv07TyYxpeLucEH1gNd4IKH2LAg5TdVhlCafZvpskfncCfx8pOhJzd76bJWeYFnFciwcYfubRc12Ip/ppIhA1/mSZ/RxjFDrJC5xifFjJpY2Xl5zXdguFqYyTR1zSp1Y9p+tktDYYSNflcxI0iyO4TPBdlRcpeqjK/piF5bklq77VSEaA+z8qmJTFzIWiitbnzR794USKBUaT0NTEsVjZqLaFVqJoPN9ODG70IPbfBHKK+/q/AWR0tJzYHRULOa4MP+W/HfGadZUbfw177G7j/OGbIs8TahLyynl4X4RinF793Oz+BU0saXtUHrVBFT/DnA3ctNPoGbs4hRIjTok8i+algT1lTHi4SxFvONKNrgQFAq2/gFnWMXgwffgYMJpiKYkmW3tTg3ZQ9Jq+f8XN+A5eeUKHWvJWJ2sgJ1Sop+wwhqFVijqWaJhwtD8MNlSBeWNNWTa5Z5kPZw5+LbVT99wqTdx29lMUH4OIG/D86ruKEauBjvH5xy6um/Sfj7ei6UUVk4AIl3MyD4MSSTOFgSwsH/QJWaQ5as7ZcmgBZkzjjU1UrQ74ci1gWBCSGHtuV1H2mhSnO3Wp/3fEV5a+4wz//6qy8JxjZsmxxy5+4w9CDNJY09T072iKG0EnOS0arEYgQAAAABJRU5ErkJggg==");
+    background-size: 100px 100px;
+    opacity: 0.03;
+    animation: grainAnim 3s steps(10) infinite;
+    z-index: 1;
+  }
+  @keyframes grainAnim {
+    from { transform: translate(0,0); }
+    to   { transform: translate(-50px,-50px); }
+  }
 
-    @keyframes pan {
-        from { transform: translate(0,0); }
-        to   { transform: translate(-256px, -256px); }
-    }
+  .center {
+    position: fixed;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+    color: white;
+    text-shadow: 3px 3px #000;
+    z-index: 10;
+  }
+  .logo-img {
+    width: 540px;
+    image-rendering: pixelated;
+    margin-bottom: 25px;
+  }
+  .btn {
+    display: inline-block;
+    padding: 14px 28px;
+    background: rgba(0,0,0,0.55);
+    border: 2px solid #777;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    transition: 0.12s;
+    box-shadow: 3px 3px #000;
+  }
+  .btn:hover {
+    background: rgba(0,0,0,0.75);
+    color: #ffff55;
+    transform: translateY(-2px);
+    box-shadow: 4px 4px #000;
+  }
 
-    /* Menu */
-    .center {
-        position: fixed;
-        width: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-        text-align: center;
-        color: white;
-        text-shadow: 3px 3px #000;
-    }
-
-    .logo-img {
-        width: 540px;
-        image-rendering: pixelated;
-        margin-bottom: 25px;
-    }
-
-    /* fun minecraft button */
-    .btn {
-        display: inline-block;
-        padding: 14px 28px;
-        background: rgba(0,0,0,0.55);
-        border: 2px solid #777;
-        color: #fff;
-        font-size: 22px;
-        cursor: pointer;
-        transition: 0.12s;
-        box-shadow: 3px 3px #000;
-    }
-
-    .btn:hover {
-        background: rgba(0,0,0,0.75);
-        color: #ffff55;
-        transform: translateY(-2px);
-        box-shadow: 4px 4px #000;
-    }
-
-    /* LOADING SCREEN */
-    .loading-screen {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.88);
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        pointer-events: none;
-        transition: 0.5s ease;
-        color: white;
-        text-shadow: 3px 3px #000;
-    }
-
-    .loading-box {
-        width: 420px;
-        background: rgba(0,0,0,0.6);
-        border: 2px solid #333;
-        padding: 22px;
-        box-sizing: border-box;
-        text-align: center;
-    }
-
-    .chunk-grid {
-        display: grid;
-        grid-template-columns: repeat(10, 1fr);
-        grid-gap: 3px;
-        margin-top: 14px;
-    }
-
-    .chunk {
-        width: 30px;
-        height: 18px;
-        background: #222;
-        opacity: 0.3;
-        transition: 0.15s;
-    }
-
-    .chunk.loaded {
-        background: #6aa84f;
-        opacity: 1;
-    }
-
-    .percentage {
-        margin-top: 14px;
-        font-size: 18px;
-    }
-
-    /* Back arrow */
-    .back-btn {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        padding: 8px 14px;
-        background: rgba(0,0,0,0.6);
-        border: 2px solid #555;
-        color: #fff;
-        cursor: pointer;
-        display: none;
-        text-shadow: 3px 3px #000;
-        transition: 0.1s;
-    }
-
-    .back-btn:hover {
-        color: #ffff55;
-        transform: translateX(-2px);
-    }
+  .loading-screen {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.4s ease;
+    color: white;
+    text-shadow: 3px 3px #000;
+    z-index: 9;
+  }
+  .loading-box {
+    width: 420px;
+    background: rgba(0,0,0,0.6);
+    border: 2px solid #333;
+    padding: 22px;
+    box-sizing: border-box;
+    text-align: center;
+  }
+  .loading-text {
+    font-size: 20px;
+  }
+  .chunk-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-gap: 3px;
+    margin-top: 14px;
+  }
+  .chunk {
+    width: 30px;
+    height: 18px;
+    background: #222;
+    opacity: 0.3;
+    transition: none;
+  }
+  .chunk.loaded {
+    background: #6aa84f;
+    opacity: 1;
+  }
+  .percentage {
+    margin-top: 14px;
+    font-size: 18px;
+  }
+  .flash {
+    position: fixed;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 50;
+    transition: opacity 0.1s ease-out;
+  }
+  .back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 8px 14px;
+    background: rgba(0,0,0,0.6);
+    border: 2px solid #555;
+    color: #fff;
+    cursor: pointer;
+    text-shadow: 3px 3px #000;
+    transition: 0.1s;
+    z-index: 20;
+    display: none;
+  }
+  .back-btn:hover {
+    color: #ffff55;
+    transform: translateX(-2px);
+  }
 </style>
 </head>
 
 <body>
+  <div class="background"></div>
+  <div class="grain"></div>
 
-<div class="background"></div>
-
-<!-- MENU -->
-<div class="center" id="menu">
-    <img class="logo-img" src="https://raw.githubusercontent.com/MCAssetArchive/Minecraft-JE-Logos/main/Logos/1.19/logo.png">
+  <div class="center" id="menu">
+    <img class="logo-img" src="https://raw.githubusercontent.com/MCAssetArchive/Minecraft-JE-Logos/main/Logos/1.19/logo.png" alt="Minecraft">
     <div class="btn" onclick="startLoading()">BEGIN</div>
-</div>
+  </div>
 
-<!-- BACK BUTTON -->
-<div class="back-btn" id="backBtn" onclick="goBack()">← Back</div>
+  <div class="back-btn" id="backBtn" onclick="goBack()">← Back</div>
 
-<!-- LOADING SCREEN -->
-<div class="loading-screen" id="loadScreen">
+  <div class="loading-screen" id="loadScreen">
     <div class="loading-box">
-        <div>Minecraft: Loading world…</div>
-
-        <div class="chunk-grid" id="grid"></div>
-
-        <div class="percentage" id="percent">0%</div>
+      <div class="loading-text" id="loadingText">Minecraft: Loading world</div>
+      <div class="chunk-grid" id="grid"></div>
+      <div class="percentage" id="percent">0%</div>
     </div>
-</div>
+  </div>
+
+  <div class="flash" id="flash"></div>
 
 <script>
-// create 100 chunks (10×10)
-const grid = document.getElementById("grid");
-for (let i = 0; i < 100; i++) {
-    let div = document.createElement("div");
-    div.className = "chunk";
-    grid.appendChild(div);
-}
+  // prepare grid
+  const grid = document.getElementById("grid");
+  for (let i = 0; i < 100; i++) {
+    let d = document.createElement("div");
+    d.className = "chunk";
+    grid.appendChild(d);
+  }
 
-function startLoading() {
+  let ellipsis = "";
+  let dotCount = 0;
+  function animateDots() {
+    dotCount = (dotCount + 1) % 4; // 0 to 3
+    ellipsis = ".".repeat(dotCount);
+    document.getElementById("loadingText").innerText = "Minecraft: Loading world" + ellipsis;
+  }
+
+  function startLoading() {
     const menu = document.getElementById("menu");
     const screen = document.getElementById("loadScreen");
     const back = document.getElementById("backBtn");
@@ -183,45 +201,59 @@ function startLoading() {
     menu.style.pointerEvents = "none";
 
     setTimeout(() => {
-        screen.style.opacity = "1";
-        screen.style.pointerEvents = "auto";
-        back.style.display = "block";
+      screen.style.opacity = "1";
+      screen.style.pointerEvents = "auto";
+      back.style.display = "block";
 
-        let p = 0;
-        let i = 0;
+      // dot animation
+      const dotsInterval = setInterval(animateDots, 500);
 
-        let interval = setInterval(() => {
-            if (i < chunks.length) {
-                chunks[i].classList.add("loaded");
-                i++;
-                p = Math.floor((i / chunks.length) * 100);
-                percent.innerText = p + "%";
-            } else {
-                clearInterval(interval);
-            }
-        }, 50); // 5 seconds total
+      let i = 0;
+      let interval = setInterval(() => {
+        if (i < chunks.length) {
+          chunks[i].classList.add("loaded");
+          i++;
+          let p = Math.floor((i / chunks.length) * 100);
+          percent.innerText = p + "%";
+        } else {
+          clearInterval(interval);
+          clearInterval(dotsInterval);
+
+          // snap to 100% (in case it’s off by one)
+          percent.innerText = "100%";
+
+          // flash
+          const flash = document.getElementById("flash");
+          flash.style.opacity = "1";
+          setTimeout(() => {
+            flash.style.opacity = "0";
+            // here you can call next step, e.g. show avatar or redirect
+          }, 100);
+
+        }
+      }, 50);
     }, 300);
-}
+  }
 
-function goBack() {
+  function goBack() {
     const screen = document.getElementById("loadScreen");
     const menu = document.getElementById("menu");
     const back = document.getElementById("backBtn");
 
-    // Reset chunks
+    // reset chunks
     document.querySelectorAll(".chunk").forEach(c => c.classList.remove("loaded"));
-    document.getElementById("percent").innerText = "0%";
+    document.getElementById("percent").innerText = "0";
+    document.getElementById("loadingText").innerText = "Minecraft: Loading world";
 
     screen.style.opacity = "0";
     screen.style.pointerEvents = "none";
     back.style.display = "none";
 
     setTimeout(() => {
-        menu.style.opacity = "1";
-        menu.style.pointerEvents = "auto";
+      menu.style.opacity = "1";
+      menu.style.pointerEvents = "auto";
     }, 300);
-}
+  }
 </script>
-
 </body>
 </html>
