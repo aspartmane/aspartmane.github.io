@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Intro — Base</title>
+<title>Minecraft Intro — Loading</title>
 
 <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
 
@@ -14,7 +14,7 @@
         image-rendering: pixelated;
     }
 
-    /* Background texture (Minecraft dirt) */
+    /* Dirt background */
     .background {
         position: fixed;
         width: 200%;
@@ -22,7 +22,7 @@
         background: url("https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/1.20.1/assets/minecraft/textures/block/dirt.png");
         background-size: 256px;
         animation: pan 25s linear infinite;
-        filter: brightness(0.7);
+        filter: brightness(0.68);
     }
 
     @keyframes pan {
@@ -30,6 +30,7 @@
         to   { transform: translate(-256px, -256px); }
     }
 
+    /* Main menu */
     .center {
         position: fixed;
         width: 100%;
@@ -40,9 +41,10 @@
         text-shadow: 3px 3px #000;
     }
 
-    .logo {
-        font-size: 40px;
-        margin-bottom: 30px;
+    .logo-img {
+        width: 520px;
+        image-rendering: pixelated;
+        margin-bottom: 25px;
     }
 
     .btn {
@@ -53,7 +55,6 @@
         color: #fff;
         font-size: 20px;
         cursor: pointer;
-        margin-top: 10px;
         transition: 0.1s;
     }
 
@@ -62,10 +63,11 @@
         transform: translateX(2px);
     }
 
-    .avatar-screen {
+    /* Loading screen */
+    .loading-screen {
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.7);
+        background: rgba(0,0,0,0.85);
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -73,22 +75,38 @@
         opacity: 0;
         pointer-events: none;
         transition: 0.6s ease;
+        color: white;
+        text-shadow: 3px 3px #000;
     }
 
-    /* Avatar placeholder (Minecraft Steve head) */
-    .avatar {
-        width: 180px;
-        height: 180px;
-        background: url("https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/refs/heads/master/data/steve.png");
-        background-size: cover;
-        image-rendering: pixelated;
-        border: 4px solid #444;
+    .loading-box {
+        width: 420px;
+        height: 160px;
+        background: rgba(0,0,0,0.6);
+        border: 2px solid #333;
+        padding: 22px;
+        box-sizing: border-box;
+        text-align: center;
     }
 
-    .name {
-        margin-top: 18px;
-        font-size: 24px;
-        color: #fff;
+    .bar-bg {
+        width: 100%;
+        height: 22px;
+        background: #000;
+        border: 2px solid #555;
+        margin-top: 14px;
+    }
+
+    .bar-fill {
+        height: 100%;
+        width: 0%;
+        background: #6aa84f;
+        transition: width 0.1s linear;
+    }
+
+    .percentage {
+        margin-top: 10px;
+        font-size: 18px;
     }
 </style>
 </head>
@@ -97,25 +115,50 @@
 
 <div class="background"></div>
 
+<!-- MENU -->
 <div class="center" id="menu">
-    <div class="logo">MINECRAFT™</div>
-    <div class="btn" onclick="begin()">BEGIN</div>
+    <img class="logo-img" src="https://raw.githubusercontent.com/KolbyTheSnek/mc-assets/main/title/minecraft.png">
+    <div class="btn" onclick="startLoading()">BEGIN</div>
 </div>
 
-<div class="avatar-screen" id="avatarScreen">
-    <div class="avatar"></div>
-    <div class="name">yourname</div>
+<!-- LOADING SCREEN -->
+<div class="loading-screen" id="loadScreen">
+    <div class="loading-box">
+        <div>Minecraft: Loading world…</div>
+        <div class="bar-bg">
+            <div class="bar-fill" id="bar"></div>
+        </div>
+        <div class="percentage" id="percent">0%</div>
+    </div>
 </div>
 
 <script>
-function begin() {
-    document.getElementById("menu").style.opacity = "0";
-    document.getElementById("menu").style.pointerEvents = "none";
+function startLoading() {
+    const menu = document.getElementById("menu");
+    const screen = document.getElementById("loadScreen");
+    const bar = document.getElementById("bar");
+    const percent = document.getElementById("percent");
 
+    // Hide menu
+    menu.style.opacity = "0";
+    menu.style.pointerEvents = "none";
+
+    // Show loading screen after fade
     setTimeout(() => {
-        const screen = document.getElementById("avatarScreen");
         screen.style.opacity = "1";
         screen.style.pointerEvents = "auto";
+
+        let p = 0;
+        let interval = setInterval(() => {
+            p += 2; // speed
+            bar.style.width = p + "%";
+            percent.innerText = p + "%";
+
+            if (p >= 100) {
+                clearInterval(interval);
+                // At 100% we can later move to the avatar screen or next page
+            }
+        }, 100); // 5 seconds total
     }, 500);
 }
 </script>
