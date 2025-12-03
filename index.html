@@ -1,218 +1,138 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Minecraft-style Intro</title>
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Minecraft — Cherry Intro</title>
 <link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
 <style>
-  body {
-    margin:0; overflow:hidden;
-    font-family:'Minecraftia',monospace;
-    background:#000;
-    image-rendering: pixelated;
-  }
-  .background {
-    position:fixed; width:200%; height:200%;
-    background: url("https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/refs/heads/1.20.1/assets/minecraft/textures/block/dirt.png");
-    background-size:256px;
-    animation: pan 25s linear infinite;
-    filter: brightness(0.7);
-  }
-  @keyframes pan {
-    from {transform:translate(0,0);}
-    to {transform:translate(-256px,-256px);}
-  }
-
-  .center {
-    position:fixed; width:100%;
-    top:50%; transform:translateY(-50%);
-    text-align:center;
-    color:#fff; text-shadow:3px 3px #000;
-    z-index:10;
-  }
-  .logo-img {
-    width: 700px; /* bigger logo */
-    image-rendering: pixelated;
-    margin-bottom: 20px;
-  }
-  .btn {
-    display:inline-block;
-    padding: 16px 32px;
-    background: rgba(0,0,0,0.6);
-    border: 2px solid #777;
-    color: #fff;
-    font-size: 26px;
-    cursor:pointer;
-    transition: 0.15s;
-    box-shadow: 4px 4px #000;
-  }
-  .btn:hover {
-    background: rgba(0,0,0,0.8);
-    color: #ffff66;
-    transform: translateY(-3px);
-    box-shadow: 5px 5px #000;
-  }
-
-  .loading-screen {
-    position:fixed; inset:0;
-    background: rgba(0,0,0,0.9);
-    display:flex; flex-direction:column;
-    justify-content:center; align-items:center;
-    opacity:0; pointer-events:none;
-    transition: 0.4s ease;
-    color:#fff; text-shadow:3px 3px #000;
-    z-index:9;
-  }
-  .loading-box {
-    width: 460px;
-    background: rgba(0,0,0,0.6);
-    border: 2px solid #333;
-    padding: 24px;
-    box-sizing: border-box;
-    text-align: center;
-  }
-  .loading-text {
-    font-size: 22px;
-    margin-bottom: 14px;
-  }
-  .chunk-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    grid-gap: 3px;
-    margin: 0 auto;
-    max-width: 100%;
-  }
-  .chunk {
-    width: 28px;
-    height: 18px;
-    background: #222;
-    opacity: 0.25;
-  }
-  .chunk.loaded {
-    background: #5cb85c;
-    opacity: 1;
-  }
-  .percentage {
-    margin-top: 16px;
-    font-size: 20px;
-  }
-  .flash {
-    position: fixed; inset:0;
-    background: white;
-    opacity:0;
-    pointer-events:none;
-    z-index:50;
-    transition: opacity 0.12s ease-out;
-  }
-
-  .back-btn {
-    position: fixed;
-    top: 20px; left: 20px;
-    padding: 8px 14px;
-    background: rgba(0,0,0,0.6);
-    border: 2px solid #555;
-    color: #fff;
-    cursor: pointer;
-    text-shadow:3px 3px #000;
-    transition: 0.1s;
-    z-index:20;
-    display: none;
-  }
-  .back-btn:hover {
-    color: #ffff66;
-    transform: translateX(-2px);
-  }
+  :root{ --ui-shadow: 4px 4px #000; --accent:#ffff66; }
+  html,body{height:100%;margin:0;background:#000;font-family:"Minecraftia","Fira Code",monospace;color:#fff;overflow:hidden;image-rendering:pixelated}
+  .panorama-wrap{position:fixed;inset:0;overflow:hidden;z-index:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.35));}
+  .panorama{position:absolute;left:50%;top:50%;width:180%;height:120%;transform:translate(-50%,-50%);background-position:center;background-size:cover;filter: blur(6px) saturate(1.05) contrast(1.03);opacity:0.96;will-change:transform;animation:panoramaMove 40s linear infinite;}
+  @keyframes panoramaMove{from{transform:translate(-50%,-50%) translateX(0) scale(1.03)}to{transform:translate(-50%,-50%) translateX(-6%) scale(1.03)}}
+  .vignette{position:fixed;inset:0;pointer-events:none;background: radial-gradient(1200px 600px at 50% 40%, rgba(255,255,255,0.02), rgba(0,0,0,0.62));z-index:2}
+  .grain{pointer-events:none;position:fixed;inset:0;z-index:3;background-image:url("data:image/png;base64,iVBOR...");background-size:120px 120px;opacity:0.03;mix-blend-mode:overlay;animation:grainMove 3s linear infinite}
+  @keyframes grainMove{from{transform:translate(0,0)}to{transform:translate(-30px,-30px)}}
+  /* UI (logo + button) */
+  .ui{position:relative;z-index:10;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;top:48%;transform:translateY(-48%);position:fixed;left:0;text-align:center}
+  .logo{width:920px;max-width:95vw;image-rendering:pixelated;filter: drop-shadow(8px 8px 0 #000);transition:transform .12s}
+  .logo:hover{transform:translateY(-4px)}
+  .begin-btn{font-size:34px;padding:18px 44px;border:4px solid rgba(255,255,255,0.12);background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.45));color:#fff;cursor:pointer;box-shadow:var(--ui-shadow);transition:transform .12s,color .12s,box-shadow .12s;border-radius:6px}
+  .begin-btn:hover{transform:translateY(-5px);color:var(--accent);box-shadow:6px 6px 0 #000}
+  /* back */
+  .back{position:fixed;left:18px;top:18px;z-index:11;padding:8px 12px;border:2px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.55);cursor:pointer;display:none;box-shadow:var(--ui-shadow)}
+  .back:hover{color:var(--accent);transform:translateX(-2px)}
+  /* loading overlay */
+  .loading-screen{position:fixed;inset:0;z-index:12;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .36s}
+  .loading-box{min-width:520px;max-width:92vw;padding:20px 26px;background:rgba(0,0,0,0.6);border:2px solid #222;box-shadow:var(--ui-shadow);text-align:center;color:#fff}
+  .loading-text{font-size:22px;margin-bottom:12px;white-space:nowrap}
+  .grid{margin:0 auto;display:grid;gap:4px}
+  .cell{background:#111;width:26px;height:18px;opacity:0.25}
+  .cell.on{background:#5db85b;opacity:1}
+  .percent{margin-top:12px;font-size:18px}
+  .flash{position:fixed;inset:0;background:#fff;opacity:0;z-index:30;pointer-events:none;transition:opacity .08s ease-out}
+  @media (max-width:720px){ .logo{width:86vw} .begin-btn{font-size:20px;padding:12px 22px} .cell{width:18px;height:14px} }
 </style>
 </head>
 <body>
 
-  <div class="background"></div>
-
-  <div class="center" id="menu">
-    <img class="logo-img" src="https://raw.githubusercontent.com/MCAssetArchive/Minecraft-JE-Logos/main/Logos/1.19/logo.png" alt="Minecraft Logo">
-    <div class="btn" onclick="startLoading()">BEGIN</div>
+  <!-- panorama area (drop your image to assets/panorama_cherry.jpg) -->
+  <div class="panorama-wrap">
+    <div id="panorama" class="panorama" style="background-image: url('assets/panorama_cherry.jpg'), linear-gradient(180deg,#f6d7e6,#b8dae0);"></div>
   </div>
 
-  <div class="back-btn" id="backBtn" onclick="goBack()">← Back</div>
+  <div class="vignette"></div>
+  <div class="grain" aria-hidden="true"></div>
 
-  <div class="loading-screen" id="loadScreen">
+  <!-- UI -->
+  <div class="ui" id="menuUI">
+    <!-- replace this src with assets/logo.png if you upload your own logo file -->
+    <img id="logoImg" class="logo" src="https://raw.githubusercontent.com/MCAssetArchive/Minecraft-JE-Logos/main/Logos/1.19/logo.png" alt="Minecraft Logo">
+    <button id="beginBtn" class="begin-btn">BEGIN</button>
+  </div>
+
+  <button id="backBtn" class="back" onclick="goBack()">← Back</button>
+
+  <!-- Loading overlay -->
+  <div id="loadingScreen" class="loading-screen" aria-hidden="true">
     <div class="loading-box">
-      <div class="loading-text" id="loadingText">Loading world</div>
-      <div class="chunk-grid" id="grid"></div>
-      <div class="percentage" id="percent">0%</div>
+      <div id="loadingText" class="loading-text">Loading world</div>
+      <div id="gridWrap" style="display:flex;justify-content:center"><div id="grid" class="grid"></div></div>
+      <div id="percent" class="percent">0%</div>
     </div>
   </div>
 
-  <div class="flash" id="flash"></div>
+  <div id="flash" class="flash"></div>
 
 <script>
-  const grid = document.getElementById("grid");
-  const CHUNKS = 144; // 12×12 grid
-  for (let i = 0; i < CHUNKS; i++) {
-    let d = document.createElement("div");
-    d.className = "chunk";
-    grid.appendChild(d);
+/* CONFIG */
+const COLS = 12, ROWS = 12, TOTAL = COLS*ROWS;
+const LOAD_MS = 5000;
+const TICK_MS = Math.max(30, Math.round(LOAD_MS / TOTAL));
+
+/* Build grid in center-out order */
+const grid = document.getElementById('grid');
+grid.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
+(function buildGrid(){
+  const cells = [];
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const el = document.createElement('div');
+      el.className = 'cell';
+      el.dataset.r = r; el.dataset.c = c;
+      grid.appendChild(el);
+      cells.push({el,r,c});
+    }
   }
+  const centerR = (ROWS-1)/2, centerC = (COLS-1)/2;
+  cells.sort((a,b)=>{
+    const da = Math.hypot(a.r-centerR,a.c-centerC), db = Math.hypot(b.r-centerR,b.c-centerC);
+    if(da===db) return (Math.abs(a.c-centerC)-Math.abs(b.c-centerC)) || a.r-b.r;
+    return da-db;
+  });
+  window._cellsOrder = cells.map(x=>x.el);
+})();
 
-  function startLoading(){
-    const menu = document.getElementById("menu");
-    const screen = document.getElementById("loadScreen");
-    const back = document.getElementById("backBtn");
-    const percent = document.getElementById("percent");
-    const chunks = document.querySelectorAll(".chunk");
+/* ellipsis */
+let dot=0, ellipsisInterval=null;
+function startEllipsis(){ const t=document.getElementById('loadingText'); ellipsisInterval=setInterval(()=>{ dot=(dot+1)%4; t.textContent='Loading world'+'.'.repeat(dot); },500); }
+function stopEllipsis(){ clearInterval(ellipsisInterval); ellipsisInterval=null; document.getElementById('loadingText').textContent='Loading world'; }
 
-    menu.style.opacity = "0";
-    menu.style.pointerEvents = "none";
+/* start/stop */
+function startLoading(){
+  document.getElementById('menuUI').style.opacity='0'; document.getElementById('menuUI').style.pointerEvents='none';
+  const ls=document.getElementById('loadingScreen'); ls.style.opacity='1'; ls.style.pointerEvents='auto';
+  document.getElementById('backBtn').style.display='block';
+  startEllipsis();
 
-    setTimeout(()=>{
-      screen.style.opacity = "1";
-      screen.style.pointerEvents = "auto";
-      back.style.display = "block";
-
-      let i = 0;
-      const interval = setInterval(()=>{
-        if (i < chunks.length){
-          chunks[i].classList.add("loaded");
-          i++;
-          let p = Math.floor((i / chunks.length)*100);
-          percent.innerText = p + "%";
-        } else {
-          clearInterval(interval);
-          percent.innerText = "100%";
-
-          // flash moment
-          const flash = document.getElementById("flash");
-          flash.style.opacity = "1";
-          setTimeout(()=>{
-            flash.style.opacity = "0";
-            // after flash: you can redirect or show avatar
-          }, 120);
-        }
-      }, 45);
-    }, 300);
-  }
-
-  function goBack(){
-    const screen = document.getElementById("loadScreen");
-    const menu = document.getElementById("menu");
-    const back = document.getElementById("backBtn");
-    const percent = document.getElementById("percent");
-    const chunks = document.querySelectorAll(".chunk");
-
-    screen.style.opacity = "0";
-    screen.style.pointerEvents = "none";
-    back.style.display = "none";
-
-    setTimeout(()=>{
-      menu.style.opacity = "1";
-      menu.style.pointerEvents = "auto";
-    }, 300);
-
-    chunks.forEach(c => c.classList.remove("loaded"));
-    percent.innerText = "0%";
-  }
+  const order = window._cellsOrder;
+  const percentEl = document.getElementById('percent');
+  let i=0;
+  const interval = setInterval(()=>{
+    const step = (Math.random()<0.08)?3:((Math.random()<0.18)?2:1);
+    for(let s=0;s<step && i<order.length; s++, i++){ order[i].classList.add('on'); }
+    const pct = Math.floor((i/order.length)*100); percentEl.textContent = pct + '%';
+    if(i>=order.length){
+      clearInterval(interval); percentEl.textContent='100%'; stopEllipsis();
+      setTimeout(()=>{ const flash=document.getElementById('flash'); flash.style.opacity='1'; setTimeout(()=>{ flash.style.opacity='0'; finalizeLoad(); },90); }, 180);
+    }
+  }, TICK_MS);
+}
+function finalizeLoad(){
+  // after the white flash — placeholder: hide loading screen and keep back visible
+  const ls=document.getElementById('loadingScreen'); ls.style.opacity='0'; ls.style.pointerEvents='none';
+  // TODO: show avatar or next screen here
+}
+function goBack(){
+  document.querySelectorAll('.cell').forEach(c=>c.classList.remove('on'));
+  document.getElementById('percent').textContent='0%'; stopEllipsis();
+  const ls=document.getElementById('loadingScreen'); ls.style.opacity='0'; ls.style.pointerEvents='none';
+  document.getElementById('menuUI').style.opacity='1'; document.getElementById('menuUI').style.pointerEvents='auto';
+  document.getElementById('backBtn').style.display='none';
+}
+document.getElementById('beginBtn').addEventListener('click', startLoading);
+document.getElementById('backBtn').addEventListener('click', goBack);
 </script>
-
 </body>
 </html>
