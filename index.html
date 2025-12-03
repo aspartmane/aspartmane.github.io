@@ -30,7 +30,7 @@
         to   { transform: translate(-256px, -256px); }
     }
 
-    /* Main menu */
+    /* Menu */
     .center {
         position: fixed;
         width: 100%;
@@ -42,46 +42,49 @@
     }
 
     .logo-img {
-        width: 520px;
+        width: 540px;
         image-rendering: pixelated;
         margin-bottom: 25px;
     }
 
+    /* fun minecraft button */
     .btn {
         display: inline-block;
-        padding: 14px 24px;
-        background: rgba(0,0,0,0.5);
-        border: 2px solid #555;
+        padding: 14px 28px;
+        background: rgba(0,0,0,0.55);
+        border: 2px solid #777;
         color: #fff;
-        font-size: 20px;
+        font-size: 22px;
         cursor: pointer;
-        transition: 0.1s;
+        transition: 0.12s;
+        box-shadow: 3px 3px #000;
     }
 
     .btn:hover {
+        background: rgba(0,0,0,0.75);
         color: #ffff55;
-        transform: translateX(2px);
+        transform: translateY(-2px);
+        box-shadow: 4px 4px #000;
     }
 
-    /* Loading screen */
+    /* LOADING SCREEN */
     .loading-screen {
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.85);
+        background: rgba(0,0,0,0.88);
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         opacity: 0;
         pointer-events: none;
-        transition: 0.6s ease;
+        transition: 0.5s ease;
         color: white;
         text-shadow: 3px 3px #000;
     }
 
     .loading-box {
         width: 420px;
-        height: 160px;
         background: rgba(0,0,0,0.6);
         border: 2px solid #333;
         padding: 22px;
@@ -89,24 +92,49 @@
         text-align: center;
     }
 
-    .bar-bg {
-        width: 100%;
-        height: 22px;
-        background: #000;
-        border: 2px solid #555;
+    .chunk-grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        grid-gap: 3px;
         margin-top: 14px;
     }
 
-    .bar-fill {
-        height: 100%;
-        width: 0%;
+    .chunk {
+        width: 30px;
+        height: 18px;
+        background: #222;
+        opacity: 0.3;
+        transition: 0.15s;
+    }
+
+    .chunk.loaded {
         background: #6aa84f;
-        transition: width 0.1s linear;
+        opacity: 1;
     }
 
     .percentage {
-        margin-top: 10px;
+        margin-top: 14px;
         font-size: 18px;
+    }
+
+    /* Back arrow */
+    .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        padding: 8px 14px;
+        background: rgba(0,0,0,0.6);
+        border: 2px solid #555;
+        color: #fff;
+        cursor: pointer;
+        display: none;
+        text-shadow: 3px 3px #000;
+        transition: 0.1s;
+    }
+
+    .back-btn:hover {
+        color: #ffff55;
+        transform: translateX(-2px);
     }
 </style>
 </head>
@@ -117,49 +145,81 @@
 
 <!-- MENU -->
 <div class="center" id="menu">
-    <img class="logo-img" src="https://raw.githubusercontent.com/KolbyTheSnek/mc-assets/main/title/minecraft.png">
+    <img class="logo-img" src="https://raw.githubusercontent.com/MCAssetArchive/Minecraft-JE-Logos/main/Logos/1.19/logo.png">
     <div class="btn" onclick="startLoading()">BEGIN</div>
 </div>
+
+<!-- BACK BUTTON -->
+<div class="back-btn" id="backBtn" onclick="goBack()">← Back</div>
 
 <!-- LOADING SCREEN -->
 <div class="loading-screen" id="loadScreen">
     <div class="loading-box">
         <div>Minecraft: Loading world…</div>
-        <div class="bar-bg">
-            <div class="bar-fill" id="bar"></div>
-        </div>
+
+        <div class="chunk-grid" id="grid"></div>
+
         <div class="percentage" id="percent">0%</div>
     </div>
 </div>
 
 <script>
+// create 100 chunks (10×10)
+const grid = document.getElementById("grid");
+for (let i = 0; i < 100; i++) {
+    let div = document.createElement("div");
+    div.className = "chunk";
+    grid.appendChild(div);
+}
+
 function startLoading() {
     const menu = document.getElementById("menu");
     const screen = document.getElementById("loadScreen");
-    const bar = document.getElementById("bar");
+    const back = document.getElementById("backBtn");
     const percent = document.getElementById("percent");
+    const chunks = document.querySelectorAll(".chunk");
 
-    // Hide menu
     menu.style.opacity = "0";
     menu.style.pointerEvents = "none";
 
-    // Show loading screen after fade
     setTimeout(() => {
         screen.style.opacity = "1";
         screen.style.pointerEvents = "auto";
+        back.style.display = "block";
 
         let p = 0;
-        let interval = setInterval(() => {
-            p += 2; // speed
-            bar.style.width = p + "%";
-            percent.innerText = p + "%";
+        let i = 0;
 
-            if (p >= 100) {
+        let interval = setInterval(() => {
+            if (i < chunks.length) {
+                chunks[i].classList.add("loaded");
+                i++;
+                p = Math.floor((i / chunks.length) * 100);
+                percent.innerText = p + "%";
+            } else {
                 clearInterval(interval);
-                // At 100% we can later move to the avatar screen or next page
             }
-        }, 100); // 5 seconds total
-    }, 500);
+        }, 50); // 5 seconds total
+    }, 300);
+}
+
+function goBack() {
+    const screen = document.getElementById("loadScreen");
+    const menu = document.getElementById("menu");
+    const back = document.getElementById("backBtn");
+
+    // Reset chunks
+    document.querySelectorAll(".chunk").forEach(c => c.classList.remove("loaded"));
+    document.getElementById("percent").innerText = "0%";
+
+    screen.style.opacity = "0";
+    screen.style.pointerEvents = "none";
+    back.style.display = "none";
+
+    setTimeout(() => {
+        menu.style.opacity = "1";
+        menu.style.pointerEvents = "auto";
+    }, 300);
 }
 </script>
 
