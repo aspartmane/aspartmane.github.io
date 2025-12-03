@@ -1,138 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>el — introduction</title>
+<meta charset="UTF-8">
+<title>Minecraft Intro — Base</title>
 
-<!-- Minecraft Font -->
-<link href="https://fonts.cdnfonts.com/css/minecrafter" rel="stylesheet">
+<link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
 
 <style>
     body {
         margin: 0;
-        background: #0d0d0f;
-        font-family: "Minecrafter", monospace;
+        overflow: hidden;
+        font-family: 'Minecraftia', monospace;
+        image-rendering: pixelated;
+    }
+
+    /* Animated Minecraft-style dirt background */
+    .background {
+        position: fixed;
+        width: 200%;
+        height: 200%;
+        background: url("https://i.imgur.com/PHU0RLD.png");
+        background-size: 256px;
+        animation: pan 25s linear infinite;
+        filter: brightness(0.7);
+    }
+
+    @keyframes pan {
+        from { transform: translate(0,0); }
+        to   { transform: translate(-256px, -256px); }
+    }
+
+    /* Center container */
+    .center {
+        position: fixed;
+        width: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        text-align: center;
+        color: white;
+        text-shadow: 3px 3px #000;
+    }
+
+    .logo {
+        font-size: 40px;
+        margin-bottom: 30px;
+    }
+
+    /* Button styled like Minecraft */
+    .btn {
+        display: inline-block;
+        padding: 14px 24px;
+        background: rgba(0,0,0,0.5);
+        border: 2px solid #555;
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: 0.1s;
+    }
+
+    /* Minecraft button hover jiggle */
+    .btn:hover {
+        color: #ffff55;
+        transform: translateX(2px);
+    }
+
+    /* Avatar screen */
+    .avatar-screen {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        overflow: hidden;
-        color: #e8e8e8;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.6s ease;
     }
 
-    .wrapper {
-        width: 90%;
-        max-width: 700px;
-        padding: 40px;
-        background: rgba(255, 255, 255, 0.04);
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        backdrop-filter: blur(8px);
-        box-shadow: 0 0 25px #000;
-        animation: fadeIn 1s ease forwards;
+    .avatar {
+        width: 180px;
+        height: 180px;
+        background: url("https://i.imgur.com/CEUQZ4D.png");
+        background-size: cover;
+        image-rendering: pixelated;
+        border: 4px solid #444;
     }
 
-    .title {
-        font-size: 2.4rem;
-        margin-bottom: 20px;
-        color: #8ef1ff;
-        letter-spacing: 2px;
-        text-shadow: 0 0 12px #8ef1ff;
-    }
-
-    .terminal {
-        font-family: "Fira Code", monospace;
-        font-size: 1rem;
-        white-space: pre-wrap;
-        line-height: 1.55rem;
-        color: #eaeaea;
-    }
-
-    @keyframes blink {
-        0% { opacity: 1; }
-        50% { opacity: 0; }
-        100% { opacity: 1; }
-    }
-
-    .cursor {
-        display: inline-block;
-        width: 10px;
-        background: #8ef1ff;
-        margin-left: 3px;
-        animation: blink 0.7s infinite;
-    }
-
-    a {
-        color: #8ef1ff;
-        text-decoration: none;
-        transition: 0.2s ease;
-    }
-
-    a:hover {
-        color: #ff9df0;
-        text-shadow: 0 0 8px #ff9df0;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    .name {
+        margin-top: 18px;
+        font-size: 24px;
+        color: #fff;
     }
 </style>
 </head>
 
 <body>
-<div class="wrapper">
-    <div class="title">EL</div>
-    <div id="terminal" class="terminal"></div>
+
+<div class="background"></div>
+
+<div class="center" id="menu">
+    <div class="logo">MINECRAFT™</div>
+    <div class="btn" onclick="begin()">BEGIN</div>
+</div>
+
+<div class="avatar-screen" id="avatarScreen">
+    <div class="avatar"></div>
+    <div class="name">yourname</div>
 </div>
 
 <script>
-// LINES WRITTEN WITH A PROFESSIONAL TONE BUT STILL COOL
-const lines = [
-  "initializing user profile...",
-  "loading environment variables...",
-  "optimizing visual modules...",
-  "",
-  "haiii! — i'm e",
-  "i mostly exist online, on the dark web",
-  "",
-  "social links:",
-  " • instagram → https://instagram.com/zdarkovq",
-  " • github   → https://github.com/aspartmane",
-  " • tiktok   → https://tiktok.com/@zdarkovqq",
-  "",
-  "system ready."
-];
+function begin() {
+    document.getElementById("menu").style.opacity = "0";
+    document.getElementById("menu").style.pointerEvents = "none";
 
-let idx = 0;
-let char = 0;
-const speed = 28;
-
-function type() {
-    const terminal = document.getElementById("terminal");
-
-    if (idx < lines.length) {
-        if (char <= lines[idx].length) {
-            terminal.innerHTML =
-                lines.slice(0, idx).join("\n") +
-                "\n" +
-                lines[idx].slice(0, char) +
-                '<span class="cursor"></span>';
-
-            char++;
-            setTimeout(type, speed);
-        } else {
-            idx++;
-            char = 0;
-            setTimeout(type, 180);
-        }
-    } else {
-        document.querySelector(".cursor").style.display = "none";
-    }
+    setTimeout(() => {
+        const screen = document.getElementById("avatarScreen");
+        screen.style.opacity = "1";
+        screen.style.pointerEvents = "auto";
+    }, 500);
 }
-
-type();
 </script>
 
 </body>
