@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Menu Background</title>
+<title>Minecraft Dirt Background</title>
 
 <style>
     html, body {
@@ -12,25 +12,53 @@
         background: #000;
     }
 
-    /* MINECRAFT PIXEL TEXTURE (procedural) */
+    /* Minecraft-style dirt pattern */
     .mc-bg {
         position: fixed;
+        inset: 0;
         width: 300%;
         height: 300%;
 
-        /* 4x4 pixel “blocks” using box-shadow pattern */
-        background-image:
-            linear-gradient(#6b4e2e 50%, #5b4026 50%),
-            linear-gradient(90deg, #6b4e2e 50%, #5b4026 50%);
-        background-size: 16px 16px;
-        image-rendering: pixelated;
+        /* Four-layer pixel dirt texture */
+        background:
+            repeating-linear-gradient(
+                0deg,
+                #6a4b2f 0px,
+                #6a4b2f 4px,
+                #5c3e25 4px,
+                #5c3e25 8px
+            ),
+            repeating-linear-gradient(
+                90deg,
+                #7b5636 0px,
+                #7b5636 4px,
+                #6c4a2d 4px,
+                #6c4a2d 8px
+            ),
+            repeating-linear-gradient(
+                45deg,
+                rgba(0,0,0,0.10) 0px,
+                rgba(0,0,0,0.10) 3px,
+                rgba(0,0,0,0) 3px,
+                rgba(0,0,0,0) 6px
+            ),
+            repeating-linear-gradient(
+                -45deg,
+                rgba(255,255,255,0.06) 0px,
+                rgba(255,255,255,0.06) 2px,
+                rgba(0,0,0,0) 2px,
+                rgba(0,0,0,0) 4px
+            );
 
-        animation: pan 45s linear infinite;
+        background-blend-mode: multiply;
+        image-rendering: pixelated;
+        animation: pan 40s linear infinite;
+        filter: brightness(0.9) contrast(1.15) saturate(1.1);
     }
 
     @keyframes pan {
-        from { transform: translate(0,0); }
-        to   { transform: translate(-500px, -350px); }
+        from { transform: translate(0, 0); }
+        to   { transform: translate(-400px, -300px); }
     }
 </style>
 </head>
