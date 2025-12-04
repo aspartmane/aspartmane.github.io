@@ -2,68 +2,36 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Dirt Background</title>
+<title>Minecraft Menu Background</title>
 
 <style>
     html, body {
         margin: 0;
         height: 100%;
         overflow: hidden;
-        background: #000;
     }
 
-    /* Minecraft-style dirt pattern */
-    .mc-bg {
+    /* Real Minecraft dirt texture */
+    .bg {
         position: fixed;
         inset: 0;
-        width: 300%;
-        height: 300%;
-
-        /* Four-layer pixel dirt texture */
-        background:
-            repeating-linear-gradient(
-                0deg,
-                #6a4b2f 0px,
-                #6a4b2f 4px,
-                #5c3e25 4px,
-                #5c3e25 8px
-            ),
-            repeating-linear-gradient(
-                90deg,
-                #7b5636 0px,
-                #7b5636 4px,
-                #6c4a2d 4px,
-                #6c4a2d 8px
-            ),
-            repeating-linear-gradient(
-                45deg,
-                rgba(0,0,0,0.10) 0px,
-                rgba(0,0,0,0.10) 3px,
-                rgba(0,0,0,0) 3px,
-                rgba(0,0,0,0) 6px
-            ),
-            repeating-linear-gradient(
-                -45deg,
-                rgba(255,255,255,0.06) 0px,
-                rgba(255,255,255,0.06) 2px,
-                rgba(0,0,0,0) 2px,
-                rgba(0,0,0,0) 4px
-            );
-
-        background-blend-mode: multiply;
+        background-image: url("assets/dirt.png");
+        background-repeat: repeat;
+        background-size: 256px 256px; /* real size */
         image-rendering: pixelated;
+
+        /* slow panning animation like Minecraft menu */
         animation: pan 40s linear infinite;
-        filter: brightness(0.9) contrast(1.15) saturate(1.1);
     }
 
     @keyframes pan {
-        from { transform: translate(0, 0); }
-        to   { transform: translate(-400px, -300px); }
+        from { background-position: 0 0; }
+        to   { background-position: -512px -512px; }
     }
 </style>
-</head>
 
+</head>
 <body>
-    <div class="mc-bg"></div>
+    <div class="bg"></div>
 </body>
 </html>
