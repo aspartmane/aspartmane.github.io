@@ -2,41 +2,29 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Menu Background</title>
+<title>Minecraft Dirt Background</title>
 
 <style>
     html, body {
         margin: 0;
-        padding: 0;
         height: 100%;
         overflow: hidden;
-        background: #000;
     }
 
-    .bg {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        height: 120%;
-        width: auto;
-        transform: translate(-50%, -50%);
-        object-fit: cover;
-
-        animation: mcPanorama 40s linear infinite;
-        filter: brightness(1.08) contrast(1.1) saturate(1.15);
+    /* Moving Minecraft dirt texture */
+    body {
+        background: url("https://i.imgur.com/8K3h7cZ.png"); /* dirt texture */
+        background-size: 256px 256px; /* crisp Minecraft tiling */
+        animation: moveDirt 40s linear infinite;
     }
 
-    @keyframes mcPanorama {
-        0%   { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-        50%  { transform: translate(-48%, -50%) scale(1.05) rotate(0.2deg); }
-        100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+    @keyframes moveDirt {
+        0%   { background-position: 0 0; }
+        100% { background-position: -512px -512px; }
     }
 </style>
 </head>
 
 <body>
-
-<img class="bg" src="https://cdn.jsdelivr.net/gh/jeroenpardon/static-images@main/landscapes/sunset_mountain.jpg">
-
 </body>
 </html>
