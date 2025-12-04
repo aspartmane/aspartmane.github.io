@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Minecraft Panorama Base</title>
+<meta charset="UTF-8">
+<title>Minecraft Style Background</title>
 
 <style>
     html, body {
@@ -13,66 +13,32 @@
         background: #000;
     }
 
-    /* Container for the panorama */
-    .panorama {
+    /* The crisp HD Minecraft-style background */
+    .bg {
         position: fixed;
         top: 50%;
         left: 50%;
-        width: 200%;
-        height: 200%;
+        width: auto;
+        height: 100%;
         transform: translate(-50%, -50%);
-        perspective: 800px;
-        animation: slowRotate 40s linear infinite;
+        object-fit: cover;
+        animation: slowZoom 25s ease-in-out infinite alternate;
+        filter: brightness(1.1) saturate(1.2);
     }
 
-    /* Cube */
-    .cube {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        transform-style: preserve-3d;
-    }
-
-    /* Each face of the cube */
-    .face {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-position: center;
-        opacity: 0.95;
-    }
-
-    .front  { transform: translateZ(-500px); }
-    .back   { transform: rotateY(180deg) translateZ(-500px); }
-    .left   { transform: rotateY(-90deg) translateZ(-500px); }
-    .right  { transform: rotateY(90deg) translateZ(-500px); }
-    .top    { transform: rotateX(90deg) translateZ(-500px); }
-    .bottom { transform: rotateX(-90deg) translateZ(-500px); }
-
-    /* Use your image for all cube faces */
-    .face {
-        background-image: url("https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/panorama.webp");
-    }
-
-    /* Rotation animation */
-    @keyframes slowRotate {
-        from { transform: translate(-50%, -50%) rotateY(0deg); }
-        to   { transform: translate(-50%, -50%) rotateY(360deg); }
+    /* Smooth Minecraft-esque zoom */
+    @keyframes slowZoom {
+        from {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        to {
+            transform: translate(-50%, -50%) scale(1.07);
+        }
     }
 </style>
 </head>
 
 <body>
-    <div class="panorama">
-        <div class="cube">
-            <div class="face front"></div>
-            <div class="face back"></div>
-            <div class="face left"></div>
-            <div class="face right"></div>
-            <div class="face top"></div>
-            <div class="face bottom"></div>
-        </div>
-    </div>
+    <img class="bg" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/panorama.webp">
 </body>
 </html>
