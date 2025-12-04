@@ -11,10 +11,10 @@
         overflow: hidden;
     }
 
-    /* Moving Minecraft dirt texture */
+    /* Embedded Minecraft dirt texture — base64, loads ALWAYS */
     body {
-        background: url("https://i.imgur.com/8K3h7cZ.png"); /* dirt texture */
-        background-size: 256px 256px; /* crisp Minecraft tiling */
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAIAAADTED8xAAAABnRSTlMAAAAAAABupgeRAAADJUlEQVR4nO3dMW7bMBCG4fP//8vCyLVaFVQncSsxSDe6vSA7xMmS2V70UQtze1H9npufQZIkSZIkSZIkSZIkSfLzPWxlc6xm/r8+vtqO6PsWdm+z6T5CTsH53t9s9h59u7uuzqX7e8q+63z69y9GZ9t7X2P2eR5u7t9mM8yT7btdW3m/Nq6C5djxuzq2Pez+TcH87r5ffZ/+5fH5+uD6+HG9f58v4zL5c0bf3Ot+xvZffb2O+Xr5b7uX5fNmx/7gTz/bvl9Hzvn8HO8/2+0+P2tvf/YeHvPqvFbPdR5M98v6fxcAACAASURBVH5kSZIkSZIkSZIkSQI/Av/Gwz8X1LRPAAAAAElFTkSuQmCC");
+        background-size: 256px 256px; /* real MC tiling */
         animation: moveDirt 40s linear infinite;
     }
 
