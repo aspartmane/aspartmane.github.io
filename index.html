@@ -2,36 +2,30 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Menu Background</title>
-
+<title>Minecraft LoadingTerrain</title>
 <style>
     html, body {
         margin: 0;
         height: 100%;
         overflow: hidden;
+        background: #000;
     }
 
-    /* Real Minecraft dirt texture */
-    .bg {
-        position: fixed;
-        inset: 0;
+    .terrain {
+        width: 100%;
+        height: 100%;
         background-image: url("assets/dirt.png");
-        background-repeat: repeat;
-        background-size: 256px 256px; /* real size */
-        image-rendering: pixelated;
-
-        /* slow panning animation like Minecraft menu */
-        animation: pan 40s linear infinite;
+        background-size: 64px 64px;
+        animation: slide 0.8s linear infinite;
     }
 
-    @keyframes pan {
+    @keyframes slide {
         from { background-position: 0 0; }
-        to   { background-position: -512px -512px; }
+        to   { background-position: -64px -64px; }
     }
 </style>
-
 </head>
 <body>
-    <div class="bg"></div>
+    <div class="terrain"></div>
 </body>
 </html>
