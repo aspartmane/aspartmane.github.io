@@ -12,30 +12,30 @@
         background: #000;
     }
 
-    /* The OG Minecraft-style background made fully in CSS */
-    body {
-        background:
-            /* noise layer */
-            repeating-radial-gradient(circle,
-                rgba(0,0,0,0.18) 0px,
-                rgba(0,0,0,0.18) 1px,
-                rgba(0,0,0,0) 2px
-            ),
-            /* brown gradient */
-            linear-gradient(135deg, #7a5a3b, #4e3a25);
+    /* MINECRAFT PIXEL TEXTURE (procedural) */
+    .mc-bg {
+        position: fixed;
+        width: 300%;
+        height: 300%;
 
-        background-size: 600% 600%;
-        animation: pan 40s linear infinite;
-        filter: brightness(0.85) saturate(1.1);
+        /* 4x4 pixel “blocks” using box-shadow pattern */
+        background-image:
+            linear-gradient(#6b4e2e 50%, #5b4026 50%),
+            linear-gradient(90deg, #6b4e2e 50%, #5b4026 50%);
+        background-size: 16px 16px;
+        image-rendering: pixelated;
+
+        animation: pan 45s linear infinite;
     }
 
     @keyframes pan {
-        from { background-position: 0 0; }
-        to   { background-position: -2000px -1500px; }
+        from { transform: translate(0,0); }
+        to   { transform: translate(-500px, -350px); }
     }
 </style>
-
 </head>
+
 <body>
+    <div class="mc-bg"></div>
 </body>
 </html>
