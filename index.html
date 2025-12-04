@@ -11,27 +11,24 @@
         height: 100%;
         overflow: hidden;
         background: #000;
-        font-family: sans-serif;
     }
 
-    /* Background that moves like Minecraft’s panorama */
     .bg {
         position: fixed;
         top: 50%;
         left: 50%;
-        width: auto;
         height: 120%;
+        width: auto;
         transform: translate(-50%, -50%);
         object-fit: cover;
 
-        /* soft slow movement */
         animation: mcPanorama 40s linear infinite;
-        filter: brightness(1.1) contrast(1.1) saturate(1.15);
+        filter: brightness(1.08) contrast(1.1) saturate(1.15);
     }
 
     @keyframes mcPanorama {
         0%   { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
-        50%  { transform: translate(-48%, -50%) scale(1.05) rotate(0.3deg); }
+        50%  { transform: translate(-48%, -50%) scale(1.05) rotate(0.2deg); }
         100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
     }
 </style>
@@ -39,8 +36,7 @@
 
 <body>
 
-    <!-- HIGH QUALITY sunset forest vibe (no download needed) -->
-    <img class="bg" src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=1600&q=80">
+<img class="bg" src="https://cdn.jsdelivr.net/gh/jeroenpardon/static-images@main/landscapes/sunset_mountain.jpg">
 
 </body>
 </html>
