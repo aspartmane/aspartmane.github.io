@@ -1,138 +1,59 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Minecraft — Cherry Intro</title>
-<link href="https://fonts.cdnfonts.com/css/minecraftia" rel="stylesheet">
-<style>
-  :root{ --ui-shadow: 4px 4px #000; --accent:#ffff66; }
-  html,body{height:100%;margin:0;background:#000;font-family:"Minecraftia","Fira Code",monospace;color:#fff;overflow:hidden;image-rendering:pixelated}
-  .panorama-wrap{position:fixed;inset:0;overflow:hidden;z-index:0;background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.35));}
-  .panorama{position:absolute;left:50%;top:50%;width:180%;height:120%;transform:translate(-50%,-50%);background-position:center;background-size:cover;filter: blur(6px) saturate(1.05) contrast(1.03);opacity:0.96;will-change:transform;animation:panoramaMove 40s linear infinite;}
-  @keyframes panoramaMove{from{transform:translate(-50%,-50%) translateX(0) scale(1.03)}to{transform:translate(-50%,-50%) translateX(-6%) scale(1.03)}}
-  .vignette{position:fixed;inset:0;pointer-events:none;background: radial-gradient(1200px 600px at 50% 40%, rgba(255,255,255,0.02), rgba(0,0,0,0.62));z-index:2}
-  .grain{pointer-events:none;position:fixed;inset:0;z-index:3;background-image:url("data:image/png;base64,iVBOR...");background-size:120px 120px;opacity:0.03;mix-blend-mode:overlay;animation:grainMove 3s linear infinite}
-  @keyframes grainMove{from{transform:translate(0,0)}to{transform:translate(-30px,-30px)}}
-  /* UI (logo + button) */
-  .ui{position:relative;z-index:10;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;top:48%;transform:translateY(-48%);position:fixed;left:0;text-align:center}
-  .logo{width:920px;max-width:95vw;image-rendering:pixelated;filter: drop-shadow(8px 8px 0 #000);transition:transform .12s}
-  .logo:hover{transform:translateY(-4px)}
-  .begin-btn{font-size:34px;padding:18px 44px;border:4px solid rgba(255,255,255,0.12);background:linear-gradient(180deg, rgba(0,0,0,0.6), rgba(0,0,0,0.45));color:#fff;cursor:pointer;box-shadow:var(--ui-shadow);transition:transform .12s,color .12s,box-shadow .12s;border-radius:6px}
-  .begin-btn:hover{transform:translateY(-5px);color:var(--accent);box-shadow:6px 6px 0 #000}
-  /* back */
-  .back{position:fixed;left:18px;top:18px;z-index:11;padding:8px 12px;border:2px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.55);cursor:pointer;display:none;box-shadow:var(--ui-shadow)}
-  .back:hover{color:var(--accent);transform:translateX(-2px)}
-  /* loading overlay */
-  .loading-screen{position:fixed;inset:0;z-index:12;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .36s}
-  .loading-box{min-width:520px;max-width:92vw;padding:20px 26px;background:rgba(0,0,0,0.6);border:2px solid #222;box-shadow:var(--ui-shadow);text-align:center;color:#fff}
-  .loading-text{font-size:22px;margin-bottom:12px;white-space:nowrap}
-  .grid{margin:0 auto;display:grid;gap:4px}
-  .cell{background:#111;width:26px;height:18px;opacity:0.25}
-  .cell.on{background:#5db85b;opacity:1}
-  .percent{margin-top:12px;font-size:18px}
-  .flash{position:fixed;inset:0;background:#fff;opacity:0;z-index:30;pointer-events:none;transition:opacity .08s ease-out}
-  @media (max-width:720px){ .logo{width:86vw} .begin-btn{font-size:20px;padding:12px 22px} .cell{width:18px;height:14px} }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minecraft Style Background</title>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+
+    /* Wrapper for the panorama */
+    .panorama {
+      position: fixed;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: blur(4px) brightness(1.05) contrast(1.05) saturate(1.1);
+      animation: pan 40s linear infinite;
+    }
+
+    /* Slow horizontal movement */
+    @keyframes pan {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 100% 50%; }
+    }
+
+    /* Subtle grain overlay (Minecraft menu vibe) */
+    .grain {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAMAAAAoyzS7AAAADFBMVEUAAADMzMyZmZn///9ERESv3KF1AAAAAXRSTlMAQObYZgAAABxJREFUCNdjYGBgYAAAAAUAAarVyFEAAAAASUVORK5CYII=");
+      opacity: 0.04;
+      mix-blend-mode: overlay;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- panorama area (drop your image to assets/panorama_cherry.jpg) -->
-  <div class="panorama-wrap">
-    <div id="panorama" class="panorama" style="background-image: url('assets/panorama_cherry.jpg'), linear-gradient(180deg,#f6d7e6,#b8dae0);"></div>
-  </div>
+  <!-- Panorama background image -->
+  <div class="panorama" id="bg"></div>
 
-  <div class="vignette"></div>
-  <div class="grain" aria-hidden="true"></div>
+  <!-- Grain layer -->
+  <div class="grain"></div>
 
-  <!-- UI -->
-  <div class="ui" id="menuUI">
-    <!-- replace this src with assets/logo.png if you upload your own logo file -->
-    <img id="logoImg" class="logo" src="https://raw.githubusercontent.com/MCAssetArchive/Minecraft-JE-Logos/main/Logos/1.19/logo.png" alt="Minecraft Logo">
-    <button id="beginBtn" class="begin-btn">BEGIN</button>
-  </div>
+  <script>
+    // Change the background image here:
+    document.getElementById("bg").style.backgroundImage =
+      "url('assets/panorama.jpg')";
+  </script>
 
-  <button id="backBtn" class="back" onclick="goBack()">← Back</button>
-
-  <!-- Loading overlay -->
-  <div id="loadingScreen" class="loading-screen" aria-hidden="true">
-    <div class="loading-box">
-      <div id="loadingText" class="loading-text">Loading world</div>
-      <div id="gridWrap" style="display:flex;justify-content:center"><div id="grid" class="grid"></div></div>
-      <div id="percent" class="percent">0%</div>
-    </div>
-  </div>
-
-  <div id="flash" class="flash"></div>
-
-<script>
-/* CONFIG */
-const COLS = 12, ROWS = 12, TOTAL = COLS*ROWS;
-const LOAD_MS = 5000;
-const TICK_MS = Math.max(30, Math.round(LOAD_MS / TOTAL));
-
-/* Build grid in center-out order */
-const grid = document.getElementById('grid');
-grid.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
-(function buildGrid(){
-  const cells = [];
-  for(let r=0;r<ROWS;r++){
-    for(let c=0;c<COLS;c++){
-      const el = document.createElement('div');
-      el.className = 'cell';
-      el.dataset.r = r; el.dataset.c = c;
-      grid.appendChild(el);
-      cells.push({el,r,c});
-    }
-  }
-  const centerR = (ROWS-1)/2, centerC = (COLS-1)/2;
-  cells.sort((a,b)=>{
-    const da = Math.hypot(a.r-centerR,a.c-centerC), db = Math.hypot(b.r-centerR,b.c-centerC);
-    if(da===db) return (Math.abs(a.c-centerC)-Math.abs(b.c-centerC)) || a.r-b.r;
-    return da-db;
-  });
-  window._cellsOrder = cells.map(x=>x.el);
-})();
-
-/* ellipsis */
-let dot=0, ellipsisInterval=null;
-function startEllipsis(){ const t=document.getElementById('loadingText'); ellipsisInterval=setInterval(()=>{ dot=(dot+1)%4; t.textContent='Loading world'+'.'.repeat(dot); },500); }
-function stopEllipsis(){ clearInterval(ellipsisInterval); ellipsisInterval=null; document.getElementById('loadingText').textContent='Loading world'; }
-
-/* start/stop */
-function startLoading(){
-  document.getElementById('menuUI').style.opacity='0'; document.getElementById('menuUI').style.pointerEvents='none';
-  const ls=document.getElementById('loadingScreen'); ls.style.opacity='1'; ls.style.pointerEvents='auto';
-  document.getElementById('backBtn').style.display='block';
-  startEllipsis();
-
-  const order = window._cellsOrder;
-  const percentEl = document.getElementById('percent');
-  let i=0;
-  const interval = setInterval(()=>{
-    const step = (Math.random()<0.08)?3:((Math.random()<0.18)?2:1);
-    for(let s=0;s<step && i<order.length; s++, i++){ order[i].classList.add('on'); }
-    const pct = Math.floor((i/order.length)*100); percentEl.textContent = pct + '%';
-    if(i>=order.length){
-      clearInterval(interval); percentEl.textContent='100%'; stopEllipsis();
-      setTimeout(()=>{ const flash=document.getElementById('flash'); flash.style.opacity='1'; setTimeout(()=>{ flash.style.opacity='0'; finalizeLoad(); },90); }, 180);
-    }
-  }, TICK_MS);
-}
-function finalizeLoad(){
-  // after the white flash — placeholder: hide loading screen and keep back visible
-  const ls=document.getElementById('loadingScreen'); ls.style.opacity='0'; ls.style.pointerEvents='none';
-  // TODO: show avatar or next screen here
-}
-function goBack(){
-  document.querySelectorAll('.cell').forEach(c=>c.classList.remove('on'));
-  document.getElementById('percent').textContent='0%'; stopEllipsis();
-  const ls=document.getElementById('loadingScreen'); ls.style.opacity='0'; ls.style.pointerEvents='none';
-  document.getElementById('menuUI').style.opacity='1'; document.getElementById('menuUI').style.pointerEvents='auto';
-  document.getElementById('backBtn').style.display='none';
-}
-document.getElementById('beginBtn').addEventListener('click', startLoading);
-document.getElementById('backBtn').addEventListener('click', goBack);
-</script>
 </body>
 </html>
