@@ -1,59 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Minecraft Style Background</title>
+  <meta charset="UTF-8">
+  <title>blublublu</title>
 
   <style>
-    html, body {
+    body {
       margin: 0;
       padding: 0;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-    }
-
-    /* Wrapper for the panorama */
-    .panorama {
-      position: fixed;
-      inset: 0;
+      height: 100vh;
+      background: url("./assets/panorama.webp") no-repeat center center fixed;
       background-size: cover;
-      background-position: center;
-      filter: blur(4px) brightness(1.05) contrast(1.05) saturate(1.1);
-      animation: pan 40s linear infinite;
-    }
-
-    /* Slow horizontal movement */
-    @keyframes pan {
-      0%   { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
-    }
-
-    /* Subtle grain overlay (Minecraft menu vibe) */
-    .grain {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAMAAAAoyzS7AAAADFBMVEUAAADMzMyZmZn///9ERESv3KF1AAAAAXRSTlMAQObYZgAAABxJREFUCNdjYGBgYAAAAAUAAarVyFEAAAAASUVORK5CYII=");
-      opacity: 0.04;
-      mix-blend-mode: overlay;
+      font-family: sans-serif;
     }
   </style>
 </head>
+
 <body>
-
-  <!-- Panorama background image -->
-  <div class="panorama" id="bg"></div>
-
-  <!-- Grain layer -->
-  <div class="grain"></div>
-
-  <script>
-    // Change the background image here:
-    document.getElementById("bg").style.backgroundImage =
-      "url('assets/panorama.jpg')";
-  </script>
 
 </body>
 </html>
