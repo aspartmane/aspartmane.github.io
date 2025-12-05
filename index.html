@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Minecraft LoadingTerrain</title>
 <style>
     html, body {
         margin: 0;
@@ -11,13 +16,18 @@
         height: 100%;
         background-image: url("assets/dirt.png");
         background-repeat: repeat;
-        background-size: 96px 96px; /* crisp, bigger but clean */
-        image-rendering: pixelated; /* minecraft sharpness */
-        animation: slide 20s linear infinite; /* slower, smoother */
+        background-size: 64px 64px;  /* slightly bigger, not stretched */
+        image-rendering: pixelated;  /* keeps it sharp */
+        animation: slide 15s linear infinite; /* smooth + slow */
     }
 
     @keyframes slide {
         from { background-position: 0 0; }
-        to   { background-position: -192px -192px; }
+        to   { background-position: -64px -64px; }
     }
 </style>
+</head>
+<body>
+    <div class="terrain"></div>
+</body>
+</html>
