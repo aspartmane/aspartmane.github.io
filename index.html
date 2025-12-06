@@ -2,139 +2,105 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Intro</title>
+<title>welcome</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
-    /* New nicer pixel font */
-    @font-face {
-        font-family: 'PixelFont';
-        src: url('https://fonts.cdnfonts.com/s/9681/PixelOperator.woff') format('woff');
-    }
-
-    html, body {
+    body {
         margin: 0;
-        height: 100%;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        user-select: none;
         overflow: hidden;
-        background: #000;
-        font-family: PixelFont, sans-serif;
+        font-family: 'Press Start 2P', cursive;
     }
 
-    /* BACKGROUND */
-    .terrain {
-        width: 200%;
-        height: 200%;
-        background-image: url("assets/dirt.png");
-        background-size: 50px 50px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        animation: slide 8s linear infinite;
-    }
-
-    @keyframes slide {
-        from { transform: translate(0, 0); }
-        to { transform: translate(-50px, -50px); }
-    }
-
-    /* BUTTON */
-    #beginBtn {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        padding: 18px 32px;
-        background: #000;
-        color: #fff;
-        border: none;
-        border-radius: 20px;
-        font-size: 22px;
-        cursor: pointer;
-        text-transform: lowercase;
-        transition: transform 0.15s cubic-bezier(.25,1.4,.5,1.2);
-        z-index: 10;
-    }
-
-    /* Cookie-clicker style “pop” */
-    #beginBtn:active {
-        transform: translate(-50%, -50%) scale(1.18);
-    }
-
-    /* EXPLOSION */
-    #explosion {
-        position: absolute;
-        width: 128px;
-        height: 128px;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%) scale(2.2);
-        background-image: url("assets/explosion.png");
-        background-repeat: no-repeat;
-        display: none;
-        image-rendering: pixelated;
-        z-index: 10;
-        animation: explode 0.6s steps(16) forwards;
-    }
-
-    /* 16 frames */
-    @keyframes explode {
-        from { background-position: 0 0; }
-        to { background-position: -256px -256px; }
-    }
-
-    /* COOKIE */
     #cookie {
-        width: 180px;
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        display: none;
+        width: 280px;       /* bigger */
+        height: 280px;
+        object-fit: cover;  /* stretch sideways */
+        image-rendering: pixelated;
         cursor: pointer;
-        transition: transform 0.1s ease;
-        z-index: 10;
+        transition: transform 0.05s; /* fast ping */
     }
 
     #cookie:active {
-        transform: translate(-50%, -50%) scale(0.9);
+        transform: scale(0.88);
+    }
+
+    #btn {
+        background: black;
+        color: white;
+        border: 2px solid white;
+        padding: 8px 14px;
+        font-size: 12px;
+        margin-top: 20px;
+        cursor: pointer;
+        font-family: 'Press Start 2P', cursive;
+        border-radius: 8px;
+        image-rendering: pixelated;
+        transition: transform 0.1s;
+    }
+
+    #btn:active {
+        transform: scale(0.92);
+    }
+
+    /* explosion frames */
+    #explosion {
+        position: absolute;
+        width: 256px;
+        height: 256px;
+        background-image: url("assets/explosion.png");
+        background-size: 512px 512px;
+        pointer-events: none;
+        display: none;
+        image-rendering: pixelated;
     }
 </style>
+
 </head>
 <body>
 
-<div class="terrain"></div>
+<img id="cookie" src="assets/cookie.png">
 
-<button id="beginBtn">begin</button>
 <div id="explosion"></div>
-<img id="cookie" src="assets/cookie.png" alt="cookie">
+
+<button id="btn">YES PRESS START 2P PLEASE</button>
 
 <script>
-let clicks = 0;
-const btn = document.getElementById("beginBtn");
-const explosion = document.getElementById("explosion");
-const cookie = document.getElementById("cookie");
+    const cookie = document.getElementById('cookie');
+    const explosion = document.getElementById('explosion');
 
-btn.addEventListener("click", () => {
-    clicks++;
-
-    if (clicks === 3) {
-        btn.style.display = "none";
-
-        // Reset explosion to first frame so it never jumps
+    function playExplosion(x, y) {
+        explosion.style.left = (x - 128) + "px";
+        explosion.style.top = (y - 128) + "px";
         explosion.style.display = "block";
-        explosion.style.animation = "none";
-        void explosion.offsetWidth; // force restart
-        explosion.style.animation = "explode 0.6s steps(16) forwards";
 
-        setTimeout(() => {
-            explosion.style.display = "none";
-            cookie.style.display = "block";
-        }, 600);
+        let frame = 0;
+
+        const anim = setInterval(() => {
+            const col = frame % 4;
+            const row = Math.floor(frame / 4);
+            explosion.style.backgroundPosition = `-${col * 64}px -${row * 64}px`;
+
+            frame++;
+
+            if (frame === 16) {
+                clearInterval(anim);
+                explosion.style.display = "none";
+            }
+        }, 35); // fast frames
     }
-});
 
-cookie.addEventListener("click", () => {
-    console.log("cookie clicked");
-});
+    cookie.addEventListener("click", (e) => {
+        playExplosion(e.clientX, e.clientY);
+    });
 </script>
 
 </body>
