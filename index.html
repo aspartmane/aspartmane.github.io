@@ -13,6 +13,7 @@
         height: 100%;
         overflow: hidden;
         background: #000;
+        font-family: 'Minecrafter', sans-serif;
     }
 
     /* Moving dirt background */
@@ -32,7 +33,7 @@
         to { transform: translate(-50px, -50px); }
     }
 
-    /* Centered Minecraft grey button */
+    /* Center */
     .btn-container {
         position: absolute;
         top: 50%;
@@ -41,28 +42,42 @@
         z-index: 10;
     }
 
+    /* REAL Minecraft button style */
     .mc-button {
-        font-family: 'Minecrafter', sans-serif;
-        font-size: 32px;
-        color: white;
-        padding: 18px 50px;
-        background: #6b6b6b; /* stone grey */
-        border: 4px solid #3a3a3a;
-        box-shadow: 0 0 0 4px #8a8a8a inset, 4px 4px 0 #000;
-        cursor: pointer;
+        font-size: 28px;
+        padding: 14px 40px;
         text-transform: lowercase;
+        color: #ffffff;
+
+        background: linear-gradient(#c6c6c6, #8b8b8b); /* classic MC gradient */
+
+        border: 2px solid #000;
+        box-shadow:
+            inset 2px 2px 0 #ffffff,     /* top-left highlight */
+            inset -2px -2px 0 #4d4d4d,   /* bottom-right shadow */
+            4px 4px 0 #000;              /* outer drop shadow */
+
+        cursor: pointer;
         user-select: none;
+        image-rendering: pixelated;
     }
 
+    /* Hover = same as Minecraft */
     .mc-button:hover {
-        background: #7c7c7c;
-        box-shadow: 0 0 0 4px #b1b1b1 inset, 6px 6px 0 #000;
+        background: linear-gradient(#d9d9d9, #a0a0a0);
         transform: translate(-2px, -2px);
+        box-shadow:
+            inset 2px 2px 0 #ffffff,
+            inset -2px -2px 0 #4d4d4d,
+            6px 6px 0 #000;
     }
 
     .mc-button:active {
         transform: translate(2px, 2px);
-        box-shadow: 0 0 0 4px #8a8a8a inset, 2px 2px 0 #000;
+        box-shadow:
+            inset 2px 2px 0 #ffffff,
+            inset -2px -2px 0 #4d4d4d,
+            2px 2px 0 #000;
     }
 </style>
 </head>
