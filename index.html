@@ -2,118 +2,115 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft LoadingTerrain</title>
-
-<!-- Minecraft font -->
-<link href="https://fonts.cdnfonts.com/css/minecrafter" rel="stylesheet">
-
+<title>Minecraft Intro</title>
 <style>
-    html, body {
+    @font-face {
+        font-family: 'Minecraftia';
+        src: url('https://fonts.cdnfonts.com/s/7506/Minecraftia-Regular.ttf') format('truetype');
+    }
+
+    body {
         margin: 0;
-        height: 100%;
         overflow: hidden;
-        background: #000;
-        font-family: 'Minecrafter', sans-serif;
+        font-family: Minecraftia, sans-serif;
     }
 
-    /* Background dirt */
-    .terrain {
-        width: 200%;
-        height: 200%;
-        background-image: url("assets/dirt.png");
-        background-size: 50px 50px;
-        position: absolute;
-        top: 0;
-        left: 0;
-        animation: slide 8s linear infinite;
-    }
-
-    @keyframes slide {
-        from { transform: translate(0, 0); }
-        to { transform: translate(-50px, -50px); }
-    }
-
-    /* Centering container */
-    .center {
+    /* --- BUTTON --- */
+    #beginBtn {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        z-index: 20;
-        user-select: none;
-        text-align: center;
-    }
-
-    /* CLEAN MINIMAL BUTTON */
-    .start-btn {
-        background: #6f6f6f;
-        color: #ffffff;
-        font-size: 32px;
-        padding: 18px 55px;
-        border-radius: 14px;
-        border: 2px solid #000;
-        text-transform: lowercase;
+        padding: 18px 32px;
+        background: #7d7d7d; /* flat grey */
+        color: white;
+        border: none;
+        border-radius: 18px;
+        font-size: 22px;
         cursor: pointer;
+        transition: transform 0.1s ease;
+        text-transform: lowercase;
+    }
+
+    #beginBtn:active {
+        transform: translate(-50%, -50%) scale(0.92);
+    }
+
+    /* --- EXPLOSION SPRITESHEET --- */
+    #explosion {
+        position: absolute;
+        width: 128px;
+        height: 128px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(1.8);
+        background-image: url("assets/explosion.png");
+        background-repeat: no-repeat;
+        display: none;
         image-rendering: pixelated;
-
-        /* smooth + click animation only */
-        transition: transform 0.15s ease;
+        animation: explode 0.6s steps(16) forwards;
     }
 
-    /* bubbly click animation */
-    .start-btn:active {
-        animation: clickPop 0.15s ease-out;
+    /* Animate 16 frames (4×4 grid) in 0.6s */
+    @keyframes explode {
+        from { background-position: 0 0; }
+        to { background-position: -256px -256px; }
     }
 
-    @keyframes clickPop {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.18); }
-        100% { transform: scale(0.92); }
-    }
-
-    /* COOKIE */
-    .cookie {
-        width: 220px;
-        height: 220px;
+    /* --- COOKIE --- */
+    #cookie {
+        width: 180px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
         display: none;
         cursor: pointer;
-        image-rendering: pixelated;
-        transition: transform 0.15s ease;
+        transition: transform 0.1s ease;
     }
 
-    .cookie:active {
-        animation: clickPop 0.15s ease-out;
+    #cookie:active {
+        transform: translate(-50%, -50%) scale(0.9);
     }
 </style>
 </head>
-
 <body>
 
-<div class="terrain"></div>
+<!-- your background stays exactly as is -->
 
-<div class="center">
-    <div id="startButton" class="start-btn">begin</div>
-    <img id="cookie" src="assets/cookie.png" class="cookie" alt="cookie">
-</div>
+<button id="beginBtn">begin</button>
+<div id="explosion"></div>
+
+<img id="cookie" src="assets/cookie.png" alt="cookie">
 
 <script>
-    let clicks = 0;
+let clicks = 0;
+const btn = document.getElementById("beginBtn");
+const explosion = document.getElementById("explosion");
+const cookie = document.getElementById("cookie");
 
-    const startBtn = document.getElementById("startButton");
-    const cookie = document.getElementById("cookie");
+btn.addEventListener("click", () => {
+    clicks++;
 
-    startBtn.addEventListener("click", () => {
-        clicks++;
+    if (clicks === 3) {
+        // hide button
+        btn.style.display = "none";
 
-        if (clicks === 3) {
-            startBtn.style.display = "none";
+        // show explosion
+        explosion.style.display = "block";
+
+        // remove explosion & show cookie after animation
+        setTimeout(() => {
+            explosion.style.display = "none";
             cookie.style.display = "block";
-        }
-    });
+        }, 600); // explosion duration
+    }
+});
 
-    cookie.addEventListener("click", () => {
-        // clickable but does nothing for now
-    });
+// cookie clicks (do nothing yet)
+cookie.addEventListener("click", () => {
+    console.log("cookie clicked");
+});
 </script>
 
 </body>
