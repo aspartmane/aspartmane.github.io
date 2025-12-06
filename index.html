@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>Minecraft LoadingTerrain</title>
 
-<!-- Minecraft font (still included) -->
+<!-- Minecraft font -->
 <link href="https://fonts.cdnfonts.com/css/minecrafter" rel="stylesheet">
 
 <style>
@@ -16,7 +16,7 @@
         font-family: 'Minecrafter', sans-serif;
     }
 
-    /* Moving dirt background */
+    /* dirt background */
     .terrain {
         width: 200%;
         height: 200%;
@@ -33,33 +33,49 @@
         to { transform: translate(-50px, -50px); }
     }
 
-    /* Center cookie */
-    .cookie-container {
+    /* Center containers */
+    .center {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 20;
-        cursor: pointer;
         user-select: none;
     }
 
+    /* cute grey button */
+    .start-btn {
+        background: #7f7f7f;
+        color: #fff;
+        font-size: 32px;
+        padding: 20px 50px;
+        border-radius: 20px;
+        border: 3px solid black;
+        text-transform: lowercase;
+        image-rendering: pixelated;
+        cursor: pointer;
+        transition: transform 0.15s ease;
+    }
+
+    /* only click animation */
+    .start-btn:active {
+        animation: pop 0.15s ease-out;
+    }
+
+    /* cookie */
     .cookie {
         width: 220px;
         height: 220px;
         image-rendering: pixelated;
-        transition: transform 0.15s ease;
+        display: none;
+        cursor: pointer;
     }
 
-    /* ONLY animation: click bubble pop */
-    .cookie:active {
-        animation: cookiePop 0.15s ease-out;
-    }
-
-    @keyframes cookiePop {
-        0%   { transform: scale(1); }
-        50%  { transform: scale(1.18); }
-        100% { transform: scale(0.92); }
+    /* click pop */
+    @keyframes pop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.15); }
+        100% { transform: scale(0.9); }
     }
 </style>
 </head>
@@ -68,10 +84,28 @@
 
 <div class="terrain"></div>
 
-<!-- Replace the button with a COOKIE -->
-<div class="cookie-container">
-    <img src="assets/cookie.png" class="cookie" alt="cookie">
+<!-- BUTTON FIRST -->
+<div class="center">
+    <div id="startButton" class="start-btn">begin</div>
+    <img id="cookie" class="cookie" src="assets/cookie.png" alt="cookie">
 </div>
+
+<script>
+    let buttonClicks = 0;
+
+    const startBtn = document.getElementById("startButton");
+    const cookie = document.getElementById("cookie");
+
+    startBtn.addEventListener("click", () => {
+        buttonClicks++;
+
+        if (buttonClicks === 3) {
+            // hide button, show cookie
+            startBtn.style.display = "none";
+            cookie.style.display = "block";
+        }
+    });
+</script>
 
 </body>
 </html>
