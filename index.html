@@ -1,12 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>welcome</title>
-
-<!-- Load Press Start 2P -->
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-
 <style>
     html, body {
         margin: 0;
@@ -16,7 +7,6 @@
         font-family: "Press Start 2P", sans-serif;
     }
 
-    /* YOUR ORIGINAL FULLY WORKING BACKGROUND */
     .terrain {
         width: 200%;
         height: 200%;
@@ -26,7 +16,7 @@
         top: 0;
         left: 0;
         animation: slide 8s linear infinite;
-        z-index: -2; /* important fix */
+        z-index: -9999 !important; /* FIX */
     }
 
     @keyframes slide {
@@ -34,13 +24,16 @@
         to { transform: translate(-50px, -50px); }
     }
 
-    /* BUTTON */
+    #beginBtn, #explosion, #cookie {
+        background: transparent !important; /* FIX */
+    }
+
     #beginBtn {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: #444;
+        background: #444 !important;
         color: white;
         padding: 20px 35px;
         border: none;
@@ -51,11 +44,11 @@
         transition: transform 0.07s ease;
         z-index: 5;
     }
+
     #beginBtn:active {
         transform: translate(-50%, -50%) scale(0.88);
     }
 
-    /* EXPLOSION */
     #explosion {
         position: absolute;
         width: 128px;
@@ -66,10 +59,9 @@
         image-rendering: pixelated;
         display: none;
         z-index: 5;
-        background: transparent;
+        background: transparent !important;
     }
 
-    /* COOKIE */
     #cookie {
         position: absolute;
         top: 50%;
@@ -79,58 +71,6 @@
         display: none;
         cursor: pointer;
         z-index: 5;
-        background: transparent;
+        background: transparent !important;
     }
 </style>
-</head>
-
-<body>
-
-<div class="terrain"></div>
-
-<button id="beginBtn">begin</button>
-<img id="explosion" src="assets/explosion.png">
-<img id="cookie" src="assets/cookie.png">
-
-<script>
-let clicks = 0;
-const btn = document.getElementById("beginBtn");
-const explosion = document.getElementById("explosion");
-const cookie = document.getElementById("cookie");
-
-btn.addEventListener("click", () => {
-    clicks++;
-
-    if (clicks === 3) {
-        btn.style.display = "none";
-        playExplosion();
-    }
-});
-
-function playExplosion() {
-    explosion.style.display = "block";
-
-    let frame = 0;
-    const frameSize = 64;
-    const totalFrames = 16;
-
-    let interval = setInterval(() => {
-        let x = (frame % 4) * -frameSize;
-        let y = Math.floor(frame / 4) * -frameSize;
-
-        explosion.style.objectFit = "none";
-        explosion.style.objectPosition = `${x}px ${y}px`;
-
-        frame++;
-
-        if (frame >= totalFrames) {
-            clearInterval(interval);
-            explosion.style.display = "none";
-            cookie.style.display = "block";
-        }
-    }, 55);
-}
-</script>
-
-</body>
-</html>
