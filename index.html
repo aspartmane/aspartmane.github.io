@@ -3,16 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <title>Minecraft Intro</title>
+
 <style>
     @font-face {
         font-family: 'Minecraftia';
         src: url('https://fonts.cdnfonts.com/s/7506/Minecraftia-Regular.ttf') format('truetype');
     }
 
-    body {
+    html, body {
         margin: 0;
+        height: 100%;
         overflow: hidden;
+        background: #000;
         font-family: Minecraftia, sans-serif;
+    }
+
+    /* --- BACKGROUND TERRAIN (your original code) --- */
+    .terrain {
+        width: 200%;
+        height: 200%;
+        background-image: url("assets/dirt.png");
+        background-size: 50px 50px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        animation: slide 8s linear infinite;
+    }
+
+    @keyframes slide {
+        from { transform: translate(0, 0); }
+        to { transform: translate(-50px, -50px); }
     }
 
     /* --- BUTTON --- */
@@ -22,7 +42,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         padding: 18px 32px;
-        background: #7d7d7d; /* flat grey */
+        background: #7d7d7d;
         color: white;
         border: none;
         border-radius: 18px;
@@ -30,13 +50,14 @@
         cursor: pointer;
         transition: transform 0.1s ease;
         text-transform: lowercase;
+        z-index: 10;
     }
 
     #beginBtn:active {
         transform: translate(-50%, -50%) scale(0.92);
     }
 
-    /* --- EXPLOSION SPRITESHEET --- */
+    /* --- EXPLOSION --- */
     #explosion {
         position: absolute;
         width: 128px;
@@ -49,9 +70,9 @@
         display: none;
         image-rendering: pixelated;
         animation: explode 0.6s steps(16) forwards;
+        z-index: 10;
     }
 
-    /* Animate 16 frames (4×4 grid) in 0.6s */
     @keyframes explode {
         from { background-position: 0 0; }
         to { background-position: -256px -256px; }
@@ -67,6 +88,7 @@
         display: none;
         cursor: pointer;
         transition: transform 0.1s ease;
+        z-index: 10;
     }
 
     #cookie:active {
@@ -76,11 +98,10 @@
 </head>
 <body>
 
-<!-- your background stays exactly as is -->
+<div class="terrain"></div>
 
 <button id="beginBtn">begin</button>
 <div id="explosion"></div>
-
 <img id="cookie" src="assets/cookie.png" alt="cookie">
 
 <script>
@@ -93,21 +114,16 @@ btn.addEventListener("click", () => {
     clicks++;
 
     if (clicks === 3) {
-        // hide button
         btn.style.display = "none";
-
-        // show explosion
         explosion.style.display = "block";
 
-        // remove explosion & show cookie after animation
         setTimeout(() => {
             explosion.style.display = "none";
             cookie.style.display = "block";
-        }, 600); // explosion duration
+        }, 600);
     }
 });
 
-// cookie clicks (do nothing yet)
 cookie.addEventListener("click", () => {
     console.log("cookie clicked");
 });
