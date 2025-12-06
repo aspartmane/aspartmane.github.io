@@ -24,9 +24,11 @@
     }
 
     .logo {
-        width: 600px;
+        width: 600px;      /* adjust size if you want */
         image-rendering: pixelated;
         filter: drop-shadow(0 0 10px #000);
+        pointer-events: none;
+        user-select: none;
     }
 
     @keyframes slide {
@@ -38,7 +40,7 @@
 <body>
 
 <div class="terrain">
-    <img src="assets/logo.jpg" class="logo">
+    <img src="assets/brrbrr.png" class="logo">
 </div>
 
 </body>
