@@ -1,12 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Begin</title>
+
+<!-- Press Start 2P -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 <style>
     html, body {
         margin: 0;
         height: 100%;
         overflow: hidden;
         background: #000;
-        font-family: "Press Start 2P", sans-serif;
     }
 
+    /* BACKGROUND */
     .terrain {
         width: 200%;
         height: 200%;
@@ -16,7 +25,6 @@
         top: 0;
         left: 0;
         animation: slide 8s linear infinite;
-        z-index: -9999 !important; /* FIX */
     }
 
     @keyframes slide {
@@ -24,53 +32,74 @@
         to { transform: translate(-50px, -50px); }
     }
 
-    #beginBtn, #explosion, #cookie {
-        background: transparent !important; /* FIX */
-    }
-
+    /* BEGIN BUTTON */
     #beginBtn {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 20px;
+        padding: 20px 40px;
+        color: white;
+        background: rgba(0,0,0,0.7);
+        border: 3px solid white;
+        border-radius: 10px;
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: #444 !important;
-        color: white;
-        padding: 20px 35px;
-        border: none;
-        border-radius: 14px;
-        font-size: 16px;
         cursor: pointer;
-        font-family: "Press Start 2P", sans-serif;
-        transition: transform 0.07s ease;
-        z-index: 5;
+        transition: transform 0.1s ease;
     }
 
     #beginBtn:active {
-        transform: translate(-50%, -50%) scale(0.88);
+        transform: translate(-50%, -50%) scale(0.9);
     }
 
+    /* EXPLOSION */
     #explosion {
         position: absolute;
-        width: 128px;
-        height: 128px;
+        width: 400px;
         top: 50%;
         left: 50%;
-        transform: translate(-64px, -64px);
-        image-rendering: pixelated;
+        transform: translate(-50%, -50%);
         display: none;
-        z-index: 5;
-        background: transparent !important;
     }
 
+    /* COOKIE */
     #cookie {
         position: absolute;
-        top: 50%;
+        width: 300px;
+        top: 65%;
         left: 50%;
-        width: 220px;
-        transform: translate(-110px, -110px);
+        transform: translate(-50%, -50%);
         display: none;
-        cursor: pointer;
-        z-index: 5;
-        background: transparent !important;
     }
 </style>
+</head>
+
+<body>
+    <div class="terrain"></div>
+
+    <button id="beginBtn">BEGIN</button>
+
+    <img id="explosion" src="assets/explosion.png">
+    <img id="cookie" src="assets/cookie.png">
+
+<script>
+let clicks = 0;
+
+document.getElementById("beginBtn").onclick = function() {
+    clicks++;
+
+    if (clicks === 3) {
+        // Show explosion
+        document.getElementById("explosion").style.display = "block";
+
+        // After 1s show cookie
+        setTimeout(() => {
+            document.getElementById("cookie").style.display = "block";
+        }, 1000);
+    }
+};
+</script>
+
+</body>
+</html>
