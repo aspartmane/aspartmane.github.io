@@ -5,9 +5,10 @@
 <title>Minecraft Intro</title>
 
 <style>
+    /* New nicer pixel font */
     @font-face {
-        font-family: 'Minecraftia';
-        src: url('https://fonts.cdnfonts.com/s/7506/Minecraftia-Regular.ttf') format('truetype');
+        font-family: 'PixelFont';
+        src: url('https://fonts.cdnfonts.com/s/9681/PixelOperator.woff') format('woff');
     }
 
     html, body {
@@ -15,10 +16,10 @@
         height: 100%;
         overflow: hidden;
         background: #000;
-        font-family: Minecraftia, sans-serif;
+        font-family: PixelFont, sans-serif;
     }
 
-    /* --- BACKGROUND TERRAIN (your original code) --- */
+    /* BACKGROUND */
     .terrain {
         width: 200%;
         height: 200%;
@@ -35,50 +36,52 @@
         to { transform: translate(-50px, -50px); }
     }
 
-    /* --- BUTTON --- */
+    /* BUTTON */
     #beginBtn {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         padding: 18px 32px;
-        background: #7d7d7d;
-        color: white;
+        background: #000;
+        color: #fff;
         border: none;
-        border-radius: 18px;
+        border-radius: 20px;
         font-size: 22px;
         cursor: pointer;
-        transition: transform 0.1s ease;
         text-transform: lowercase;
+        transition: transform 0.15s cubic-bezier(.25,1.4,.5,1.2);
         z-index: 10;
     }
 
+    /* Cookie-clicker style “pop” */
     #beginBtn:active {
-        transform: translate(-50%, -50%) scale(0.92);
+        transform: translate(-50%, -50%) scale(1.18);
     }
 
-    /* --- EXPLOSION --- */
+    /* EXPLOSION */
     #explosion {
         position: absolute;
         width: 128px;
         height: 128px;
         left: 50%;
         top: 50%;
-        transform: translate(-50%, -50%) scale(1.8);
+        transform: translate(-50%, -50%) scale(2.2);
         background-image: url("assets/explosion.png");
         background-repeat: no-repeat;
         display: none;
         image-rendering: pixelated;
-        animation: explode 0.6s steps(16) forwards;
         z-index: 10;
+        animation: explode 0.6s steps(16) forwards;
     }
 
+    /* 16 frames */
     @keyframes explode {
         from { background-position: 0 0; }
         to { background-position: -256px -256px; }
     }
 
-    /* --- COOKIE --- */
+    /* COOKIE */
     #cookie {
         width: 180px;
         position: absolute;
@@ -115,7 +118,12 @@ btn.addEventListener("click", () => {
 
     if (clicks === 3) {
         btn.style.display = "none";
+
+        // Reset explosion to first frame so it never jumps
         explosion.style.display = "block";
+        explosion.style.animation = "none";
+        void explosion.offsetWidth; // force restart
+        explosion.style.animation = "explode 0.6s steps(16) forwards";
 
         setTimeout(() => {
             explosion.style.display = "none";
