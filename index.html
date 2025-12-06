@@ -1,1 +1,91 @@
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>Minecraft LoadingTerrain</title> <style> html, body { margin: 0; height: 100%; overflow: hidden; background: #000; } .terrain { width: 100%; height: 100%; background-image: url("assets/dirt.png"); background-size: 50px 50px; animation: slide 5s linear infinite; } @keyframes slide { from { background-position: 0 0; } to { background-position: -30px -30px; } } </style> </head> <body> <div class="terrain"></div> </body> </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Minecraft LoadingTerrain</title>
+
+<style>
+    html, body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+    }
+
+    .terrain {
+        width: 100%;
+        height: 100%;
+        background-image: url("assets/dirt.png");
+        background-size: 50px 50px;
+        animation: slide 5s linear infinite;
+    }
+
+    @keyframes slide {
+        from { background-position: 0 0; }
+        to { background-position: -30px -30px; }
+    }
+
+    /* ------------------------------
+       MINECRAFT LOGO (just the text)
+       ------------------------------ */
+    .logo {
+        position: absolute;
+        top: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: Minecraftia, sans-serif;
+        font-size: 90px;
+        color: #fff;
+        text-shadow:
+            4px 4px #3a3a3a,
+            6px 6px #000;
+        letter-spacing: 4px;
+        user-select: none;
+        image-rendering: pixelated;
+    }
+
+    /* ------------------------------
+       GREY BUTTON (Minecraft Beta style)
+       ------------------------------ */
+    .btn {
+        position: absolute;
+        top: 250px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 320px;
+        padding: 14px 0;
+        font-family: Minecraftia, sans-serif;
+        font-size: 26px;
+        color: #000;
+        text-align: center;
+        background: #c6c6c6;
+        border: 4px solid #000;
+        box-shadow:
+            inset 4px 4px #ffffff,
+            inset -4px -4px #555555;
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .btn:hover {
+        filter: brightness(1.1);
+    }
+
+    /* Fallback font */
+    @font-face {
+        font-family: 'Minecraftia';
+        src: url('https://fonts.cdnfonts.com/s/28948/Minecraftia-Regular.ttf') format('truetype');
+    }
+</style>
+</head>
+
+<body>
+
+    <div class="terrain"></div>
+
+    <!-- ADDED ELEMENTS ONLY -->
+    <div class="logo">MINECRAFT</div>
+    <div class="btn">BEGIN</div>
+
+</body>
+</html>
