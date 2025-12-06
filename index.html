@@ -16,7 +16,7 @@
         font-family: 'Minecrafter', sans-serif;
     }
 
-    /* dirt background */
+    /* Background dirt */
     .terrain {
         width: 200%;
         height: 200%;
@@ -33,7 +33,7 @@
         to { transform: translate(-50px, -50px); }
     }
 
-    /* Center containers */
+    /* Centering container */
     .center {
         position: absolute;
         top: 50%;
@@ -41,41 +41,48 @@
         transform: translate(-50%, -50%);
         z-index: 20;
         user-select: none;
+        text-align: center;
     }
 
-    /* cute grey button */
+    /* CLEAN MINIMAL BUTTON */
     .start-btn {
-        background: #7f7f7f;
-        color: #fff;
+        background: #6f6f6f;
+        color: #ffffff;
         font-size: 32px;
-        padding: 20px 50px;
-        border-radius: 20px;
-        border: 3px solid black;
+        padding: 18px 55px;
+        border-radius: 14px;
+        border: 2px solid #000;
         text-transform: lowercase;
-        image-rendering: pixelated;
         cursor: pointer;
+        image-rendering: pixelated;
+
+        /* smooth + click animation only */
         transition: transform 0.15s ease;
     }
 
-    /* only click animation */
+    /* bubbly click animation */
     .start-btn:active {
-        animation: pop 0.15s ease-out;
+        animation: clickPop 0.15s ease-out;
     }
 
-    /* cookie */
+    @keyframes clickPop {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.18); }
+        100% { transform: scale(0.92); }
+    }
+
+    /* COOKIE */
     .cookie {
         width: 220px;
         height: 220px;
-        image-rendering: pixelated;
         display: none;
         cursor: pointer;
+        image-rendering: pixelated;
+        transition: transform 0.15s ease;
     }
 
-    /* click pop */
-    @keyframes pop {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.15); }
-        100% { transform: scale(0.9); }
+    .cookie:active {
+        animation: clickPop 0.15s ease-out;
     }
 </style>
 </head>
@@ -84,26 +91,28 @@
 
 <div class="terrain"></div>
 
-<!-- BUTTON FIRST -->
 <div class="center">
     <div id="startButton" class="start-btn">begin</div>
-    <img id="cookie" class="cookie" src="assets/cookie.png" alt="cookie">
+    <img id="cookie" src="assets/cookie.png" class="cookie" alt="cookie">
 </div>
 
 <script>
-    let buttonClicks = 0;
+    let clicks = 0;
 
     const startBtn = document.getElementById("startButton");
     const cookie = document.getElementById("cookie");
 
     startBtn.addEventListener("click", () => {
-        buttonClicks++;
+        clicks++;
 
-        if (buttonClicks === 3) {
-            // hide button, show cookie
+        if (clicks === 3) {
             startBtn.style.display = "none";
             cookie.style.display = "block";
         }
+    });
+
+    cookie.addEventListener("click", () => {
+        // clickable but does nothing for now
     });
 </script>
 
