@@ -3,104 +3,125 @@
 <head>
 <meta charset="UTF-8">
 <title>welcome</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
-    body {
+    html, body {
         margin: 0;
-        background: #000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100vh;
-        user-select: none;
+        height: 100%;
         overflow: hidden;
-        font-family: 'Press Start 2P', cursive;
+        background: #000;
+        font-family: "Press Start 2P", sans-serif;
     }
 
-    #cookie {
-        width: 280px;       /* bigger */
-        height: 280px;
-        object-fit: cover;  /* stretch sideways */
-        image-rendering: pixelated;
-        cursor: pointer;
-        transition: transform 0.05s; /* fast ping */
+    /* BACKGROUND */
+    .terrain {
+        width: 200%;
+        height: 200%;
+        background-image: url("assets/dirt.png");
+        background-size: 50px 50px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        animation: slide 8s linear infinite;
+        z-index: -2;
     }
 
-    #cookie:active {
-        transform: scale(0.88);
+    @keyframes slide {
+        from { transform: translate(0, 0); }
+        to { transform: translate(-50px, -50px); }
     }
 
-    #btn {
-        background: black;
+    /* BUTTON */
+    #beginBtn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #555;
         color: white;
-        border: 2px solid white;
-        padding: 8px 14px;
-        font-size: 12px;
-        margin-top: 20px;
+        padding: 20px 35px;
+        border: none;
+        border-radius: 12px;
+        font-size: 20px;
         cursor: pointer;
-        font-family: 'Press Start 2P', cursive;
-        border-radius: 8px;
-        image-rendering: pixelated;
-        transition: transform 0.1s;
+        transition: transform 0.08s ease;
     }
 
-    #btn:active {
-        transform: scale(0.92);
+    #beginBtn:active {
+        transform: translate(-50%, -50%) scale(0.88);
     }
 
-    /* explosion frames */
+    /* EXPLOSION */
     #explosion {
         position: absolute;
-        width: 256px;
-        height: 256px;
-        background-image: url("assets/explosion.png");
-        background-size: 512px 512px;
-        pointer-events: none;
-        display: none;
+        width: 128px;
+        height: 128px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-64px, -64px);
         image-rendering: pixelated;
+        display: none;
+    }
+
+    /* COOKIE */
+    #cookie {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 220px; 
+        transform: translate(-110px, -110px);
+        display: none;
+        cursor: pointer;
     }
 </style>
-
 </head>
+
 <body>
 
+<div class="terrain"></div>
+
+<button id="beginBtn">begin</button>
+<img id="explosion" src="assets/explosion.png">
 <img id="cookie" src="assets/cookie.png">
 
-<div id="explosion"></div>
-
-<button id="btn">YES PRESS START 2P PLEASE</button>
-
 <script>
-    const cookie = document.getElementById('cookie');
-    const explosion = document.getElementById('explosion');
+let clicks = 0;
+const btn = document.getElementById("beginBtn");
+const explosion = document.getElementById("explosion");
+const cookie = document.getElementById("cookie");
 
-    function playExplosion(x, y) {
-        explosion.style.left = (x - 128) + "px";
-        explosion.style.top = (y - 128) + "px";
-        explosion.style.display = "block";
+btn.addEventListener("click", () => {
+    clicks++;
 
-        let frame = 0;
-
-        const anim = setInterval(() => {
-            const col = frame % 4;
-            const row = Math.floor(frame / 4);
-            explosion.style.backgroundPosition = `-${col * 64}px -${row * 64}px`;
-
-            frame++;
-
-            if (frame === 16) {
-                clearInterval(anim);
-                explosion.style.display = "none";
-            }
-        }, 35); // fast frames
+    if (clicks === 3) {
+        btn.style.display = "none";
+        playExplosion();
     }
+});
 
-    cookie.addEventListener("click", (e) => {
-        playExplosion(e.clientX, e.clientY);
-    });
+function playExplosion() {
+    explosion.style.display = "block";
+
+    let frame = 0;
+    const frameSize = 64;
+    const totalFrames = 16;
+
+    let interval = setInterval(() => {
+        let x = (frame % 4) * -frameSize;
+        let y = Math.floor(frame / 4) * -frameSize;
+        explosion.style.objectFit = "none";
+        explosion.style.objectPosition = `${x}px ${y}px`;
+
+        frame++;
+
+        if (frame >= totalFrames) {
+            clearInterval(interval);
+            explosion.style.display = "none";
+            cookie.style.display = "block";
+        }
+    }, 55); // fast ping-like animation
+}
 </script>
 
 </body>
