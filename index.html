@@ -47,18 +47,17 @@
         transform: translate(-50%, -50%);
         cursor: pointer;
         transition: transform 0.07s ease;
-        box-shadow: 0 0 0px #fff;
     }
 
-    /* CLICK BOUNCE */
+    /* CLICK ANIMATION */
     #beginBtn:active {
         transform: translate(-50%, -50%) scale(0.85);
     }
 
-    /* EXPLOSION */
+    /* EXPLOSION (4x4 spritesheet) */
     #explosion {
         position: absolute;
-        width: 128px;      /* size of explosion */
+        width: 128px;      /* bigger explosion */
         height: 128px;
         top: 50%;
         left: 50%;
@@ -68,23 +67,26 @@
         background-repeat: no-repeat;
         image-rendering: pixelated;
 
-        /* 16 frames → stretched horizontally */
-        background-size: 1600% 100%;
+        /* 4 columns × 4 rows */
+        background-size: 400% 400%;
 
-        /* Slow explosion */
+        /* play all 16 frames */
         animation: explode 1.6s steps(16) forwards;
     }
 
     @keyframes explode {
-        from { background-position: 0 0; }
-        to { background-position: -1500% 0; }
+        /* from top-left frame */
+        from { background-position: 0% 0%; }
+
+        /* to bottom-right frame */
+        to { background-position: -300% -300%; }
     }
 
     /* COOKIE */
     #cookie {
         position: absolute;
         width: 300px;
-        top: 50%;
+        top: 50%;  /* appears where the button was */
         left: 50%;
         transform: translate(-50%, -50%);
         display: none;
@@ -117,18 +119,22 @@ beginBtn.onclick = function() {
     clicks++;
 
     if (clicks === 3) {
-        beginBtn.style.display = "none";          // hide button
-        explosion.style.display = "block";        // show explosion
+        // hide the button
+        beginBtn.style.display = "none";
 
+        // show explosion
+        explosion.style.display = "block";
+
+        // after explosion finishes, show cookie
         setTimeout(() => {
-            explosion.style.display = "none";     // hide explosion
-            cookie.style.display = "block";       // show cookie
-        }, 1600); // same as animation duration
+            cookie.style.display = "block";
+        }, 1600);  // matches animation time
     }
 };
 
-// cookie does nothing yet
-cookie.onclick = function() {};
+cookie.onclick = function() {
+    // empty for now
+};
 </script>
 
 </body>
