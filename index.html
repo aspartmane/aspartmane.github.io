@@ -16,6 +16,24 @@
     -moz-osx-font-smoothing:grayscale;
   }
 
+  /* SCROLLING DIRT BACKGROUND (covers the whole viewport) */
+  .terrain {
+    position: fixed;
+    inset: 0;
+    width: 200%;
+    height: 200%;
+    background-image: url("assets/dirt.png");
+    background-size: 50px 50px;
+    top: 0;
+    left: 0;
+    animation: slide 8s linear infinite;
+    z-index: -2;
+  }
+  @keyframes slide {
+    from { transform: translate(0, 0); }
+    to   { transform: translate(-50px, -50px); }
+  }
+
   /* center stage */
   .stage {
     width:100%;
@@ -23,6 +41,8 @@
     display:flex;
     justify-content:center;
     align-items:center;
+    position: relative;
+    z-index: 0;
   }
 
   /* container keeps explosion + button aligned exactly */
@@ -31,6 +51,7 @@
     width: 240px;
     height: 240px;
     /* optional: keep a little room around */
+    z-index: 2;
   }
 
   /* BEGIN button (same behavior as before) */
@@ -65,6 +86,7 @@
     image-rendering: pixelated; /* keep it crisp for pixel art */
     will-change: background-position, opacity, transform;
     opacity: 1;
+    /* width/height/background-size set dynamically from JS based on sprite */
   }
 
   /* cookie (appears where button was) */
@@ -98,10 +120,13 @@
 </style>
 </head>
 <body>
+  <!-- scrolling dirt background -->
+  <div class="terrain" aria-hidden="true"></div>
+
   <div class="stage">
     <div id="container">
-      <div id="explosion"></div>
-      <button id="beginBtn">BEGIN</button>
+      <div id="explosion" aria-hidden="true"></div>
+      <button id="beginBtn" aria-label="Begin">BEGIN</button>
       <div id="cookie" title="cookie (does nothing yet)"></div>
     </div>
   </div>
@@ -122,7 +147,7 @@ const cookieEl = document.getElementById('cookie');
 let clicks = 0;
 
 // CONFIG: animation duration in ms and visual scale
-const DURATION = 700;     // ms total (you can increase to 1000/1600 if you want slower)
+const DURATION = 700;     // ms total (increase to 1000/1600 if you want slower)
 const SCALE = 2.0;        // how much to scale the raw frame size for display
 
 // preload the sprite so we can inspect its naturalWidth/Height
@@ -177,9 +202,6 @@ function setupExplosionFromImage(img){
 
   // pre-set backgroundPosition to the first frame
   explosionEl.style.backgroundPosition = "0px 0px";
-
-  // debug in console (optional)
-  // console.log("Sprite setup:", { FRAME_COUNT, FRAME_W, FRAME_H, approx });
 }
 
 // animate by updating background-position using requestAnimationFrame
