@@ -58,16 +58,27 @@
     /* EXPLOSION (spritesheet) */
     #explosion {
         position: absolute;
-        width: 96px;
-        height: 96px;
+        width: 220px;   /* bigger explosion */
+        height: 220px;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         display: none;
         background-image: url("assets/explosion.png");
         background-repeat: no-repeat;
+        background-size: 1200px 96px; /* ensure correct scaling */
         image-rendering: pixelated;
-        animation: explode 0.6s steps(12) forwards;
+        animation: explode 0.7s steps(12) forwards, fadeout 0.7s ease-out forwards;
+    }
+
+    @keyframes explode {
+        from { background-position: 0 0; }
+        to { background-position: -1152px 0; }
+    }
+
+    @keyframes fadeout {
+        0% { opacity: 1; }
+        100% { opacity: 0; }
     }
 
     @keyframes explode {
