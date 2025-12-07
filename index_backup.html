@@ -22,6 +22,7 @@
     font-family: "Press Start 2P", monospace;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: #000;
   }
 
   @keyframes slide {
@@ -40,7 +41,7 @@
   }
 
   /* -----------------------------------------------------
-      MINECRAFT GRASS BLOCK STYLE BUTTON
+      MINECRAFT GRASS BLOCK STYLE BUTTON (unchanged)
   ------------------------------------------------------*/
 
   #beginBtn {
@@ -101,7 +102,7 @@
   }
   .ping { animation: ping 140ms cubic-bezier(.2,.9,.3,1); }
 
-  /* COOKIE SYSTEM */
+  /* COOKIE SYSTEM (kept base styling) */
   .cookie {
     position: absolute;
     left: 50%;
@@ -124,6 +125,133 @@
     display: block;
     opacity: 1;
   }
+
+  /* ---------- Cookie2 mask (vertical reveal) ---------- */
+  #cookie2Mask {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    width: 320px;
+    height: 320px;
+    background-image: url("assets/cookie2.png");
+    background-size: cover;
+    background-position: top;
+    image-rendering: pixelated;
+    display: none;
+    z-index: 35;
+    pointer-events: none;
+    clip-path: inset(0 0 100% 0); /* start hidden */
+  }
+
+  /* ---------- Corruption green lines (2009 style) ---------- */
+  .corrupt-line {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 320px;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(0,255,0,0.9), rgba(0,200,0,0.6));
+    mix-blend-mode: screen;
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    image-rendering: pixelated;
+  }
+
+  /* ---------- CRT overlay ---------- */
+  #crt {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2000;
+    display: none;
+  }
+  #crt::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 3px
+    );
+    opacity: 0.6;
+    mix-blend-mode: multiply;
+  }
+  #crt::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.35) 100%);
+    opacity: 0.6;
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+
+  /* ---------- Fake XP dialog ---------- */
+  #xpDialog {
+    position: fixed;
+    left: 50%;
+    top: 25%;
+    transform: translateX(-50%);
+    width: 360px;
+    background: #c0d8ff;
+    border: 4px solid #000080;
+    color: #000;
+    font-family: Arial, sans-serif;
+    padding: 8px;
+    z-index: 3000;
+    display: none;
+    box-shadow: 6px 6px 0 rgba(0,0,0,0.6);
+  }
+  #xpDialog .title {
+    background: linear-gradient(#000080, #1f4fb0);
+    color: #fff;
+    padding: 6px;
+    font-size: 12px;
+  }
+  #xpDialog .body {
+    background: #fff;
+    padding: 8px;
+    font-size: 12px;
+  }
+  #xpDialog .buttons {
+    display:flex;
+    justify-content: flex-end;
+    gap:8px;
+    padding-top: 8px;
+  }
+  .xp-btn {
+    background:#e6e6e6;
+    border:1px solid #777;
+    padding:6px 10px;
+    font-size:12px;
+    cursor:pointer;
+  }
+
+  /* jumpscare huge transform (instant zoom) */
+  .jumpscare {
+    transform: translate(-50%, -50%) scale(12) !important;
+    opacity: 1 !important;
+    transition: transform 20ms linear;
+    z-index: 9999;
+    filter: none !important;
+  }
+
+  /* small particle (cookie1 fun click) */
+  .p {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #ffd66b;
+    border-radius: 2px;
+    pointer-events: none;
+    z-index: 500;
+    image-rendering: pixelated;
+  }
 </style>
 </head>
 <body>
@@ -133,61 +261,364 @@
   <button id="beginBtn">START</button>
 
   <div id="cookie1" class="cookie" style="background-image:url('assets/cookie1.png');"></div>
+  <div id="cookie2Mask"></div>
   <div id="cookie2" class="cookie" style="background-image:url('assets/cookie2.png');"></div>
 
 </div>
 
+<!-- CRT overlay & XP dialog -->
+<div id="crt" aria-hidden="true"></div>
+<div id="xpDialog" role="dialog" aria-hidden="true">
+  <div class="title">Microsoft Windows</div>
+  <div class="body">
+    <div><strong>Program Error</strong></div>
+    <div>cookies.exe has encountered a problem and needs to close.</div>
+    <div class="buttons">
+      <button class="xp-btn">OK</button>
+      <button class="xp-btn">Details</button>
+    </div>
+  </div>
+</div>
+
 <script>
-/* -------------------------------------------------------
-   BUTTON CLICK → show cookie1 (no explosion)
---------------------------------------------------------- */
+/* ------------------------------------------------------------------
+   Keep base behaviour but add:
+   - cookie1 fun clicks (particles + juicy ping)
+   - cookie2 masked load (3s) with CRT, corrupted lines, XP dialog, sounds
+   - pause halfway for 0.5s then resume
+   - 5th click during loaded cookie2 flicker (we'll keep earlier behavior too)
+   - 10th click -> instant jumpscare zoom (big)
+   ------------------------------------------------------------------ */
 
 const btn = document.getElementById("beginBtn");
 const cookie1 = document.getElementById("cookie1");
 const cookie2 = document.getElementById("cookie2");
+const cookie2Mask = document.getElementById("cookie2Mask");
+
+const crt = document.getElementById("crt");
+const xpDialog = document.getElementById("xpDialog");
 
 let cookie1Clicks = 0;
 let cookie2Clicks = 0;
+let cookie2Loaded = false;
+let cookie2Loading = false;
+let cookie2Paused = false;
 
-/* tiny click animation */
 function cookiePing(el){
   el.classList.remove("ping");
   void el.offsetWidth;
   el.classList.add("ping");
 }
 
-/* START → cookie1 */
+/* -------------------------
+   WebAudio helper (simple creepy sounds)
+   - we generate short noise + beep bursts during loading
+   ------------------------- */
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function ensureAudio(){
+  if(!audioCtx) audioCtx = new AudioCtx();
+}
+
+// simple noise burst
+function playNoise(duration=0.12, gain=0.12){
+  try{
+    ensureAudio();
+    const ctx = audioCtx;
+    const bufferSize = ctx.sampleRate * duration;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i=0;i<bufferSize;i++) data[i] = (Math.random()*2-1) * (1 - i/bufferSize);
+    const src = ctx.createBufferSource();
+    src.buffer = buffer;
+    const g = ctx.createGain(); g.gain.value = gain;
+    src.connect(g).connect(ctx.destination);
+    src.start();
+    src.stop(ctx.currentTime + duration);
+  }catch(e){ /* ignore */ }
+}
+
+// short beep
+function playBeep(freq=600, duration=0.08, gain=0.08){
+  try{
+    ensureAudio();
+    const ctx = audioCtx;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.frequency.value = freq;
+    o.type = 'square';
+    g.gain.value = gain;
+    o.connect(g).connect(ctx.destination);
+    o.start();
+    o.stop(ctx.currentTime + duration);
+  }catch(e){ /* ignore */ }
+}
+
+/* -------------------------
+   START button -> show cookie1
+   keep same behavior as before
+   ------------------------- */
 btn.addEventListener("click", () => {
   btn.classList.add("ping");
   btn.style.display = "none";
-
   cookie1.classList.add("visible");
 });
 
-/* COOKIE 1 → after 5 clicks → cookie2 */
-cookie1.addEventListener("click", () => {
+/* -------------------------
+   COOKIE1 fun clicks (Minecraft-y pixel)
+   - spawn tiny yellow crumbs that fly out
+   - scale & ping
+   ------------------------- */
+function spawnParticle(x,y){
+  const p = document.createElement('div');
+  p.className = 'p';
+  p.style.left = x + 'px';
+  p.style.top = y + 'px';
+  document.body.appendChild(p);
+  // random velocity
+  const vx = (Math.random() - 0.5) * 6;
+  const vy = - (Math.random()*6 + 2);
+  let life = 0;
+  function frame(){
+    life++;
+    p.style.transform = `translate(${vx*life}px, ${vy*life + 0.5*life*life}px) scale(${1 - life*0.02})`;
+    p.style.opacity = 1 - life*0.06;
+    if(life > 40){ p.remove(); return; }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+cookie1.addEventListener("click", (e) => {
   cookiePing(cookie1);
   cookie1Clicks++;
 
-  if(cookie1Clicks >= 5){
+  // juicy click animation
+  cookie1.style.transform = "translate(-50%,-50%) scale(0.86) rotate(" + (Math.random()*8-4) + "deg)";
+  setTimeout(()=> cookie1.style.transform = "translate(-50%,-50%) scale(1)", 120);
+
+  // spawn particles around center of cookie (approx)
+  const rect = cookie1.getBoundingClientRect();
+  for(let i=0;i<6;i++){
+    spawnParticle(rect.left + rect.width/2 + (Math.random()*80-40), rect.top + rect.height/2 + (Math.random()*40-20));
+  }
+
+  // playful beep feedback occasionally
+  if(cookie1Clicks % 2 === 0){
+    playBeep(800 + (cookie1Clicks*30), 0.06, 0.03);
+  } else {
+    playNoise(0.06, 0.02);
+  }
+
+  // after 5 clicks, start cookie2 loading
+  if(cookie1Clicks >= 5 && !cookie2Loading && !cookie2Loaded){
     cookie1.style.opacity = "0";
     setTimeout(()=>{
       cookie1.style.display = "none";
-      cookie2.classList.add("visible");
+      cookie2Mask.style.display = "block";
+      startCookie2Load();
     }, 250);
   }
 });
 
-/* COOKIE 2 → after 10 clicks → (now NOTHING happens) */
+/* -------------------------
+   Cookie2 loading animation (vertical mask)
+   - duration: 3000ms total
+   - halfway pause: when progress reaches 0.5 pause for 500ms then resume
+   - during loading: CRT overlay ON, corrupted green lines spawn, XP dialog flicker
+   - play creepy sounds periodically
+   - style A = pixelated / blocky feel (we simulate by small brief stutters & lines)
+   ------------------------- */
+
+function startCookie2Load(){
+  cookie2Loading = true;
+  cookie2Loaded = false;
+  cookie2Paused = false;
+  cookie2Clicks = 0;
+  cookie2Mask.style.clipPath = "inset(0 0 100% 0)";
+  cookie2Mask.style.display = "block";
+
+  // show CRT overlay
+  crt.style.display = "block";
+
+  // small schedule for XP dialog & corrupted lines during loading
+  const duration = 3000; // ms total (excluding pause)
+  const half = duration * 0.5;
+  const start = performance.now();
+
+  // spawn some corruption lines periodically
+  let linesInterval = setInterval(()=> spawnCorruptLine(), 220);
+
+  // play sounds intermittently
+  let soundInterval = setInterval(()=>{
+    playBeep(500 + Math.random()*600, 0.06, 0.04);
+    setTimeout(()=> playNoise(0.08, 0.02), 60);
+  }, 420);
+
+  // show xp dialog briefly once in the middle
+  setTimeout(()=> {
+    xpDialog.style.display = 'block';
+    // small flicker sound
+    playBeep(1200, 0.05, 0.05);
+    setTimeout(()=> { xpDialog.style.display = 'none'; }, 700);
+  }, Math.floor(duration*0.4));
+
+  // animation loop with pause at halfway
+  let paused = false;
+  function step(now){
+    let t = now - start;
+    // if we paused earlier, shift start forward
+    if(!paused && t >= half){
+      // pause for 500ms
+      paused = true;
+      cookie2Paused = true;
+      // freeze visuals: hide mask for half second (simulate hang)
+      // But to be exactly like you wanted: "pause some time, then continue half a second later"
+      setTimeout(()=> {
+        // resume by advancing start time
+        cookie2Paused = false;
+        const shift = 500; // pause length
+        // artificially bump start forward so progress continues
+        // we do this by increasing start by 500
+        start += shift;
+        requestAnimationFrame(step);
+      }, 500);
+
+      // brief heavier corruption flash
+      for(let i=0;i<6;i++) setTimeout(spawnCorruptLine, i*40);
+      playNoise(0.15, 0.14);
+      // show a quick XP flicker
+      xpDialog.style.display = 'block';
+      setTimeout(()=> xpDialog.style.display = 'none', 380);
+
+      return;
+    }
+
+    // compute progress (exclude pause since start adjusted)
+    let progress = Math.min((now - start) / duration, 1);
+    const reveal = 100 - progress * 100;
+    cookie2Mask.style.clipPath = `inset(0 0 ${reveal}% 0)`;
+
+    // small stutter effect to make it blocky (2009 feel)
+    if(Math.random() < 0.02) {
+      // tiny jitter in clip-path to mimic chunky load
+      const jitter = Math.floor(Math.random()*6);
+      cookie2Mask.style.clipPath = `inset(0 0 ${Math.max(0,reveal - jitter)}% 0)`;
+    }
+
+    if(progress < 1){
+      requestAnimationFrame(step);
+    } else {
+      // finished
+      clearInterval(linesInterval);
+      clearInterval(soundInterval);
+      // remove CRT or keep a subtle one? we'll fade CRT out slowly
+      setTimeout(()=> { crt.style.display = "none"; }, 300);
+      cookie2Mask.style.display = "none";
+      cookie2.classList.add("visible");
+      cookie2Loaded = true;
+      cookie2Loading = false;
+      cookie2Paused = false;
+    }
+  }
+
+  requestAnimationFrame(step);
+}
+
+/* spawn a corrupt green line across the cookie area */
+function spawnCorruptLine(){
+  const l = document.createElement('div');
+  l.className = 'corrupt-line';
+  // random vertical position within cookie mask
+  const offset = Math.floor(Math.random()*300) - 140; // -140..160 approximate
+  l.style.top = (window.innerHeight/2 - 160 + offset) + 'px';
+  // short life and flicker
+  document.body.appendChild(l);
+  // quick show
+  requestAnimationFrame(()=> {
+    l.style.opacity = 1;
+    l.style.transform = `translateX(${(Math.random()*12 - 6)}px)`;
+  });
+  setTimeout(()=> {
+    l.style.opacity = 0;
+    setTimeout(()=> l.remove(), 120 + Math.random()*120);
+  }, 60 + Math.random()*220);
+}
+
+/* -------------------------
+   Cookie2 click behavior after loaded
+   - 5th click: also cause a freeze/glitch (we keep the loading freeze earlier)
+   - 10th click: instant jumpscare zoom (cookie2 expands huge)
+   ------------------------- */
+
 cookie2.addEventListener("click", () => {
   cookiePing(cookie2);
+  if(!cookie2Loaded) return; // ignore clicks while still loading
+
   cookie2Clicks++;
 
+  // unsettling jitter on click
+  cookie2.style.transform = "translate(-50%,-50%) scale(0.95) rotate(" + (Math.random()*6-3) + "deg)";
+  setTimeout(()=> cookie2.style.transform = "translate(-50%,-50%) scale(1)", 140);
+
+  // subtle creepy sound
+  playNoise(0.06, 0.03);
+  playBeep(700 - cookie2Clicks*8, 0.05, 0.03);
+
+  if(cookie2Clicks === 5){
+    // big full-screen glitch flash & temporary freeze of the whole screen
+    // show CRT overlay full-intensity and spawn many corrupt lines
+    crt.style.display = "block";
+    for(let i=0;i<18;i++) setTimeout(spawnCorruptLine, i*30);
+    playNoise(0.22, 0.18);
+    // quick blackout-ish blink
+    document.body.style.transition = 'filter 80ms';
+    document.body.style.filter = 'brightness(0.2) contrast(1.6)';
+    setTimeout(()=> {
+      document.body.style.filter = '';
+      crt.style.display = 'none';
+    }, 500);
+  }
+
   if(cookie2Clicks >= 10){
-    /* No jumpscare. No glitch.  
-       Just… nothing :) */
+    // instant jumpscare: use same cookie2 image zoomed to fill screen
+    cookie2.classList.add('jumpscare');
+
+    // also a hard pop sound
+    playBeep(1000, 0.08, 0.25);
+    // lock pointer-events to avoid accidental clicks behind it
+    cookie2.style.pointerEvents = 'none';
+    // also spawn many corrupt lines and show CRT for full effect
+    crt.style.display = "block";
+    for(let i=0;i<30;i++) setTimeout(spawnCorruptLine, i*18);
+
+    // leave jumpscare for 3 seconds then reset to a black-ish screen and show CRT static
+    setTimeout(()=> {
+      // after jumpscare, fade to black (simulate crash)
+      document.body.style.transition = 'background-color 220ms linear';
+      document.body.style.backgroundColor = '#000';
+      // keep CRT overlay visible (static)
+      crt.style.display = 'block';
+      // remove cookie2 element visibility (optional)
+      // cookie2.style.opacity = '0';
+    }, 3000);
   }
 });
+
+/* ------------------------------------------------------------------
+   Accessibility: allow keyboard activation for START (Enter/Space)
+   ------------------------------------------------------------------ */
+btn.addEventListener('keydown', e => {
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    btn.click();
+  }
+});
+
+/* ------------------------------------------------------------------
+   End of script
+   ------------------------------------------------------------------ */
 </script>
 
 </body>
