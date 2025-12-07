@@ -1,305 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Begin</title>
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-
+<meta charset="UTF-8" />
+<title>Cookie Horror Game</title>
 <style>
-  html, body {
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-    background-image: url("assets/dirt.png");
-    background-size: 50px 50px;
-    animation: slide 6s linear infinite;
-    font-family: "Press Start 2P", monospace;
-  }
-
-  @keyframes slide {
-    from { background-position: 0 0; }
-    to   { background-position: -200px -200px; }
-  }
-
-  .center {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);
-    width: 320px;
-    height: 320px;
-    pointer-events: none; /* allow clicks to pass through except on elements that explicitly opt-in */
-  }
-
-  /* ---------- BUTTON (fixed: pointer-events:auto) ---------- */
-  #beginBtn {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);
-    z-index: 20;
-    cursor: pointer;
-    pointer-events: auto; /* <-- IMPORTANT: allow the button to receive clicks */
-    user-select: none;
-    display: inline-block;
-    padding: 22px 40px;
-    font-size: 18px;
-    color: #fff;
-    border: 4px solid #2d1f0f;
-    outline: none;
-    border-radius: 6px;
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.9);
-    font-family: "Press Start 2P", monospace;
-
-    background-image:
-      url("assets/grass_top.png"),
-      url("assets/grass_side.png"),
-      linear-gradient(to bottom,#3fa63f 0%,#3fa63f 22%,#5e3b18 22%,#5e3b18 100%);
-    background-size: 100% 42px, 100% calc(100% - 42px), auto;
-    background-position: top, bottom, 0 0;
-    background-repeat: no-repeat;
-    image-rendering: pixelated;
-
-    transition: transform 130ms ease, filter 130ms ease;
-  }
-
-  #beginBtn:hover { transform: translate(-50%,-50%) scale(1.05); }
-  #beginBtn:active { transform: translate(-50%,-50%) scale(0.9); }
-
-  @keyframes ping {
-    0% { transform: translate(-50%,-50%) scale(1); }
-    50% { transform: translate(-50%,-50%) scale(0.90); }
-    100% { transform: translate(-50%,-50%) scale(1); }
-  }
-  .ping { animation: ping 150ms ease; }
-
-  #explosionCanvas {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);
-    z-index: 10;
-    display: none;
-    image-rendering: pixelated;
-  }
-
-  /* COOKIES */
-  .cookie {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%) scale(1);
-    background-size: cover;
-    opacity: 0;
-    display: none;
-    pointer-events: auto;
-    transition: opacity 250ms ease, transform 180ms ease;
-    image-rendering: pixelated;
-    z-index: 30;
-  }
-
-  #cookie1 { width: 260px; height: 260px; }
-  #cookie2 {
-    width: 320px;
-    height: 320px;
-    clip-path: inset(0 0 100% 0);
-    transition: clip-path 2.6s ease-out, opacity 250ms;
-  }
-
-  .visible { display: block; opacity: 1; }
-  .jumpscare {
-    transform: translate(-50%,-50%) scale(8) !important;
-    transition: transform 30ms linear;
-    opacity: 1 !important;
-    z-index: 9999;
-  }
-
-  @keyframes corruptFlicker {
-    0% { filter: contrast(800%) brightness(200%) hue-rotate(40deg); }
-    25% { filter: grayscale(1) brightness(400%); }
-    50% { filter: hue-rotate(240deg) invert(1); }
-    75% { filter: saturate(900%) contrast(1500%); }
-    100% { filter: none; }
-  }
-  .corrupt { animation: corruptFlicker 0.5s steps(4) forwards; }
-
-  /* GLITCH VOID (kept but unused unless you re-enable) */
-  #glitchScreen { position: fixed; inset: 0; background: #000; display: none; z-index: 10000; pointer-events: none; overflow: hidden; }
-  .glash { position: absolute; inset: 0; background: #fff; opacity: 0; mix-blend-mode: screen; }
-  .glash.green { background: #00ff00; }
-  .gl-block { position: absolute; background: #00ff22; opacity: 0; pointer-events: none; mix-blend-mode: screen; }
-  .scanline { position: absolute; inset: 0; background-image: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 3px); opacity: 0; mix-blend-mode: difference; }
-  .tear { position: absolute; left:0; width:100%; height:3px; background: linear-gradient(90deg,#fff,#00ff00,#ff00ff); opacity:0; mix-blend-mode:screen; transform: translateY(0); }
-  .static { position:absolute; inset:0; background-image: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.03) 0 1px, transparent 2px), radial-gradient(circle at 80% 70%, rgba(255,255,255,0.02) 0 1px, transparent 2px); opacity:0; mix-blend-mode:screen; }
-  .showBrief { opacity: 1 !important; transition: opacity 40ms linear !important; }
-
+    body {
+        margin: 0;
+        background: #000;
+        overflow: hidden;
+        font-family: sans-serif;
+        color: white;
+        user-select: none;
+    }
+    #beginBtn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 20px 40px;
+        font-size: 24px;
+        background: #333;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+    #game {
+        display: none;
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+    }
+    .cookie {
+        width: 200px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        transition: transform 0.1s;
+        cursor: pointer;
+    }
+    #scaryImg {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        z-index: 9999;
+    }
+    #loadReveal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 0%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: top;
+        z-index: 9998;
+    }
 </style>
 </head>
 <body>
+<button id="beginBtn">START</button>
 
-<div class="center">
-  <canvas id="explosionCanvas"></canvas>
-
-  <button id="beginBtn">START</button>
-
-  <div id="cookie1" class="cookie" style="background-image:url('assets/cookie1.png');"></div>
-  <div id="cookie2" class="cookie" style="background-image:url('assets/cookie2.png');"></div>
+<div id="game">
+    <img id="cookie1" class="cookie" src="assets/cookie1.png" />
+    <img id="cookie2" class="cookie" src="assets/cookie2.png" style="display:none;" />
 </div>
 
-<!-- glitch overlay DOM kept -->
-<div id="glitchScreen" aria-hidden="true">
-  <div id="glash-white" class="glash"></div>
-  <div id="glash-green" class="glash green"></div>
-  <div id="scanline" class="scanline"></div>
-  <div id="static" class="static"></div>
-  <div id="tear" class="tear"></div>
-  <div id="blocks-container"></div>
-</div>
+<div id="loadReveal"></div>
+<img id="scaryImg" src="assets/jumpscare.png" />
 
 <script>
-/* Explosion (unchanged) */
-const btn = document.getElementById("beginBtn");
-const canvas = document.getElementById("explosionCanvas");
+let beginBtn = document.getElementById("beginBtn");
+let game = document.getElementById("game");
+let cookie1 = document.getElementById("cookie1");
+let cookie2 = document.getElementById("cookie2");
+let scaryImg = document.getElementById("scaryImg");
+let loadReveal = document.getElementById("loadReveal");
 
-let btnClicks = 0;
-const img = new Image();
-img.src = "assets/Explosion.png";
-img.onload = () => setupSprite(img);
+let clicks1 = 0;
+let stage2activated = false;
 
-let frameW, frameH, cols, totalFrames;
-function setupSprite(image){
-  const w = image.naturalWidth;
-  const h = image.naturalHeight;
-  frameW = frameH = h;
-  cols = Math.floor(w/h);
-  totalFrames = cols;
-  canvas.width = frameW * 2;
-  canvas.height = frameH * 2;
-  canvas._img = image;
-  canvas._fw = frameW;
-  canvas._fh = frameH;
-  canvas._cols = cols;
-  canvas._total = totalFrames;
-}
+beginBtn.onclick = () => {
+    beginBtn.style.display = "none";
+    game.style.display = "block";
+};
 
-function playSpriteOnce(duration){
-  const ctx = canvas.getContext("2d");
-  canvas.style.display = "block";
-  return new Promise(res=>{
-    const start = performance.now();
-    function step(now){
-      const p = Math.min(1,(now-start)/duration);
-      let fi = Math.floor(p * canvas._total);
-      if(fi >= canvas._total) fi = canvas._total - 1;
-      const sx = fi * canvas._fw;
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      ctx.drawImage(canvas._img, sx,0, canvas._fw,canvas._fh, 0,0, canvas.width,canvas.height);
-      if(p < 1) requestAnimationFrame(step);
-      else { canvas.style.display="none"; res(); }
+// COOKIE 1 — needs 5 clicks
+cookie1.onclick = () => {
+    clicks1++;
+    cookie1.style.transform = "translate(-50%, -50%) scale(0.9)";
+    setTimeout(() => { cookie1.style.transform = "translate(-50%, -50%) scale(1)"; }, 100);
+
+    if (clicks1 >= 5) {
+        cookie1.style.display = "none";
+        cookie2.style.display = "block";
+        stage2activated = true;
     }
-    requestAnimationFrame(step);
-  });
+};
+
+// COOKIE 2 — creepy behavior
+cookie2.onclick = () => {
+    if (!stage2activated) return;
+
+    // corrupt-like shake
+    cookie2.style.transform = "translate(-50%, -50%) scale(0.9) rotate(3deg)";
+    setTimeout(() => {
+        cookie2.style.transform = "translate(-50%, -50%) scale(1) rotate(-3deg)";
+    }, 150);
+
+    // start PNG loading effect
+    fakePngReveal();
+};
+
+function fakePngReveal() {
+    cookie2.style.display = "none";
+
+    loadReveal.style.backgroundImage = "url('assets/fake_loading.png')";
+    loadReveal.style.display = "block";
+    loadReveal.style.height = "0%";
+
+    let h = 0;
+    let reveal = setInterval(() => {
+        h += 2;
+        loadReveal.style.height = h + "%";
+
+        if (h >= 100) {
+            clearInterval(reveal);
+            setTimeout(jumpscare, 400);
+        }
+    }, 60); // medium speed
 }
 
-/* Cookies & interactions (unchanged logic) */
-const cookie1 = document.getElementById("cookie1");
-const cookie2 = document.getElementById("cookie2");
-let cookie1Clicks = 0;
-let cookie2Clicks = 0;
-
-function cookiePing(el){
-  el.classList.remove("ping");
-  void el.offsetWidth;
-  el.classList.add("ping");
-}
-
-btn.addEventListener("click", async () => {
-  btn.classList.add("ping");
-  btnClicks++;
-  if(btnClicks === 1){
-    btn.style.display = "none";
-    await playSpriteOnce(800);
-    cookie1.classList.add("visible");
-  }
-});
-
-cookie1.addEventListener("click", () => {
-  cookiePing(cookie1);
-  cookie1Clicks++;
-  if(cookie1Clicks >= 5){
-    cookie1.style.opacity = "0";
-    setTimeout(()=>{
-      cookie1.style.display = "none";
-      cookie2.style.display = "block";
-      requestAnimationFrame(()=>{
-        cookie2.classList.add("visible");
-        cookie2.style.clipPath = "inset(0 0 0 0)";
-      });
-    }, 250);
-  }
-});
-
-cookie2.addEventListener("click", () => {
-  cookiePing(cookie2);
-  cookie2Clicks++;
-  if(cookie2Clicks === 7){
-    cookie2.classList.add("corrupt");
-    setTimeout(()=> cookie2.classList.remove("corrupt"), 500);
-  }
-  if(cookie2Clicks === 15){
-    cookie2.classList.add("jumpscare");
-  }
-});
-
-/* Glitch functions kept in file for later (unchanged) */
-function rand(min,max){ return Math.random()*(max-min)+min; }
-function randint(min,max){ return Math.floor(rand(min,max)); }
-function spawnBlock(duration=80){
-  const b = document.createElement("div");
-  b.className = "gl-block";
-  const w = randint(6,120), h = randint(4,80);
-  b.style.width = w+"px"; b.style.height = h+"px";
-  b.style.left = randint(0,window.innerWidth-w)+"px"; b.style.top = randint(0,window.innerHeight-h)+"px";
-  blocksContainer.appendChild(b);
-  requestAnimationFrame(()=> b.style.opacity = "1");
-  setTimeout(()=> { b.style.opacity = "0"; setTimeout(()=> b.remove(),80); }, duration);
-}
-
-async function startGlitchVoid(){
-  // kept but not used by current flow
-  const glitchScreen = document.getElementById("glitchScreen");
-  glitchScreen.style.display = "block";
-  await new Promise(r=>setTimeout(r,10));
-  const GLITCH_DURATION = 6000, start = performance.now();
-  const glashWhite = document.getElementById("glash-white"), glashGreen = document.getElementById("glash-green"),
-        scanline = document.getElementById("scanline"), staticEl = document.getElementById("static"),
-        tear = document.getElementById("tear"), blocksContainer = document.getElementById("blocks-container");
-  function step(){ const t=performance.now()-start; if(t>GLITCH_DURATION){ cleanupGlitch(); return; } const r=Math.random();
-    if(r<0.15){ glashWhite.style.opacity=1; setTimeout(()=>glashWhite.style.opacity=0, randint(30,120)); }
-    else if(r<0.30){ glashGreen.style.opacity=1; setTimeout(()=>glashGreen.style.opacity=0, randint(30,120)); }
-    else if(r<0.55){ for(let i=0;i<randint(1,6);i++) spawnBlock(randint(40,140)); }
-    else if(r<0.7){ staticEl.style.opacity=1; setTimeout(()=>staticEl.style.opacity=0, randint(40,140)); }
-    else if(r<0.85){ tear.style.top = randint(0,window.innerHeight)+"px"; tear.style.opacity=1; setTimeout(()=>tear.style.opacity=0, randint(30,160)); }
-    else { scanline.style.opacity=0.5; setTimeout(()=>scanline.style.opacity=0, randint(30,100)); }
-    setTimeout(step, randint(40,170));
-  }
-  step();
-}
-
-function cleanupGlitch(){
-  const blocksContainer = document.getElementById("blocks-container");
-  blocksContainer.querySelectorAll(".gl-block").forEach(n=>n.remove());
-  document.getElementById("glash-white").style.opacity=0;
-  document.getElementById("glash-green").style.opacity=0;
-  document.getElementById("static").style.opacity=0;
-  document.getElementById("scanline").style.opacity=0;
-  document.getElementById("tear").style.opacity=0;
-  document.getElementById("glitchScreen").style.display="block";
-  document.getElementById("glitchScreen").style.background="#000";
+function jumpscare() {
+    scaryImg.style.display = "block";
+    let audio = new Audio("assets/jumpscare_sound.mp3");
+    audio.play();
+    setTimeout(() => {
+        scaryImg.style.display = "none";
+    }, 1500);
 }
 </script>
-
 </body>
 </html>
