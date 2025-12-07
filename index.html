@@ -15,48 +15,56 @@
         background: #000;
     }
 
-    /* Dirt background */
+    /* LEFT–RIGHT dirt animation */
     .terrain {
         width: 100%;
         height: 100%;
         background-image: url("assets/dirt.png");
         background-size: 50px 50px;
-        animation: slide 5s linear infinite;
+        animation: slideLR 6s linear infinite;
         position: absolute;
         top: 0;
         left: 0;
         z-index: 0;
     }
 
-    @keyframes slide {
+    @keyframes slideLR {
         from { background-position: 0 0; }
-        to { background-position: 0 50px; }
+        to { background-position: 200px 0; }
     }
 
-    /* START button with Minecraft grass block look */
+    /* Minecraft-style START button (grass block) */
     #beginBtn {
         font-family: 'Press Start 2P', cursive;
         font-size: 18px;
-        padding: 20px 40px;
+        padding: 22px 45px;
         color: white;
-        background: linear-gradient(#6aa84f, #38761d);
+
+        /* grass top + dirt sides */
+        background: 
+            linear-gradient(#6aa84f 45%, #3d2b1f 45%);
+
         border: 6px solid #3d2b1f;
         border-bottom: 10px solid #3d2b1f;
         border-radius: 6px;
+
         text-shadow: 2px 2px 0px #000;
         cursor: pointer;
+
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 10;
-        transition: transform 0.15s ease;
+
+        transition: transform 0.15s ease, opacity 0.3s ease;
     }
 
     #beginBtn:active {
-        transform: translate(-50%, -50%) scale(0.92);
+        transform: translate(-50%, -50%) scale(0.90);
     }
 
+    /* Cookies */
     #cookie1, #cookie2 {
         width: 220px;
         position: absolute;
@@ -69,7 +77,7 @@
         z-index: 20;
     }
 
-    /* cookie2 loads top-to-bottom */
+    /* cookie2 loading effect */
     #cookie2.reveal {
         clip-path: inset(0 0 0 0);
         transition: clip-path 2.5s linear;
@@ -99,7 +107,6 @@
 
 <img id="cookie1" src="assets/cookie1.png">
 <img id="cookie2" src="assets/cookie2.png">
-
 <img id="jumpscare" src="assets/jumpscare.png">
 
 <script>
@@ -140,7 +147,7 @@ cookie1.addEventListener("click", () => {
         setTimeout(() => {
             cookie1.style.display = "none";
 
-            /* reveal cookie2 with PNG-loading effect */
+            /* reveal cookie2 PNG loading effect */
             cookie2.style.opacity = "1";
             cookie2.style.clipPath = "inset(100% 0 0 0)";
             cookie2.offsetHeight;
@@ -156,23 +163,14 @@ cookie2.addEventListener("click", () => {
 
     cookie2Clicks++;
 
-    /* creepy slow click ping */
     cookie2.style.transform = "translate(-50%, -50%) scale(0.94)";
     setTimeout(() => {
         cookie2.style.transform = "translate(-50%, -50%) scale(1)";
     }, 120);
 
-    /* after 10 clicks → FULLSCREEN jumpscare */
     if (cookie2Clicks >= 10) {
-
-        setTimeout(() => {
-            jumpscare.style.opacity = "1";
-        }, 200);
-
-        /* stay 3 seconds */
-        setTimeout(() => {
-            jumpscare.style.opacity = "0";
-        }, 3000);
+        setTimeout(() => jumpscare.style.opacity = "1", 150);
+        setTimeout(() => jumpscare.style.opacity = "0", 3000);
     }
 });
 </script>
