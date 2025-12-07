@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Minecraft Cookie Boom</title>
+<title>Begin</title>
 
-<!-- PRESS START 2P FONT -->
+<!-- PRESS START 2P -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
@@ -13,12 +13,11 @@
         height: 100%;
         overflow: hidden;
 
-        font-family: 'Press Start 2P', monospace;
-
-        /* MOVING DIRT BACKGROUND */
         background: url("assets/dirt.png");
         background-size: 50px 50px;
         animation: slide 5s linear infinite;
+
+        font-family: 'Press Start 2P', monospace;
     }
 
     @keyframes slide {
@@ -26,7 +25,7 @@
         to { background-position: -200px -200px; }
     }
 
-    /* Center wrapper */
+    /* Center container */
     .center {
         position: absolute;
         top: 50%;
@@ -35,27 +34,28 @@
         text-align: center;
     }
 
-    /* BEGIN BUTTON (your old Minecraft style) */
-    .begin-btn {
-        background: #c6c6c6;
-        border: 4px solid #4f4f4f;
-        box-shadow: 4px 4px #000;
-        padding: 15px 25px;
-        color: #000;
-        font-size: 18px;
+    /* BUTTON – transparent black with white text */
+    #beginBtn {
+        padding: 20px 40px;
+        font-size: 20px;
+        color: white;
+        background: rgba(0,0,0,0.6);
+        border: 3px solid white;
+        border-radius: 12px;
         cursor: pointer;
-        margin-bottom: 30px;
+        transition: transform 0.05s ease; /* FASTER CLICK */
     }
 
-    .begin-btn:active {
-        box-shadow: 0px 0px #000;
-        transform: translate(4px, 4px);
+    #beginBtn:active {
+        transform: scale(0.82);        /* fast bounce */
     }
 
-    /* Cookie */
+    /* COOKIE */
     #cookie {
-        width: 150px;
-        transition: opacity 0.25s ease;
+        width: 260px;
+        display: none;
+        transition: opacity 0.3s ease;
+        cursor: pointer;
     }
 
     /* Explosion */
@@ -64,35 +64,51 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        width: 300px;
+        width: 350px;
+        display: none;
         opacity: 0;
-        pointer-events: none;
         transition: opacity 0.25s ease;
+        pointer-events: none;
     }
+
 </style>
 </head>
 <body>
 
 <div class="center">
-    <button class="begin-btn" onclick="explode()">BEGIN</button><br>
-    <img id="cookie" src="assets/cookie.png" alt="cookie">
+    <button id="beginBtn">BEGIN</button>
+    <img id="cookie" src="assets/cookie.png">
 </div>
 
-<img id="explosion" src="assets/Explosion.png" alt="boom">
+<img id="explosion" src="assets/Explosion.png">
 
 <script>
-function explode() {
-    const cookie = document.getElementById("cookie");
-    const explosion = document.getElementById("explosion");
+let clicks = 0;
 
-    cookie.style.opacity = 0;
+const btn = document.getElementById("beginBtn");
+const explosion = document.getElementById("explosion");
+const cookie = document.getElementById("cookie");
 
-    explosion.style.opacity = 1;
-    setTimeout(() => {
-        explosion.style.opacity = 0;
-        cookie.style.opacity = 1;
-    }, 700);
-}
+btn.onclick = function() {
+    clicks++;
+
+    if (clicks === 3) {
+        btn.style.display = "none";     // remove button
+
+        explosion.style.display = "block";
+        explosion.style.opacity = 1;     // fade in explosion
+
+        setTimeout(() => {
+            explosion.style.opacity = 0; // fade out explosion
+        }, 500);
+
+        setTimeout(() => {
+            explosion.style.display = "none";
+            cookie.style.display = "block";
+            cookie.style.opacity = 1;    // cookie fades in
+        }, 900);
+    }
+};
 </script>
 
 </body>
