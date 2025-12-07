@@ -1,107 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Cookie Sequence</title>
+<meta charset="utf-8" />
+<title>Begin</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<!-- PRESS START 2P -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 <style>
-    body {
-        background: black;
-        margin: 0;
-        overflow: hidden;
-    }
+  html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
 
-    /* EXPLOSION */
-    #explosion {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 200px;
-        opacity: 0;
-        pointer-events: none;
-    }
+    background-image: url("assets/dirt.png");
+    background-size: 50px 50px;
+    background-repeat: repeat;
+    animation: slide 6s linear infinite;
 
-    /* COOKIE IMAGES */
-    .cookie {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(1);
-        width: 160px;
-        opacity: 0;
-        transition: opacity 0.7s ease, transform 0.1s ease;
-        cursor: pointer;
-    }
+    font-family: "Press Start 2P", monospace;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-    /* CLICK ANIMATION (Cookie Clicker style pop) */
-    .cookie:active {
-        transform: translate(-50%, -50%) scale(0.88);
-    }
+  @keyframes slide {
+    from { background-position: 0 0; }
+    to   { background-position: -200px -200px; }
+  }
+
+  .center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    width: 320px;
+    height: 320px;
+    pointer-events: none;
+  }
+
+  #beginBtn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 20;
+    pointer-events: auto;
+
+    padding: 18px 38px;
+    font-size: 18px;
+    color: #fff;
+    background: rgba(0,0,0,0.6);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    outline: none;
+    transition: transform 120ms cubic-bezier(.2,.9,.3,1);
+    user-select: none;
+  }
+
+  @keyframes ping {
+    0%   { transform: translate(-50%,-50%) scale(1); }
+    40%  { transform: translate(-50%,-50%) scale(0.85); }
+    100% { transform: translate(-50%,-50%) scale(1); }
+  }
+  .ping { animation: ping 140ms cubic-bezier(.2,.9,.3,1); }
+
+  #explosionCanvas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 10;
+    pointer-events: none;
+    display: none;
+    image-rendering: pixelated;
+  }
+
+  /* COOKIE SYSTEM */
+  .cookie {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%) scale(1);
+    width: 260px;
+    height: 260px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    display: none;
+    opacity: 0;
+    pointer-events: auto;
+    transition: opacity 250ms ease, transform 160ms ease;
+    z-index: 30;
+  }
+  .cookie.visible {
+    display: block;
+    opacity: 1;
+  }
+
 </style>
 </head>
 <body>
 
-<img id="explosion" src="assets/explosion.gif">
+<div class="center">
 
-<img id="cookie1" class="cookie" src="assets/cookie1.png">
-<img id="cookie2" class="cookie" src="assets/cookie2.png">
+  <canvas id="explosionCanvas"></canvas>
+
+  <button id="beginBtn">BEGIN</button>
+
+  <!-- COOKIE 1 -->
+  <div id="cookie1" class="cookie"
+       style="background-image:url('assets/cookie1.png');"></div>
+
+  <!-- COOKIE 2 -->
+  <div id="cookie2" class="cookie"
+       style="background-image:url('assets/cookie2.png');"></div>
+
+</div>
 
 <script>
-    const explosion = document.getElementById("explosion");
-    const cookie1 = document.getElementById("cookie1");
-    const cookie2 = document.getElementById("cookie2");
+/* -------------------------------------------------------
+   EXPLOSION SYSTEM (unchanged from your base)
+--------------------------------------------------------- */
 
-    let clicks = 0;
+const btn = document.getElementById("beginBtn");
+const canvas = document.getElementById("explosionCanvas");
 
-    // 1) PLAY EXPLOSION
-    function startSequence() {
-        explosion.style.opacity = 1;
+let btnClicks = 0;
+const SPRITE_URL = "assets/Explosion.png";
+const DURATION = 800;
+const SCALE = 2.0;
 
-        // length depends on your gif → usually ~1.5s
-        setTimeout(() => {
-            explosion.style.opacity = 0;
+const img = new Image();
+img.src = SPRITE_URL;
+img.onload = () => setupSprite(img);
 
-            // 2) FADE IN COOKIE 1
-            setTimeout(() => {
-                cookie1.style.opacity = 1;
-            }, 500);
+let frameW, frameH, cols, rows, totalFrames;
 
-        }, 1500);
+function setupSprite(image) {
+  const w = image.naturalWidth;
+  const h = image.naturalHeight;
+
+  frameW = frameH = h;
+  cols = Math.floor(w / h);
+  rows = 1;
+  totalFrames = cols;
+
+  canvas.width  = frameW * SCALE;
+  canvas.height = frameH * SCALE;
+  canvas.style.width = canvas.width + "px";
+  canvas.style.height = canvas.height + "px";
+
+  canvas._img = image;
+  canvas._frameW = frameW;
+  canvas._frameH = frameH;
+  canvas._cols = cols;
+  canvas._total = totalFrames;
+}
+
+function playSpriteOnce(duration) {
+  const ctx = canvas.getContext("2d");
+  const total = canvas._total;
+  const fw = canvas._frameW;
+  const fh = canvas._frameH;
+
+  canvas.style.display = "block";
+  const start = performance.now();
+
+  return new Promise((resolve)=>{
+    function step(now){
+      const t = now - start;
+      const p = Math.min(1, t/duration);
+      let fi = Math.floor(p * total);
+      if(fi >= total) fi = total - 1;
+
+      const sx = fi * fw;
+      const sy = 0;
+
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(canvas._img, sx, sy, fw, fh,
+          0, 0, canvas.width, canvas.height);
+
+      if(t < duration){
+        requestAnimationFrame(step);
+      } else {
+        canvas.style.display = "none";
+        resolve();
+      }
     }
+    requestAnimationFrame(step);
+  });
+}
 
-    startSequence();
+/* -------------------------------------------------------
+   COOKIE SYSTEM  (NEW)
+--------------------------------------------------------- */
 
+const cookie1 = document.getElementById("cookie1");
+const cookie2 = document.getElementById("cookie2");
+let cookie1Clicks = 0;
 
+function cookiePing(el){
+  el.classList.remove("ping");
+  void el.offsetWidth;
+  el.classList.add("ping");
+}
 
-    // 3) COOKIE 1 CLICK COUNTER
-    cookie1.addEventListener("click", () => {
-        clicks++;
+btn.addEventListener("click", async () => {
+  btn.classList.add("ping");
+  btnClicks++;
 
-        // subtle click pop animation
-        cookie1.style.transform = "translate(-50%, -50%) scale(0.9)";
-        setTimeout(() => {
-            cookie1.style.transform = "translate(-50%, -50%) scale(1)";
-        }, 120);
+  if(btnClicks === 3){
+    btn.style.display = "none";
 
-        if (clicks === 5) {
-            // fade out first cookie
-            cookie1.style.opacity = 0;
+    await playSpriteOnce(DURATION);
 
-            // show cookie2 smoothly
-            setTimeout(() => {
-                cookie2.style.opacity = 1;
-            }, 600);
-        }
-    });
+    cookie1.classList.add("visible");
+  }
+});
 
-    // 4) COOKIE 2 — clickable but no action
-    cookie2.addEventListener("click", () => {
-        // does nothing yet
-        cookie2.style.transform = "translate(-50%, -50%) scale(0.9)";
-        setTimeout(() => {
-            cookie2.style.transform = "translate(-50%, -50%) scale(1)";
-        }, 120);
-    });
+/* COOKIE 1 CLICKING */
+cookie1.addEventListener("click", () => {
+  cookiePing(cookie1);
+  cookie1Clicks++;
+
+  if(cookie1Clicks >= 5){
+    // fade out cookie1
+    cookie1.style.opacity = "0";
+    setTimeout(()=>{
+      cookie1.style.display = "none";
+      // fade in cookie2
+      cookie2.classList.add("visible");
+    }, 250);
+  }
+});
+
+/* COOKIE 2 CLICKING (does nothing but ping) */
+cookie2.addEventListener("click", () => {
+  cookiePing(cookie2);
+});
+
 </script>
 
 </body>
