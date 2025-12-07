@@ -2,149 +2,180 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>Cookie Horror Game</title>
+<title>Cookie Game</title>
+
+<!-- Press Start 2P -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 <style>
-    body {
+    html, body {
         margin: 0;
-        background: #000;
+        height: 100%;
         overflow: hidden;
-        font-family: sans-serif;
-        color: white;
-        user-select: none;
+        background: #000;
     }
-    #beginBtn {
+
+    /* Dirt background */
+    .terrain {
+        width: 100%;
+        height: 100%;
+        background-image: url("assets/dirt.png");
+        background-size: 50px 50px;
+        animation: slide 5s linear infinite;
         position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        padding: 20px 40px;
-        font-size: 24px;
-        background: #333;
-        color: white;
-        border: none;
-        border-radius: 10px;
-        cursor: pointer;
-    }
-    #game {
-        display: none;
-        width: 100vw;
-        height: 100vh;
-        position: relative;
-    }
-    .cookie {
-        width: 200px;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        transition: transform 0.1s;
-        cursor: pointer;
-    }
-    #scaryImg {
-        display: none;
-        position: fixed;
         top: 0;
         left: 0;
-        width: 100vw;
-        height: 100vh;
-        object-fit: cover;
-        z-index: 9999;
+        z-index: 0;
     }
-    #loadReveal {
-        display: none;
-        position: fixed;
+
+    @keyframes slide {
+        from { background-position: 0 0; }
+        to { background-position: 0 50px; }
+    }
+
+    /* START button with Minecraft grass block look */
+    #beginBtn {
+        font-family: 'Press Start 2P', cursive;
+        font-size: 18px;
+        padding: 20px 40px;
+        color: white;
+        background: linear-gradient(#6aa84f, #38761d);
+        border: 6px solid #3d2b1f;
+        border-bottom: 10px solid #3d2b1f;
+        border-radius: 6px;
+        text-shadow: 2px 2px 0px #000;
+        cursor: pointer;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        transition: transform 0.15s ease;
+    }
+
+    #beginBtn:active {
+        transform: translate(-50%, -50%) scale(0.92);
+    }
+
+    #cookie1, #cookie2 {
+        width: 220px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        opacity: 0;
+        cursor: pointer;
+        transition: transform 0.1s ease, opacity 0.4s;
+        z-index: 20;
+    }
+
+    /* cookie2 loads top-to-bottom */
+    #cookie2.reveal {
+        clip-path: inset(0 0 0 0);
+        transition: clip-path 2.5s linear;
+    }
+
+    /* fullscreen jumpscare */
+    #jumpscare {
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
-        height: 0%;
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: top;
-        z-index: 9998;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        z-index: 999;
+        pointer-events: none;
+        transition: opacity 0.15s linear;
     }
 </style>
+
 </head>
 <body>
+
+<div class="terrain"></div>
+
 <button id="beginBtn">START</button>
 
-<div id="game">
-    <img id="cookie1" class="cookie" src="assets/cookie1.png" />
-    <img id="cookie2" class="cookie" src="assets/cookie2.png" style="display:none;" />
-</div>
+<img id="cookie1" src="assets/cookie1.png">
+<img id="cookie2" src="assets/cookie2.png">
 
-<div id="loadReveal"></div>
-<img id="scaryImg" src="assets/jumpscare.png" />
+<img id="jumpscare" src="assets/jumpscare.png">
 
 <script>
-let beginBtn = document.getElementById("beginBtn");
-let game = document.getElementById("game");
-let cookie1 = document.getElementById("cookie1");
-let cookie2 = document.getElementById("cookie2");
-let scaryImg = document.getElementById("scaryImg");
-let loadReveal = document.getElementById("loadReveal");
+let started = false;
+let cookie1Clicks = 0;
+let cookie2Clicks = 0;
 
-let clicks1 = 0;
-let stage2activated = false;
+const startBtn = document.getElementById("beginBtn");
+const cookie1 = document.getElementById("cookie1");
+const cookie2 = document.getElementById("cookie2");
+const jumpscare = document.getElementById("jumpscare");
 
-beginBtn.onclick = () => {
-    beginBtn.style.display = "none";
-    game.style.display = "block";
-};
+/* CLICK START → show cookie1 */
+startBtn.addEventListener("click", () => {
+    if (started) return;
+    started = true;
 
-// COOKIE 1 — needs 5 clicks
-cookie1.onclick = () => {
-    clicks1++;
-    cookie1.style.transform = "translate(-50%, -50%) scale(0.9)";
-    setTimeout(() => { cookie1.style.transform = "translate(-50%, -50%) scale(1)"; }, 100);
+    startBtn.style.opacity = "0";
+    setTimeout(() => startBtn.style.display = "none", 400);
 
-    if (clicks1 >= 5) {
-        cookie1.style.display = "none";
-        cookie2.style.display = "block";
-        stage2activated = true;
+    setTimeout(() => {
+        cookie1.style.opacity = "1";
+    }, 450);
+});
+
+/* COOKIE 1 (5 clicks) */
+cookie1.addEventListener("click", () => {
+    if (cookie1.style.opacity !== "1") return;
+
+    cookie1Clicks++;
+    cookie1.style.transform = "translate(-50%, -50%) scale(0.88)";
+    setTimeout(() => {
+        cookie1.style.transform = "translate(-50%, -50%) scale(1)";
+    }, 90);
+
+    if (cookie1Clicks >= 5) {
+        cookie1.style.opacity = "0";
+        setTimeout(() => {
+            cookie1.style.display = "none";
+
+            /* reveal cookie2 with PNG-loading effect */
+            cookie2.style.opacity = "1";
+            cookie2.style.clipPath = "inset(100% 0 0 0)";
+            cookie2.offsetHeight;
+            cookie2.classList.add("reveal");
+
+        }, 350);
     }
-};
+});
 
-// COOKIE 2 — creepy behavior
-cookie2.onclick = () => {
-    if (!stage2activated) return;
+/* COOKIE 2 (10 clicks → jumpscare) */
+cookie2.addEventListener("click", () => {
+    if (cookie2.style.opacity !== "1") return;
 
-    // corrupt-like shake
-    cookie2.style.transform = "translate(-50%, -50%) scale(0.9) rotate(3deg)";
+    cookie2Clicks++;
+
+    /* creepy slow click ping */
+    cookie2.style.transform = "translate(-50%, -50%) scale(0.94)";
     setTimeout(() => {
-        cookie2.style.transform = "translate(-50%, -50%) scale(1) rotate(-3deg)";
-    }, 150);
+        cookie2.style.transform = "translate(-50%, -50%) scale(1)";
+    }, 120);
 
-    // start PNG loading effect
-    fakePngReveal();
-};
+    /* after 10 clicks → FULLSCREEN jumpscare */
+    if (cookie2Clicks >= 10) {
 
-function fakePngReveal() {
-    cookie2.style.display = "none";
+        setTimeout(() => {
+            jumpscare.style.opacity = "1";
+        }, 200);
 
-    loadReveal.style.backgroundImage = "url('assets/fake_loading.png')";
-    loadReveal.style.display = "block";
-    loadReveal.style.height = "0%";
-
-    let h = 0;
-    let reveal = setInterval(() => {
-        h += 2;
-        loadReveal.style.height = h + "%";
-
-        if (h >= 100) {
-            clearInterval(reveal);
-            setTimeout(jumpscare, 400);
-        }
-    }, 60); // medium speed
-}
-
-function jumpscare() {
-    scaryImg.style.display = "block";
-    let audio = new Audio("assets/jumpscare_sound.mp3");
-    audio.play();
-    setTimeout(() => {
-        scaryImg.style.display = "none";
-    }, 1500);
-}
+        /* stay 3 seconds */
+        setTimeout(() => {
+            jumpscare.style.opacity = "0";
+        }, 3000);
+    }
+});
 </script>
+
 </body>
 </html>
