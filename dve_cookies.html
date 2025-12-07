@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Begin</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+
+<!-- PRESS START 2P -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+
+    background-image: url("assets/dirt.png");
+    background-size: 50px 50px;
+    background-repeat: repeat;
+    animation: slide 6s linear infinite;
+
+    font-family: "Press Start 2P", monospace;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  @keyframes slide {
+    from { background-position: 0 0; }
+    to   { background-position: -200px -200px; }
+  }
+
+  .center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    width: 320px;
+    height: 320px;
+    pointer-events: none;
+  }
+
+  #beginBtn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 20;
+    pointer-events: auto;
+
+    padding: 18px 38px;
+    font-size: 18px;
+    color: #fff;
+    background: rgba(0,0,0,0.6);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    outline: none;
+    transition: transform 120ms cubic-bezier(.2,.9,.3,1);
+    user-select: none;
+  }
+
+  @keyframes ping {
+    0%   { transform: translate(-50%,-50%) scale(1); }
+    40%  { transform: translate(-50%,-50%) scale(0.85); }
+    100% { transform: translate(-50%,-50%) scale(1); }
+  }
+  .ping { animation: ping 140ms cubic-bezier(.2,.9,.3,1); }
+
+  #explosionCanvas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 10;
+    pointer-events: none;
+    display: none;
+    image-rendering: pixelated;
+  }
+
+  /* COOKIE SYSTEM */
+  .cookie {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%) scale(1);
+    width: 260px;
+    height: 260px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    display: none;
+    opacity: 0;
+    pointer-events: auto;
+    transition: opacity 250ms ease, transform 160ms ease;
+    z-index: 30;
+  }
+  .cookie.visible {
+    display: block;
+    opacity: 1;
+  }
+
+</style>
+</head>
+<body>
+
+<div class="center">
+
+  <canvas id="explosionCanvas"></canvas>
+
+  <button id="beginBtn">BEGIN</button>
+
+  <!-- COOKIE 1 -->
+  <div id="cookie1" class="cookie"
+       style="background-image:url('assets/cookie1.png');"></div>
+
+  <!-- COOKIE 2 -->
+  <div id="cookie2" class="cookie"
+       style="background-image:url('assets/cookie2.png');"></div>
+
+</div>
+
+<script>
+/* -------------------------------------------------------
+   EXPLOSION SYSTEM (unchanged from your base)
+--------------------------------------------------------- */
+
+const btn = document.getElementById("beginBtn");
+const canvas = document.getElementById("explosionCanvas");
+
+let btnClicks = 0;
+const SPRITE_URL = "assets/Explosion.png";
+const DURATION = 800;
+const SCALE = 2.0;
+
+const img = new Image();
+img.src = SPRITE_URL;
+img.onload = () => setupSprite(img);
+
+let frameW, frameH, cols, rows, totalFrames;
+
+function setupSprite(image) {
+  const w = image.naturalWidth;
+  const h = image.naturalHeight;
+
+  frameW = frameH = h;
+  cols = Math.floor(w / h);
+  rows = 1;
+  totalFrames = cols;
+
+  canvas.width  = frameW * SCALE;
+  canvas.height = frameH * SCALE;
+  canvas.style.width = canvas.width + "px";
+  canvas.style.height = canvas.height + "px";
+
+  canvas._img = image;
+  canvas._frameW = frameW;
+  canvas._frameH = frameH;
+  canvas._cols = cols;
+  canvas._total = totalFrames;
+}
+
+function playSpriteOnce(duration) {
+  const ctx = canvas.getContext("2d");
+  const total = canvas._total;
+  const fw = canvas._frameW;
+  const fh = canvas._frameH;
+
+  canvas.style.display = "block";
+  const start = performance.now();
+
+  return new Promise((resolve)=>{
+    function step(now){
+      const t = now - start;
+      const p = Math.min(1, t/duration);
+      let fi = Math.floor(p * total);
+      if(fi >= total) fi = total - 1;
+
+      const sx = fi * fw;
+      const sy = 0;
+
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(canvas._img, sx, sy, fw, fh,
+          0, 0, canvas.width, canvas.height);
+
+      if(t < duration){
+        requestAnimationFrame(step);
+      } else {
+        canvas.style.display = "none";
+        resolve();
+      }
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+/* -------------------------------------------------------
+   COOKIE SYSTEM  (NEW)
+--------------------------------------------------------- */
+
+const cookie1 = document.getElementById("cookie1");
+const cookie2 = document.getElementById("cookie2");
+let cookie1Clicks = 0;
+
+function cookiePing(el){
+  el.classList.remove("ping");
+  void el.offsetWidth;
+  el.classList.add("ping");
+}
+
+btn.addEventListener("click", async () => {
+  btn.classList.add("ping");
+  btnClicks++;
+
+  if(btnClicks === 3){
+    btn.style.display = "none";
+
+    await playSpriteOnce(DURATION);
+
+    cookie1.classList.add("visible");
+  }
+});
+
+/* COOKIE 1 CLICKING */
+cookie1.addEventListener("click", () => {
+  cookiePing(cookie1);
+  cookie1Clicks++;
+
+  if(cookie1Clicks >= 5){
+    // fade out cookie1
+    cookie1.style.opacity = "0";
+    setTimeout(()=>{
+      cookie1.style.display = "none";
+      // fade in cookie2
+      cookie2.classList.add("visible");
+    }, 250);
+  }
+});
+
+/* COOKIE 2 CLICKING (does nothing but ping) */
+cookie2.addEventListener("click", () => {
+  cookiePing(cookie2);
+});
+
+</script>
+
+</body>
+</html>
