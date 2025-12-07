@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <title>Begin</title>
-
-<!-- PRESS START 2P FONT -->
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<!-- PRESS START 2P -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
@@ -13,7 +13,7 @@
     margin: 0;
     overflow: hidden;
 
-    /* dirt background */
+    /* moving dirt background */
     background-image: url("assets/dirt.png");
     background-size: 50px 50px;
     background-repeat: repeat;
@@ -29,117 +29,273 @@
     to   { background-position: -200px -200px; }
   }
 
-  /* center everything */
+  /* center container that holds everything exactly where the button used to be */
   .center {
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
+    transform: translate(-50%,-50%);
+    width: 320px;
+    height: 320px;
+    pointer-events: none; /* allow button inside to receive clicks */
   }
 
-  /* BEGIN button: transparent black, white text, NO white outline */
+  /* BEGIN button - transparent black with white text, no white outline */
   #beginBtn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 20;
+    pointer-events: auto;
+
     padding: 18px 38px;
-    font-size: 20px;
+    font-size: 18px;
     color: #fff;
     background: rgba(0,0,0,0.6);
-    border: none;              /* removed white outline */
+    border: none;             /* no white outline */
     border-radius: 10px;
     cursor: pointer;
     outline: none;
-    transform-origin: center;
-    /* remove default focus outline for clean look (you can add custom focus styles if needed) */
-    transition: transform 160ms cubic-bezier(.2,.9,.3,1), box-shadow 160ms;
+    transition: transform 120ms cubic-bezier(.2,.9,.3,1), box-shadow 120ms;
     user-select: none;
+    font-family: "Press Start 2P", monospace;
   }
 
-  /* smooth "ping" animation using a temporary class */
+  /* smooth ping - faster */
   @keyframes ping {
     0%   { transform: translate(-50%,-50%) scale(1); }
-    40%  { transform: translate(-50%,-50%) scale(0.86); }
+    40%  { transform: translate(-50%,-50%) scale(0.85); }
     100% { transform: translate(-50%,-50%) scale(1); }
   }
-  /* when JS adds .ping we use transform that includes the translate so keyframes play correctly */
-  #beginBtn.ping {
-    animation: ping 160ms cubic-bezier(.2,.9,.3,1);
+  #beginBtn.ping { animation: ping 120ms cubic-bezier(.2,.9,.3,1); }
+
+  /* explosion will be drawn in a canvas placed exactly where the button is */
+  #explosionCanvas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 10;
+    pointer-events: none;
+    display: none;
+    image-rendering: pixelated;
   }
 
-  /* cookie (hidden at first; appears where the button was) */
+  /* cookie (appears where the button was) */
   #cookie {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    z-index: 30;
     width: 260px;
+    height: 260px;
     display: none;
-    opacity: 0;
-    transition: opacity 260ms ease, transform 260ms ease;
-    transform: translate(-50%,-50%) scale(1);
-    cursor: pointer;
-    border-radius: 8px;
+    pointer-events: auto;
     background-image: url("assets/cookie.png");
     background-size: cover;
     background-position: center;
-    position: absolute;
-    left: 50%;
-    top: 50%;
+    border-radius: 12px;
+    transition: transform 200ms ease, opacity 200ms ease;
+    opacity: 0;
   }
+  #cookie.visible { display:block; opacity:1; transform: translate(-50%,-50%) scale(1); }
 
-  #cookie.visible {
-    display: block;
-    opacity: 1;
-  }
-
-  /* keep everything centered visually (button used as the initial visible element) */
-  /* ensure button is positioned relative to center container as well */
-  #beginBtn {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%); /* base translation; ping animation overrides with translate in keyframes */
-    z-index: 4;
-  }
-
-  /* reduce accidental selection highlight */
+  /* remove focus outline for visual cleanliness; keep keyboard accessible via JS */
   button:focus { outline: none; }
 </style>
 </head>
 <body>
 
-<div class="center" aria-hidden="false">
-  <button id="beginBtn" aria-label="Begin">BEGIN</button>
-  <div id="cookie" aria-hidden="true"></div>
-</div>
+  <div class="center" aria-hidden="false">
+    <canvas id="explosionCanvas" aria-hidden="true"></canvas>
+    <button id="beginBtn" aria-label="Begin">BEGIN</button>
+    <div id="cookie" title="cookie (does nothing yet)"></div>
+  </div>
 
 <script>
-  const btn = document.getElementById('beginBtn');
-  const cookie = document.getElementById('cookie');
-  let clicks = 0;
+/*
+ Robust explosion player that:
+ - auto-detects frames in sprite sheet (grid or single-row)
+ - draws frames to a canvas for perfect alignment & scaling
+ - hides button on 3rd click, plays explosion, then shows cookie
+ - configurable duration and scale
+*/
 
-  // Faster, smoother ping: use a class that runs a short keyframe animation
-  btn.addEventListener('click', (e) => {
-    // add temporary ping class for smooth animation
-    btn.classList.remove('ping');
-    // force reflow so animation restarts reliably
-    void btn.offsetWidth;
-    btn.classList.add('ping');
+// Elements
+const btn = document.getElementById('beginBtn');
+const canvas = document.getElementById('explosionCanvas');
+const cookie = document.getElementById('cookie');
 
-    clicks++;
+let clicks = 0;
+const DURATION = 800; // animation duration in ms (tweakable)
+const SCALE = 2.0;    // how much to scale each source frame for display
 
-    if (clicks === 3) {
-      // remove button
-      btn.style.display = 'none';
+// Explosion sprite URL (your uploaded file)
+const SPRITE_URL = 'assets/Explosion.png';
+const img = new Image();
+img.src = SPRITE_URL;
+img.onload = () => setupSprite(img);
+img.onerror = () => {
+  console.error('Failed to load explosion sprite:', SPRITE_URL);
+};
 
-      // show cookie at the same place
-      cookie.classList.add('visible');
-      cookie.setAttribute('aria-hidden', 'false');
-    }
+// will be populated by setupSprite
+let frameW = 0, frameH = 0, cols = 1, rows = 1, totalFrames = 1;
+
+// Try to detect a square frame size by searching for reasonable divisors
+function detectGrid(w, h) {
+  // collect candidate frame sizes that divide width and height evenly and produce 4..256 frames
+  const candidates = [];
+  for (let fw = 8; fw <= Math.max(w,h); fw++) {
+    if (w % fw !== 0) continue;
+    if (h % fw !== 0) continue;
+    const c = (w / fw) * (h / fw);
+    if (c >= 2 && c <= 512) candidates.push({fw, frames: c});
+  }
+  // Choose candidate with frames between 4 and 64 preference, then smallest fw
+  candidates.sort((a,b) => {
+    const scoreA = Math.abs(a.frames - 16) + a.fw/1000;
+    const scoreB = Math.abs(b.frames - 16) + b.fw/1000;
+    return scoreA - scoreB;
   });
+  return candidates.length ? candidates[0].fw : null;
+}
 
-  // keep Enter/Space from accidentally triggering double-clicks via keyboard
-  btn.addEventListener('keydown', (e) => {
-    if (e.key === ' ' || e.key === 'Enter') {
-      e.preventDefault();
-      btn.click();
+function setupSprite(image) {
+  const w = image.naturalWidth;
+  const h = image.naturalHeight;
+
+  // attempt simple single-row detection: frames = w / h if integer >1
+  if (h > 0 && Math.abs((w / h) - Math.round(w / h)) < 0.01 && Math.round(w / h) > 1) {
+    // single-row strip where each frame is square = h x h
+    frameW = Math.round(h);
+    frameH = Math.round(h);
+    cols = Math.round(w / frameW);
+    rows = 1;
+    totalFrames = cols * rows;
+  } else {
+    // try to detect square frame by divisors (handles 4x4, etc.)
+    const detected = detectGrid(w, h);
+    if (detected) {
+      frameW = detected;
+      frameH = detected;
+      cols = w / frameW;
+      rows = h / frameH;
+      totalFrames = cols * rows;
+    } else {
+      // fallback: treat each column as one frame with width = w / gcd(w,h)
+      const fallbackCols = Math.max(1, Math.floor(w / Math.max(1, h)));
+      frameW = Math.round(w / fallbackCols);
+      frameH = h;
+      cols = fallbackCols;
+      rows = 1;
+      totalFrames = cols * rows;
     }
+  }
+
+  // set canvas size to scaled frame size
+  canvas.width  = Math.round(frameW * SCALE);
+  canvas.height = Math.round(frameH * SCALE);
+  canvas.style.width  = canvas.width + 'px';
+  canvas.style.height = canvas.height + 'px';
+
+  // position canvas exactly where button is (already centered via CSS)
+  // ensure it's visible layer-wise
+  canvas.style.zIndex = 10;
+
+  // store image locally for animation
+  canvas._img = image;
+  canvas._cols = cols;
+  canvas._rows = rows;
+  canvas._frameW = frameW;
+  canvas._frameH = frameH;
+  canvas._total = totalFrames;
+
+  // optional debug:
+  // console.log('Sprite setup:', {w,h, frameW, frameH, cols, rows, totalFrames});
+}
+
+// Play animation by drawing frames to canvas
+function playSpriteOnce(duration = DURATION) {
+  if (!canvas._img) return Promise.resolve();
+  const ctx = canvas.getContext('2d');
+  const start = performance.now();
+  const total = canvas._total || 1;
+  const frameWsrc = canvas._frameW;
+  const frameHsrc = canvas._frameH;
+  const colsSrc = canvas._cols;
+
+  canvas.style.display = 'block';
+
+  return new Promise(resolve => {
+    function step(now) {
+      const t = now - start;
+      const progress = Math.min(1, t / duration);
+      let fi = Math.floor(progress * total);
+      if (fi >= total) fi = total - 1;
+      // compute source x,y (row-major)
+      const sx = (fi % colsSrc) * frameWsrc;
+      const sy = Math.floor(fi / colsSrc) * frameHsrc;
+
+      // clear and draw
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // draw scaled
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(canvas._img, sx, sy, frameWsrc, frameHsrc, 0, 0, canvas.width, canvas.height);
+
+      if (t < duration) {
+        requestAnimationFrame(step);
+      } else {
+        // finish last frame then hide
+        setTimeout(() => {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          canvas.style.display = 'none';
+          resolve();
+        }, 0);
+      }
+    }
+    requestAnimationFrame(step);
   });
+}
+
+// handle clicks & flow
+btn.addEventListener('click', async () => {
+  // ping animation
+  btn.classList.remove('ping');
+  void btn.offsetWidth;
+  btn.classList.add('ping');
+
+  clicks++;
+  if (clicks === 3) {
+    // hide button immediately
+    btn.style.display = 'none';
+
+    // show canvas and play animation
+    // make sure canvas is ready; if not, wait a tiny bit for image to load
+    if (!canvas._img) {
+      // image not ready, try to wait up to 500ms
+      await new Promise(r => setTimeout(r, 200));
+    }
+
+    // play the sprite; this returns a promise when finished
+    await playSpriteOnce(DURATION);
+
+    // after explosion finishes, reveal cookie in same place
+    cookie.classList.add('visible');
+    cookie.style.opacity = '1';
+    cookie.setAttribute('aria-hidden', 'false');
+  }
+});
+
+// keyboard accessibility for Enter/Space
+btn.addEventListener('keydown', e => {
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    btn.click();
+  }
+});
 </script>
 
 </body>
