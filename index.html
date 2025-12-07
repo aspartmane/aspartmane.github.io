@@ -39,7 +39,7 @@
         padding: 20px 40px;
         color: white;
         background: rgba(0,0,0,0.7);
-        border: none; /* removed white outline */
+        border: none;
         border-radius: 10px;
         position: absolute;
         top: 50%;
@@ -55,11 +55,11 @@
         transform: translate(-50%, -50%) scale(0.85);
     }
 
-    /* EXPLOSION (spritesheet) */
+    /* EXPLOSION — using your 16-frame sheet */
     #explosion {
         position: absolute;
-        width: 96px;
-        height: 96px;
+        width: 128px;      /* bigger explosion */
+        height: 128px;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
@@ -67,19 +67,22 @@
         background-image: url("assets/explosion.png");
         background-repeat: no-repeat;
         image-rendering: pixelated;
-        animation: explode 0.6s steps(12) forwards;
+
+        /* 16 frames → stretch horizontally */
+        background-size: 1600% 100%;
+        animation: explode 0.7s steps(16) forwards;
     }
 
     @keyframes explode {
         from { background-position: 0 0; }
-        to { background-position: -1152px 0; }
+        to { background-position: -1500% 0; }
     }
 
     /* COOKIE */
     #cookie {
         position: absolute;
         width: 300px;
-        top: 50%; /* same center as the button */
+        top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         display: none;
@@ -112,16 +115,16 @@ beginBtn.onclick = function() {
     clicks++;
 
     if (clicks === 3) {
-        // 1. hide the button
+        // hide the button
         beginBtn.style.display = "none";
 
-        // 2. show explosion
+        // show explosion
         explosion.style.display = "block";
 
-        // 3. after 1s show cookie IN THE SAME PLACE AS BUTTON
+        // after explosion is done → show cookie (same place as button)
         setTimeout(() => {
             cookie.style.display = "block";
-        }, 1000);
+        }, 700);
     }
 };
 
