@@ -39,6 +39,7 @@
     pointer-events: none;
   }
 
+  /* BEGIN BUTTON — PRESS START 2P */
   #beginBtn {
     position: absolute;
     left: 50%;
@@ -57,6 +58,8 @@
     outline: none;
     transition: transform 120ms cubic-bezier(.2,.9,.3,1);
     user-select: none;
+
+    font-family: "Press Start 2P", monospace;
   }
 
   @keyframes ping {
@@ -83,17 +86,28 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%,-50%) scale(1);
-    width: 260px;
-    height: 260px;
-    border-radius: 12px;
     background-size: cover;
     background-position: center;
+    border-radius: 12px;
     display: none;
     opacity: 0;
     pointer-events: auto;
     transition: opacity 250ms ease, transform 160ms ease;
     z-index: 30;
   }
+
+  /* Cookie 1 size */
+  #cookie1 {
+    width: 260px;
+    height: 260px;
+  }
+
+  /* Cookie 2 (BIGGER as requested) */
+  #cookie2 {
+    width: 320px;
+    height: 320px;
+  }
+
   .cookie.visible {
     display: block;
     opacity: 1;
@@ -109,11 +123,9 @@
 
   <button id="beginBtn">BEGIN</button>
 
-  <!-- COOKIE 1 -->
   <div id="cookie1" class="cookie"
        style="background-image:url('assets/cookie1.png');"></div>
 
-  <!-- COOKIE 2 -->
   <div id="cookie2" class="cookie"
        style="background-image:url('assets/cookie2.png');"></div>
 
@@ -121,7 +133,7 @@
 
 <script>
 /* -------------------------------------------------------
-   EXPLOSION SYSTEM (unchanged from your base)
+   EXPLOSION SYSTEM
 --------------------------------------------------------- */
 
 const btn = document.getElementById("beginBtn");
@@ -195,11 +207,12 @@ function playSpriteOnce(duration) {
 }
 
 /* -------------------------------------------------------
-   COOKIE SYSTEM  (NEW)
+   COOKIE SYSTEM
 --------------------------------------------------------- */
 
 const cookie1 = document.getElementById("cookie1");
 const cookie2 = document.getElementById("cookie2");
+
 let cookie1Clicks = 0;
 
 function cookiePing(el){
@@ -208,11 +221,12 @@ function cookiePing(el){
   el.classList.add("ping");
 }
 
+/* BUTTON CLICK — now triggers explosion immediately */
 btn.addEventListener("click", async () => {
   btn.classList.add("ping");
   btnClicks++;
 
-  if(btnClicks === 3){
+  if(btnClicks === 1){
     btn.style.display = "none";
 
     await playSpriteOnce(DURATION);
@@ -221,17 +235,15 @@ btn.addEventListener("click", async () => {
   }
 });
 
-/* COOKIE 1 CLICKING */
+/* COOKIE 1 CLICKING — 5 clicks ➜ cookie2 */
 cookie1.addEventListener("click", () => {
   cookiePing(cookie1);
   cookie1Clicks++;
 
   if(cookie1Clicks >= 5){
-    // fade out cookie1
     cookie1.style.opacity = "0";
     setTimeout(()=>{
       cookie1.style.display = "none";
-      // fade in cookie2
       cookie2.classList.add("visible");
     }, 250);
   }
@@ -241,7 +253,6 @@ cookie1.addEventListener("click", () => {
 cookie2.addEventListener("click", () => {
   cookiePing(cookie2);
 });
-
 </script>
 
 </body>
