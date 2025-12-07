@@ -113,6 +113,14 @@
     opacity: 1;
   }
 
+  /* 🔥 JUMPSCARE CLASS */
+  .jumpscare {
+    transform: translate(-50%, -50%) scale(8) !important;
+    opacity: 1 !important;
+    transition: transform 20ms linear;
+    z-index: 9999;
+  }
+
 </style>
 </head>
 <body>
@@ -214,6 +222,7 @@ const cookie1 = document.getElementById("cookie1");
 const cookie2 = document.getElementById("cookie2");
 
 let cookie1Clicks = 0;
+let cookie2Clicks = 0;
 
 function cookiePing(el){
   el.classList.remove("ping");
@@ -221,7 +230,7 @@ function cookiePing(el){
   el.classList.add("ping");
 }
 
-/* BUTTON CLICK — now triggers explosion immediately */
+/* BUTTON CLICK — explosion then cookie1 */
 btn.addEventListener("click", async () => {
   btn.classList.add("ping");
   btnClicks++;
@@ -235,7 +244,7 @@ btn.addEventListener("click", async () => {
   }
 });
 
-/* COOKIE 1 CLICKING — 5 clicks ➜ cookie2 */
+/* COOKIE 1 CLICKING — after 5 clicks -> cookie2 */
 cookie1.addEventListener("click", () => {
   cookiePing(cookie1);
   cookie1Clicks++;
@@ -249,9 +258,14 @@ cookie1.addEventListener("click", () => {
   }
 });
 
-/* COOKIE 2 CLICKING (does nothing but ping) */
+/* COOKIE 2 CLICKING — after 10 clicks -> JUMPSCARE */
 cookie2.addEventListener("click", () => {
   cookiePing(cookie2);
+  cookie2Clicks++;
+
+  if(cookie2Clicks >= 10){
+    cookie2.classList.add("jumpscare");
+  }
 });
 </script>
 
