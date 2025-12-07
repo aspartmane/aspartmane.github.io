@@ -1,95 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Cookie Click Explosion</title>
+<meta charset="utf-8" />
+<title>Begin</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 <style>
-    body {
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background: #000;
-        overflow: hidden;
-    }
+  html,body{
+    height:100%;
+    margin:0;
+    background:#000;
+    font-family: 'Press Start 2P', monospace;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
 
-    #container {
-        position: relative;
-        width: 200px;
-        height: 200px;
-    }
+  /* center stage */
+  .stage {
+    width:100%;
+    height:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+  }
 
-    #btn {
-        width: 200px;
-        height: 200px;
-        background-image: url("assets/cookie.png");
-        background-size: cover;
-        border: none;
-        cursor: pointer;
-        border-radius: 50%;
-        position: relative;
-        z-index: 2;
-    }
+  /* container keeps explosion + button aligned exactly */
+  #container {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    /* optional: keep a little room around */
+  }
 
-    /* EXPLOSION SPRITE */
-    #explosion {
-        position: absolute;
-        width: 512px;   /* sprite width divided by number of frames: 8192/16 = 512 */
-        height: 512px;  /* your sprite’s height */
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        background-image: url("assets/Explosion.png");
-        background-repeat: no-repeat;
-        background-size: 8192px 512px; /* 16 frames × 512px */
-        opacity: 0;
-        pointer-events: none;
-        z-index: 1;
-    }
+  /* BEGIN button (same behavior as before) */
+  #beginBtn{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+    z-index:4;
+    font-family: 'Press Start 2P', monospace;
+    font-size:18px;
+    color:#fff;
+    background: rgba(0,0,0,0.7);
+    border:none;
+    border-radius:10px;
+    padding:20px 32px;
+    cursor:pointer;
+    transition: transform .07s ease;
+    user-select:none;
+  }
+  #beginBtn:active{ transform: translate(-50%,-50%) scale(.85); }
 
-    /* SPRITE ANIMATION */
-    @keyframes spriteBoom {
-        0%   { background-position:   0px 0; opacity: 1; }
-        6%   { background-position: -512px 0; }
-        12%  { background-position: -1024px 0; }
-        18%  { background-position: -1536px 0; }
-        25%  { background-position: -2048px 0; }
-        31%  { background-position: -2560px 0; }
-        37%  { background-position: -3072px 0; }
-        43%  { background-position: -3584px 0; }
-        50%  { background-position: -4096px 0; }
-        56%  { background-position: -4608px 0; }
-        62%  { background-position: -5120px 0; }
-        68%  { background-position: -5632px 0; }
-        75%  { background-position: -6144px 0; }
-        81%  { background-position: -6656px 0; }
-        87%  { background-position: -7168px 0; }
-        100% { background-position: -7680px 0; opacity: 0; }
-    }
+  /* explosion element — background image will be the sprite sheet */
+  #explosion {
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+    z-index:3;
+    pointer-events:none; /* doesn't block clicks */
+    display:none;
+    image-rendering: pixelated; /* keep it crisp for pixel art */
+    will-change: background-position, opacity, transform;
+    opacity: 1;
+  }
 
-    .boom {
-        animation: spriteBoom 0.7s steps(1) forwards;
-    }
+  /* cookie (appears where button was) */
+  #cookie {
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+    z-index:5;
+    display:none;
+    width:180px;
+    height:180px;
+    background-image: url("assets/cookie.png");
+    background-size: cover;
+    background-position:center;
+    border:none;
+    cursor:pointer;
+    transition: transform .07s ease;
+    border-radius: 12px;
+  }
+  #cookie:active{ transform: translate(-50%,-50%) scale(.85); }
+
+  /* optional: a tiny fade when cookie appears */
+  .fade-in {
+    animation: fadeIn .18s ease forwards;
+  }
+  @keyframes fadeIn {
+    from{ opacity: 0; transform: translate(-50%,-50%) scale(.9); }
+    to  { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+  }
 </style>
 </head>
 <body>
-
-<div id="container">
-    <div id="explosion"></div>
-    <button id="btn"></button>
-</div>
+  <div class="stage">
+    <div id="container">
+      <div id="explosion"></div>
+      <button id="beginBtn">BEGIN</button>
+      <div id="cookie" title="cookie (does nothing yet)"></div>
+    </div>
+  </div>
 
 <script>
-    const button = document.getElementById("btn");
-    const explosion = document.getElementById("explosion");
+/*
+  Robust sprite player:
+  - detects frames by checking image naturalWidth / naturalHeight
+  - animates frames over a duration (durationMs)
+  - scales explosion based on sprite frame height and a scale factor
+  - hides button on 3rd click, plays explosion, then shows cookie
+*/
 
-    button.addEventListener("click", () => {
-        explosion.classList.remove("boom");
-        void explosion.offsetWidth; // restart animation
-        explosion.classList.add("boom");
-    });
+const beginBtn = document.getElementById('beginBtn');
+const explosionEl = document.getElementById('explosion');
+const cookieEl = document.getElementById('cookie');
+
+let clicks = 0;
+
+// CONFIG: animation duration in ms and visual scale
+const DURATION = 700;     // ms total (you can increase to 1000/1600 if you want slower)
+const SCALE = 2.0;        // how much to scale the raw frame size for display
+
+// preload the sprite so we can inspect its naturalWidth/Height
+const spriteUrl = "assets/Explosion.png";
+const spriteImg = new Image();
+spriteImg.src = spriteUrl;
+spriteImg.onload = () => {
+  setupExplosionFromImage(spriteImg);
+};
+spriteImg.onerror = () => {
+  console.error("Failed to load sprite:", spriteUrl);
+  // still allow the flow but explosion will be invisible
+};
+
+// store internal state for animation
+let FRAME_COUNT = 1;
+let FRAME_W = 0;
+let FRAME_H = 0;
+let playing = false;
+
+function setupExplosionFromImage(img){
+  // detect frames assuming single-row strip: frames = width / height
+  const w = img.naturalWidth;
+  const h = img.naturalHeight;
+
+  if (!w || !h) return;
+
+  // try integer division
+  const approx = w / h;
+  const rounded = Math.round(approx);
+
+  if (Math.abs(approx - rounded) < 0.01 && rounded >= 1) {
+    FRAME_COUNT = rounded;
+    FRAME_H = h;
+    FRAME_W = Math.round(w / FRAME_COUNT);
+  } else {
+    // fallback: treat sheet as square frames where frame size equals height,
+    // and use floor to avoid fractions
+    FRAME_H = h;
+    FRAME_COUNT = Math.floor(w / FRAME_H) || 1;
+    FRAME_W = Math.round(w / FRAME_COUNT);
+  }
+
+  // CSS sizing: set element size to frame size * SCALE
+  explosionEl.style.width  = (FRAME_W * SCALE) + "px";
+  explosionEl.style.height = (FRAME_H * SCALE) + "px";
+
+  // set background image and scaled background size so the sprite pixels scale properly
+  // background-size should scale the full atlas accordingly
+  explosionEl.style.backgroundImage = `url("${spriteUrl}")`;
+  explosionEl.style.backgroundSize  = (FRAME_W * FRAME_COUNT * SCALE) + "px " + (FRAME_H * SCALE) + "px";
+
+  // pre-set backgroundPosition to the first frame
+  explosionEl.style.backgroundPosition = "0px 0px";
+
+  // debug in console (optional)
+  // console.log("Sprite setup:", { FRAME_COUNT, FRAME_W, FRAME_H, approx });
+}
+
+// animate by updating background-position using requestAnimationFrame
+function playExplosionOnce(duration = DURATION){
+  if (playing) return;
+  if (FRAME_COUNT <= 1) {
+    // no frames; show for duration then hide
+    explosionEl.style.display = "block";
+    playing = true;
+    setTimeout(() => {
+      explosionEl.style.display = "none";
+      playing = false;
+    }, duration);
+    return;
+  }
+
+  const start = performance.now();
+  explosionEl.style.display = "block";
+  playing = true;
+
+  function frame(now){
+    const t = now - start;
+    if (t >= duration){
+      // final frame (hide)
+      explosionEl.style.display = "none";
+      playing = false;
+      return;
+    }
+    // progress [0..1)
+    const progress = Math.max(0, Math.min(0.9999, t / duration));
+    // pick frame index [0 .. FRAME_COUNT-1]
+    const idx = Math.floor(progress * FRAME_COUNT);
+    // compute background-position X (scaled)
+    const posX = - idx * FRAME_W * SCALE;
+    explosionEl.style.backgroundPosition = posX + "px 0px";
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+// Main button logic: on 3rd click hide button -> play explosion -> show cookie
+beginBtn.addEventListener('click', () => {
+  clicks++;
+  // keep click bounce - the CSS active state handles visual bounce
+
+  if (clicks === 3) {
+    // hide button
+    beginBtn.style.display = "none";
+
+    // show and play explosion
+    playExplosionOnce(DURATION);
+
+    // after animation, show cookie where button was
+    setTimeout(() => {
+      cookieEl.style.display = "block";
+      cookieEl.classList.add('fade-in');
+    }, DURATION);
+  }
+});
+
+// cookie is intentionally inert for now
+cookieEl.addEventListener('click', (e) => {
+  // no action yet
+});
+
+// optional: ensure focus/keyboard doesn't accidentally click repeatedly
+beginBtn.addEventListener('keydown', e => e.preventDefault());
 </script>
-
 </body>
 </html>
