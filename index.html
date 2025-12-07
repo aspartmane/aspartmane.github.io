@@ -40,7 +40,7 @@
   }
 
   /* -----------------------------------------------------
-      MINECRAFT GRASS BLOCK STYLE BUTTON
+      MINECRAFT GRASS BLOCK STYLE BUTTON (with fallbacks)
   ------------------------------------------------------*/
 
   #beginBtn {
@@ -52,43 +52,64 @@
     pointer-events: auto;
     cursor: pointer;
     user-select: none;
-
+    display: inline-block;
     padding: 22px 40px;
     font-size: 18px;
     color: #fff;
-    border: none;
+    border: 4px solid #2d1f0f;
     outline: none;
+    border-radius: 6px;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.9);
 
     font-family: "Press Start 2P", monospace;
-    text-shadow: 2px 2px #000;
 
-    /* Pixelated grass texture top */
+    /* Try to use the detailed textures first; if they fail, fall back to the CSS gradient below */
     background-image:
       url("assets/grass_top.png"),
-      url("assets/grass_side.png");
-    background-size: 100% 40px, 100% calc(100% - 40px);
-    background-position: top, bottom;
-    background-repeat: no-repeat;
+      url("assets/grass_side.png"),
+      linear-gradient(
+        to bottom,
+        #3fa63f 0%,      /* grass top fallback */
+        #3fa63f 22%,
+        #5e3b18 22%,     /* dirt fallback */
+        #5e3b18 100%
+      );
 
-    /* Pixel sharpness */
+    /* sizes: first image is top strip, second fills the bottom; fallback gradient fills everywhere */
+    background-size: 100% 42px, 100% calc(100% - 42px), auto;
+    background-position: top, bottom, 0 0;
+    background-repeat: no-repeat, repeat, no-repeat;
+
+    /* solid backup color in case images and gradient are ignored (very rare) */
+    background-color: #5e3b18;
+
+    /* pixel-y look if textures are pixel art */
     image-rendering: pixelated;
 
-    border-radius: 6px;
-    transition: transform 140ms cubic-bezier(.2,.9,.3,1);
+    /* smooth-ish hover animation */
+    transition: transform 140ms cubic-bezier(.2,.9,.3,1), filter 120ms;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
   }
 
+  /* hover / active */
+  #beginBtn:hover {
+    transform: translate(-50%,-50%) scale(1.05);
+    filter: brightness(1.15);
+  }
   #beginBtn:active {
     transform: translate(-50%,-50%) scale(0.92);
+    filter: brightness(0.9);
   }
 
-  .ping {
-    animation: ping 140ms cubic-bezier(.2,.9,.3,1);
-  }
+  /* CLICK PING EFFECT */
   @keyframes ping {
     0%   { transform: translate(-50%,-50%) scale(1); }
     40%  { transform: translate(-50%,-50%) scale(0.85); }
     100% { transform: translate(-50%,-50%) scale(1); }
   }
+  .ping { animation: ping 140ms cubic-bezier(.2,.9,.3,1); }
 
   #explosionCanvas {
     position: absolute;
@@ -117,45 +138,82 @@
     image-rendering: pixelated;
   }
 
-  #cookie1 {
-    width: 260px;
-    height: 260px;
-  }
-
-  #cookie2 {
-    width: 350px;
-    height: 350px;
-  }
+  #cookie1 { width: 260px; height: 260px; }
+  #cookie2 { width: 320px; height: 320px; }
 
   .cookie.visible {
     display: block;
     opacity: 1;
   }
 
-  /* GLITCH OVERLAY */
-  #glitchOverlay {
-    display: none;
+  .jumpscare {
+    transform: translate(-50%, -50%) scale(8) !important;
+    opacity: 1 !important;
+    transition: transform 20ms linear;
+    z-index: 9999;
+  }
+
+  /* ========== GLITCH OVERLAY ========== */
+  #glitchScreen {
     position: fixed;
     inset: 0;
-    background: black;
-    z-index: 9999;
+    background: #000;
+    display: none;
+    z-index: 10000;
+    pointer-events: none;
     overflow: hidden;
   }
-
-  .glitchLine {
+  .glash {
     position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0.0;
+    mix-blend-mode: screen;
+  }
+  .glash.green { background: #00ff00; mix-blend-mode: screen; }
+  .gl-block {
+    position: absolute;
+    background: #00ff22;
+    opacity: 0.0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+  .scanline {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 3px
+    );
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: difference;
+  }
+  .tear {
+    position: absolute;
+    left: 0;
     width: 100%;
-    height: 2px;
-    background: rgb(0,255,0);
-    opacity: 0.3;
-    animation: glitchMove 0.2s linear infinite;
+    height: 3px;
+    background: linear-gradient(90deg,#fff, #00ff00, #ff00ff);
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    transform: translateY(0);
   }
-
-  @keyframes glitchMove {
-    from { transform: translateX(-10%); }
-    to   { transform: translateX(110%); }
+  .static {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(255,255,255,0.03) 0 1px, transparent 2px),
+      radial-gradient(circle at 80% 70%, rgba(255,255,255,0.02) 0 1px, transparent 2px);
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
   }
-
+  .showBrief { opacity: 1 !important; transition: opacity 40ms linear !important; }
 </style>
 </head>
 <body>
@@ -166,19 +224,23 @@
 
   <button id="beginBtn">BEGIN</button>
 
-  <div id="cookie1" class="cookie"
-       style="background-image:url('assets/cookie1.png');"></div>
-
-  <div id="cookie2" class="cookie"
-       style="background-image:url('assets/cookie2.png');"></div>
-
+  <div id="cookie1" class="cookie" style="background-image:url('assets/cookie1.png');"></div>
+  <div id="cookie2" class="cookie" style="background-image:url('assets/cookie2.png');"></div>
 </div>
 
-<div id="glitchOverlay"></div>
+<!-- GLITCH OVERLAY (DOM) -->
+<div id="glitchScreen" aria-hidden="true">
+  <div id="glash-white" class="glash" ></div>
+  <div id="glash-green" class="glash green" ></div>
+  <div id="scanline" class="scanline"></div>
+  <div id="static" class="static"></div>
+  <div id="tear" class="tear"></div>
+  <div id="blocks-container"></div>
+</div>
 
 <script>
 /* -------------------------------------------------------
-   EXPLOSION SYSTEM
+   EXPLOSION SYSTEM (unchanged)
 --------------------------------------------------------- */
 
 const btn = document.getElementById("beginBtn");
@@ -252,12 +314,11 @@ function playSpriteOnce(duration) {
 }
 
 /* -------------------------------------------------------
-   COOKIE SYSTEM
+   COOKIE SYSTEM & JUMPSCARE -> GLITCH (UNCHANGED)
 --------------------------------------------------------- */
 
 const cookie1 = document.getElementById("cookie1");
 const cookie2 = document.getElementById("cookie2");
-const glitchOverlay = document.getElementById("glitchOverlay");
 
 let cookie1Clicks = 0;
 let cookie2Clicks = 0;
@@ -268,21 +329,19 @@ function cookiePing(el){
   el.classList.add("ping");
 }
 
-/* BUTTON CLICK — now triggers explosion immediately */
+/* BUTTON CLICK — explosion then cookie1 */
 btn.addEventListener("click", async () => {
   btn.classList.add("ping");
   btnClicks++;
 
   if(btnClicks === 1){
     btn.style.display = "none";
-
     await playSpriteOnce(DURATION);
-
     cookie1.classList.add("visible");
   }
 });
 
-/* COOKIE 1 CLICKING — 5 clicks ➜ cookie2 */
+/* COOKIE 1 CLICKING — after 5 clicks -> cookie2 */
 cookie1.addEventListener("click", () => {
   cookiePing(cookie1);
   cookie1Clicks++;
@@ -296,36 +355,108 @@ cookie1.addEventListener("click", () => {
   }
 });
 
-/* COOKIE 2 — 10 clicks ➜ JUMPSCARE + glitch */
+/* COOKIE 2 CLICKING — after 10 clicks -> JUMPSCARE then GLITCH sequence */
 cookie2.addEventListener("click", () => {
   cookiePing(cookie2);
   cookie2Clicks++;
 
-  if(cookie2Clicks === 10){
-    cookie2.style.transition = "transform 120ms ease";
-    cookie2.style.transform = "translate(-50%,-50%) scale(5)";
-    setTimeout(()=>{ startGlitch(); }, 400);
+  if(cookie2Clicks >= 10){
+    // perform instant jumpscare zoom
+    cookie2.classList.add("jumpscare");
+
+    // after 3 seconds freeze (keep zoom) then start the glitch blackout
+    setTimeout(() => {
+      startGlitchVoid(); // run the silent ultra-glitch
+    }, 3000);
   }
 });
 
-/* -------------------------------------------------------
-   GLITCH SYSTEM
---------------------------------------------------------- */
+/* ---------------------------
+   GLITCH VOID IMPLEMENTATION
+--------------------------- */
 
-function startGlitch(){
-  glitchOverlay.style.display = "block";
+const glitchScreen = document.getElementById("glitchScreen");
+const glashWhite = document.getElementById("glash-white");
+const glashGreen = document.getElementById("glash-green");
+const scanline = document.getElementById("scanline");
+const staticEl = document.getElementById("static");
+const tear = document.getElementById("tear");
+const blocksContainer = document.getElementById("blocks-container");
 
-  for(let i=0;i<60;i++){
-    const line = document.createElement("div");
-    line.className = "glitchLine";
-    line.style.top = Math.random()*100 + "%";
-    line.style.height = (1 + Math.random()*3) + "px";
-    glitchOverlay.appendChild(line);
+function rand(min, max){ return Math.random() * (max - min) + min; }
+function randint(min, max){ return Math.floor(rand(min, max)); }
+
+function spawnBlock(duration=80){
+  const b = document.createElement("div");
+  b.className = "gl-block";
+  const w = randint(6, 120);
+  const h = randint(4, 80);
+  b.style.width = w + "px";
+  b.style.height = h + "px";
+  b.style.left = randint(0, window.innerWidth - w) + "px";
+  b.style.top = randint(0, window.innerHeight - h) + "px";
+  b.style.opacity = "0.0";
+  const colors = ["#00ff00", "#00ff88", "#88ff00", "#ff00ff", "#ffffff"];
+  b.style.background = colors[randint(0, colors.length)];
+  blocksContainer.appendChild(b);
+  requestAnimationFrame(()=> b.style.opacity = "1");
+  setTimeout(()=> {
+    b.style.opacity = "0";
+    setTimeout(()=> { blocksContainer.removeChild(b); }, 80);
+  }, duration);
+}
+
+async function startGlitchVoid(){
+  glitchScreen.style.display = "block";
+  await new Promise(r=>setTimeout(r, 10));
+  const GLITCH_DURATION = 6000;
+  const start = performance.now();
+
+  function glitchStep(){
+    const elapsed = performance.now() - start;
+    if(elapsed > GLITCH_DURATION){
+      cleanupGlitch();
+      return;
+    }
+
+    const choice = Math.random();
+
+    if(choice < 0.15){
+      glashWhite.style.opacity = "1";
+      setTimeout(()=> glashWhite.style.opacity = "0", randint(30,120));
+    } else if(choice < 0.30){
+      glashGreen.style.opacity = "1";
+      setTimeout(()=> glashGreen.style.opacity = "0", randint(30,120));
+    } else if(choice < 0.55){
+      const count = randint(1, 6);
+      for(let i=0;i<count;i++) spawnBlock(randint(40,140));
+    } else if(choice < 0.7){
+      staticEl.style.opacity = 1;
+      setTimeout(()=> staticEl.style.opacity = 0, randint(40,140));
+    } else if(choice < 0.85){
+      tear.style.top = randint(0, window.innerHeight) + "px";
+      tear.style.opacity = 1;
+      setTimeout(()=> tear.style.opacity = 0, randint(30,160));
+    } else {
+      scanline.style.opacity = 0.5;
+      setTimeout(()=> scanline.style.opacity = 0, randint(30,100));
+    }
+
+    setTimeout(glitchStep, randint(40, 170));
   }
 
-  setTimeout(()=>{
-    glitchOverlay.style.background = "black";
-  }, 300);
+  glitchStep();
+}
+
+function cleanupGlitch(){
+  blocksContainer.querySelectorAll(".gl-block").forEach(n => n.remove());
+  glashWhite.style.opacity = 0;
+  glashGreen.style.opacity = 0;
+  staticEl.style.opacity = 0;
+  scanline.style.opacity = 0;
+  tear.style.opacity = 0;
+  glitchScreen.style.display = "block";
+  glitchScreen.style.background = "#000";
 }
 </script>
 
