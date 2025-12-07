@@ -13,12 +13,10 @@
     height: 100%;
     margin: 0;
     overflow: hidden;
-
     background-image: url("assets/dirt.png");
     background-size: 50px 50px;
     background-repeat: repeat;
     animation: slide 6s linear infinite;
-
     font-family: "Press Start 2P", monospace;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -47,7 +45,6 @@
     transform: translate(-50%,-50%);
     z-index: 20;
     pointer-events: auto;
-
     padding: 18px 38px;
     font-size: 18px;
     color: #fff;
@@ -58,7 +55,6 @@
     outline: none;
     transition: transform 120ms cubic-bezier(.2,.9,.3,1);
     user-select: none;
-
     font-family: "Press Start 2P", monospace;
   }
 
@@ -113,7 +109,7 @@
     opacity: 1;
   }
 
-  /* 🔥 JUMPSCARE CLASS */
+  /* 🔥 JUMPSCARE CLASS (instant zoom) */
   .jumpscare {
     transform: translate(-50%, -50%) scale(8) !important;
     opacity: 1 !important;
@@ -121,6 +117,81 @@
     z-index: 9999;
   }
 
+  /* ========== GLITCH OVERLAY ========== */
+  /* full black container that will host random glitch children */
+  #glitchScreen {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: none; /* shown by JS */
+    z-index: 10000;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  /* single-frame full white/colored flash overlays */
+  .glash {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0.0;
+    mix-blend-mode: screen;
+  }
+
+  .glash.green { background: #00ff00; mix-blend-mode: screen; }
+
+  /* tiny block glitches */
+  .gl-block {
+    position: absolute;
+    background: #00ff22;
+    opacity: 0.0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+
+  /* scanline flicker (very subtle, optional) */
+  .scanline {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 3px
+    );
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: difference;
+  }
+
+  /* chromatic tear line */
+  .tear {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg,#fff, #00ff00, #ff00ff);
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    transform: translateY(0);
+  }
+
+  /* subtle static noise using radial-gradients layered (kept low impact) */
+  .static {
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(255,255,255,0.03) 0 1px, transparent 2px),
+      radial-gradient(circle at 80% 70%, rgba(255,255,255,0.02) 0 1px, transparent 2px);
+    opacity: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+  }
+
+  /* utility helper to show element briefly */
+  .showBrief { opacity: 1 !important; transition: opacity 40ms linear !important; }
 </style>
 </head>
 <body>
@@ -131,17 +202,25 @@
 
   <button id="beginBtn">BEGIN</button>
 
-  <div id="cookie1" class="cookie"
-       style="background-image:url('assets/cookie1.png');"></div>
+  <div id="cookie1" class="cookie" style="background-image:url('assets/cookie1.png');"></div>
+  <div id="cookie2" class="cookie" style="background-image:url('assets/cookie2.png');"></div>
+</div>
 
-  <div id="cookie2" class="cookie"
-       style="background-image:url('assets/cookie2.png');"></div>
-
+<!-- GLITCH OVERLAY (in DOM but hidden until used) -->
+<div id="glitchScreen" aria-hidden="true">
+  <div id="glash-white" class="glash" ></div>
+  <div id="glash-green" class="glash green" ></div>
+  <div id="scanline" class="scanline"></div>
+  <div id="static" class="static"></div>
+  <div id="tear" class="tear"></div>
+  <!-- container for random blocks -->
+  <div id="blocks-container"></div>
 </div>
 
 <script>
 /* -------------------------------------------------------
    EXPLOSION SYSTEM
+   (unchanged)
 --------------------------------------------------------- */
 
 const btn = document.getElementById("beginBtn");
@@ -215,7 +294,7 @@ function playSpriteOnce(duration) {
 }
 
 /* -------------------------------------------------------
-   COOKIE SYSTEM
+   COOKIE SYSTEM & JUMPSCARE -> GLITCH (NEW)
 --------------------------------------------------------- */
 
 const cookie1 = document.getElementById("cookie1");
@@ -237,9 +316,7 @@ btn.addEventListener("click", async () => {
 
   if(btnClicks === 1){
     btn.style.display = "none";
-
     await playSpriteOnce(DURATION);
-
     cookie1.classList.add("visible");
   }
 });
@@ -258,15 +335,144 @@ cookie1.addEventListener("click", () => {
   }
 });
 
-/* COOKIE 2 CLICKING — after 10 clicks -> JUMPSCARE */
+/* COOKIE 2 CLICKING — after 10 clicks -> JUMPSCARE then GLITCH sequence */
 cookie2.addEventListener("click", () => {
   cookiePing(cookie2);
   cookie2Clicks++;
 
   if(cookie2Clicks >= 10){
+    // perform instant jumpscare zoom
     cookie2.classList.add("jumpscare");
+
+    // after 3 seconds freeze (keep zoom) then start the glitch blackout
+    setTimeout(() => {
+      startGlitchVoid(); // run the silent ultra-glitch
+    }, 3000);
   }
 });
+
+/* ---------------------------
+   GLITCH VOID IMPLEMENTATION
+   silent, randomized, violent
+   runs ~6 seconds then stays black
+--------------------------- */
+
+const glitchScreen = document.getElementById("glitchScreen");
+const glashWhite = document.getElementById("glash-white");
+const glashGreen = document.getElementById("glash-green");
+const scanline = document.getElementById("scanline");
+const staticEl = document.getElementById("static");
+const tear = document.getElementById("tear");
+const blocksContainer = document.getElementById("blocks-container");
+
+function rand(min, max){ return Math.random() * (max - min) + min; }
+function randint(min, max){ return Math.floor(rand(min, max)); }
+
+function showBrief(el, duration=60){
+  el.classList.add("showBrief");
+  setTimeout(()=> el.classList.remove("showBrief"), duration);
+}
+
+/* create a single random pixel block flash */
+function spawnBlock(duration=80){
+  const b = document.createElement("div");
+  b.className = "gl-block";
+  const w = randint(6, 120);
+  const h = randint(4, 80);
+  b.style.width = w + "px";
+  b.style.height = h + "px";
+  b.style.left = randint(0, window.innerWidth - w) + "px";
+  b.style.top = randint(0, window.innerHeight - h) + "px";
+  b.style.opacity = "0.0";
+  // color variations
+  const colors = ["#00ff00", "#00ff88", "#88ff00", "#ff00ff", "#ffffff"];
+  b.style.background = colors[randint(0, colors.length)];
+  blocksContainer.appendChild(b);
+  // brief flash
+  requestAnimationFrame(()=>{
+    b.style.opacity = "1";
+  });
+  setTimeout(()=> {
+    b.style.opacity = "0";
+    setTimeout(()=> { blocksContainer.removeChild(b); }, 80);
+  }, duration);
+}
+
+async function startGlitchVoid(){
+  // show black overlay immediately
+  glitchScreen.style.display = "block";
+
+  // run a random storm for ~6000ms
+  const GLITCH_DURATION = 6000;
+  const start = performance.now();
+
+  // ensure the screen is fully black initially (we already have blackout)
+  // quick tiny delay to ensure DOM updated
+  await new Promise(r=>setTimeout(r, 10));
+
+  // main loop uses setInterval-ish behavior via recursive timeout
+  function glitchStep(){
+    const elapsed = performance.now() - start;
+    if(elapsed > GLITCH_DURATION){
+      // finish: keep the screen black and clear children
+      cleanupGlitch();
+      return;
+    }
+
+    // Randomly pick a glitch event to show briefly
+    const choice = Math.random();
+
+    if(choice < 0.15){
+      // white flash single-frame
+      glashWhite.style.opacity = "1";
+      setTimeout(()=> glashWhite.style.opacity = "0", randint(30,120));
+    } else if(choice < 0.30){
+      // green flash
+      glashGreen.style.opacity = "1";
+      setTimeout(()=> glashGreen.style.opacity = "0", randint(30,120));
+    } else if(choice < 0.55){
+      // spawn a few tiny blocks
+      const count = randint(1, 6);
+      for(let i=0;i<count;i++) spawnBlock(randint(40,140));
+    } else if(choice < 0.7){
+      // brief static overlay
+      staticEl.style.opacity = 1;
+      setTimeout(()=> staticEl.style.opacity = 0, randint(40,140));
+    } else if(choice < 0.85){
+      // tear line flash across random Y
+      tear.style.top = randint(0, window.innerHeight) + "px";
+      tear.style.opacity = 1;
+      setTimeout(()=> tear.style.opacity = 0, randint(30,160));
+    } else {
+      // tiny scanline flicker
+      scanline.style.opacity = 0.5;
+      setTimeout(()=> scanline.style.opacity = 0, randint(30,100));
+    }
+
+    // schedule next glitch event shortly (random)
+    const next = randint(40, 170);
+    setTimeout(glitchStep, next);
+  }
+
+  glitchStep();
+}
+
+function cleanupGlitch(){
+  // remove any remaining blocks quickly
+  blocksContainer.querySelectorAll(".gl-block").forEach(n => n.remove());
+  // hide overlays
+  glashWhite.style.opacity = 0;
+  glashGreen.style.opacity = 0;
+  staticEl.style.opacity = 0;
+  scanline.style.opacity = 0;
+  tear.style.opacity = 0;
+  // leave glitchScreen visible as dead black
+  glitchScreen.style.display = "block";
+  glitchScreen.style.background = "#000";
+  // no further action (silence)
+}
+
+/* End of glitch implementation */
 </script>
 
 </body>
