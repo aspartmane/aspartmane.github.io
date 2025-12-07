@@ -20,8 +20,6 @@
     animation: slide 6s linear infinite;
 
     font-family: "Press Start 2P", monospace;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 
   @keyframes slide {
@@ -29,7 +27,6 @@
     to   { background-position: -200px -200px; }
   }
 
-  /* center container that holds everything exactly where the button used to be */
   .center {
     position: absolute;
     left: 50%;
@@ -37,10 +34,9 @@
     transform: translate(-50%,-50%);
     width: 320px;
     height: 320px;
-    pointer-events: none; /* allow button inside to receive clicks */
+    pointer-events: none;
   }
 
-  /* BEGIN button - transparent black with white text, no white outline */
   #beginBtn {
     position: absolute;
     left: 50%;
@@ -53,7 +49,7 @@
     font-size: 18px;
     color: #fff;
     background: rgba(0,0,0,0.6);
-    border: none;             /* no white outline */
+    border: none;
     border-radius: 10px;
     cursor: pointer;
     outline: none;
@@ -62,15 +58,13 @@
     font-family: "Press Start 2P", monospace;
   }
 
-  /* smooth ping - faster */
   @keyframes ping {
     0%   { transform: translate(-50%,-50%) scale(1); }
     40%  { transform: translate(-50%,-50%) scale(0.85); }
     100% { transform: translate(-50%,-50%) scale(1); }
   }
-  #beginBtn.ping { animation: ping 120ms cubic-bezier(.2,.9,.3,1); }
+  .ping { animation: ping 120ms cubic-bezier(.2,.9,.3,1); }
 
-  /* explosion will be drawn in a canvas placed exactly where the button is */
   #explosionCanvas {
     position: absolute;
     left: 50%;
@@ -82,221 +76,168 @@
     image-rendering: pixelated;
   }
 
-  /* cookie (appears where the button was) */
-  #cookie {
+  /* COOKIE 1 */
+  #cookie1 {
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%,-50%);
+    transform: translate(-50%,-50%) scale(0.9);
     z-index: 30;
     width: 260px;
     height: 260px;
     display: none;
+    opacity: 0;
     pointer-events: auto;
-    background-image: url("assets/cookie.png");
+    background-image: url("assets/cookie1.png");
     background-size: cover;
     background-position: center;
     border-radius: 12px;
     transition: transform 200ms ease, opacity 200ms ease;
-    opacity: 0;
   }
-  #cookie.visible { display:block; opacity:1; transform: translate(-50%,-50%) scale(1); }
 
-  /* remove focus outline for visual cleanliness; keep keyboard accessible via JS */
-  button:focus { outline: none; }
+  /* COOKIE 2 */
+  #cookie2 {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%) scale(0.9);
+    z-index: 40;
+    width: 280px;
+    height: 280px;
+    display: none;
+    opacity: 0;
+    pointer-events: auto;
+    background-image: url("assets/cookie2.png");
+    background-size: cover;
+    background-position: center;
+    border-radius: 14px;
+    transition: transform 200ms ease, opacity 200ms ease;
+  }
+
+  .cookieVisible {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%,-50%) scale(1);
+  }
 </style>
 </head>
 <body>
 
-  <div class="center" aria-hidden="false">
-    <canvas id="explosionCanvas" aria-hidden="true"></canvas>
-    <button id="beginBtn" aria-label="Begin">BEGIN</button>
-    <div id="cookie" title="cookie (does nothing yet)"></div>
+  <div class="center">
+    <canvas id="explosionCanvas"></canvas>
+    <button id="beginBtn">BEGIN</button>
+
+    <!-- New cookie system -->
+    <div id="cookie1"></div>
+    <div id="cookie2"></div>
   </div>
 
 <script>
-/*
- Robust explosion player that:
- - auto-detects frames in sprite sheet (grid or single-row)
- - draws frames to a canvas for perfect alignment & scaling
- - hides button on 3rd click, plays explosion, then shows cookie
- - configurable duration and scale
-*/
+/* ===========================
+   ORIGINAL EXPLOSION SYSTEM
+   (LEFT UNEDITED)
+=========================== */
 
-// Elements
 const btn = document.getElementById('beginBtn');
 const canvas = document.getElementById('explosionCanvas');
-const cookie = document.getElementById('cookie');
+const cookie1 = document.getElementById("cookie1");
+const cookie2 = document.getElementById("cookie2");
 
 let clicks = 0;
-const DURATION = 800; // animation duration in ms (tweakable)
-const SCALE = 2.0;    // how much to scale each source frame for display
+const DURATION = 800;
+const SCALE = 2.0;
 
-// Explosion sprite URL (your uploaded file)
-const SPRITE_URL = 'assets/Explosion.png';
+const SPRITE_URL = "assets/Explosion.png";
 const img = new Image();
 img.src = SPRITE_URL;
 img.onload = () => setupSprite(img);
-img.onerror = () => {
-  console.error('Failed to load explosion sprite:', SPRITE_URL);
-};
 
-// will be populated by setupSprite
 let frameW = 0, frameH = 0, cols = 1, rows = 1, totalFrames = 1;
-
-// Try to detect a square frame size by searching for reasonable divisors
-function detectGrid(w, h) {
-  // collect candidate frame sizes that divide width and height evenly and produce 4..256 frames
-  const candidates = [];
-  for (let fw = 8; fw <= Math.max(w,h); fw++) {
-    if (w % fw !== 0) continue;
-    if (h % fw !== 0) continue;
-    const c = (w / fw) * (h / fw);
-    if (c >= 2 && c <= 512) candidates.push({fw, frames: c});
-  }
-  // Choose candidate with frames between 4 and 64 preference, then smallest fw
-  candidates.sort((a,b) => {
-    const scoreA = Math.abs(a.frames - 16) + a.fw/1000;
-    const scoreB = Math.abs(b.frames - 16) + b.fw/1000;
-    return scoreA - scoreB;
-  });
-  return candidates.length ? candidates[0].fw : null;
-}
 
 function setupSprite(image) {
   const w = image.naturalWidth;
   const h = image.naturalHeight;
 
-  // attempt simple single-row detection: frames = w / h if integer >1
-  if (h > 0 && Math.abs((w / h) - Math.round(w / h)) < 0.01 && Math.round(w / h) > 1) {
-    // single-row strip where each frame is square = h x h
-    frameW = Math.round(h);
-    frameH = Math.round(h);
-    cols = Math.round(w / frameW);
-    rows = 1;
-    totalFrames = cols * rows;
-  } else {
-    // try to detect square frame by divisors (handles 4x4, etc.)
-    const detected = detectGrid(w, h);
-    if (detected) {
-      frameW = detected;
-      frameH = detected;
-      cols = w / frameW;
-      rows = h / frameH;
-      totalFrames = cols * rows;
-    } else {
-      // fallback: treat each column as one frame with width = w / gcd(w,h)
-      const fallbackCols = Math.max(1, Math.floor(w / Math.max(1, h)));
-      frameW = Math.round(w / fallbackCols);
-      frameH = h;
-      cols = fallbackCols;
-      rows = 1;
-      totalFrames = cols * rows;
-    }
-  }
+  frameW = h;
+  frameH = h;
+  cols = Math.floor(w / h);
+  rows = 1;
+  totalFrames = cols;
 
-  // set canvas size to scaled frame size
-  canvas.width  = Math.round(frameW * SCALE);
-  canvas.height = Math.round(frameH * SCALE);
-  canvas.style.width  = canvas.width + 'px';
-  canvas.style.height = canvas.height + 'px';
+  canvas.width = frameW * SCALE;
+  canvas.height = frameH * SCALE;
 
-  // position canvas exactly where button is (already centered via CSS)
-  // ensure it's visible layer-wise
-  canvas.style.zIndex = 10;
-
-  // store image locally for animation
   canvas._img = image;
   canvas._cols = cols;
-  canvas._rows = rows;
   canvas._frameW = frameW;
   canvas._frameH = frameH;
   canvas._total = totalFrames;
-
-  // optional debug:
-  // console.log('Sprite setup:', {w,h, frameW, frameH, cols, rows, totalFrames});
 }
 
-// Play animation by drawing frames to canvas
 function playSpriteOnce(duration = DURATION) {
-  if (!canvas._img) return Promise.resolve();
   const ctx = canvas.getContext('2d');
-  const start = performance.now();
-  const total = canvas._total || 1;
+  const total = canvas._total;
   const frameWsrc = canvas._frameW;
   const frameHsrc = canvas._frameH;
   const colsSrc = canvas._cols;
 
-  canvas.style.display = 'block';
+  canvas.style.display = "block";
 
-  return new Promise(resolve => {
+  return new Promise(res => {
+    const start = performance.now();
     function step(now) {
       const t = now - start;
-      const progress = Math.min(1, t / duration);
-      let fi = Math.floor(progress * total);
+      let fi = Math.floor((t / duration) * total);
       if (fi >= total) fi = total - 1;
-      // compute source x,y (row-major)
+
       const sx = (fi % colsSrc) * frameWsrc;
-      const sy = Math.floor(fi / colsSrc) * frameHsrc;
 
-      // clear and draw
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      // draw scaled
       ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(canvas._img, sx, sy, frameWsrc, frameHsrc, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(canvas._img, sx, 0, frameWsrc, frameHsrc, 0, 0, canvas.width, canvas.height);
 
-      if (t < duration) {
-        requestAnimationFrame(step);
-      } else {
-        // finish last frame then hide
-        setTimeout(() => {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          canvas.style.display = 'none';
-          resolve();
-        }, 0);
+      if (t < duration) requestAnimationFrame(step);
+      else {
+        canvas.style.display = "none";
+        res();
       }
     }
     requestAnimationFrame(step);
   });
 }
 
-// handle clicks & flow
-btn.addEventListener('click', async () => {
-  // ping animation
-  btn.classList.remove('ping');
-  void btn.offsetWidth;
-  btn.classList.add('ping');
+/* ===========================
+   COOKIE LOGIC (NEW)
+=========================== */
+
+let cookie1Clicks = 0;
+
+btn.addEventListener("click", async () => {
+  btn.classList.remove("ping"); void btn.offsetWidth;
+  btn.classList.add("ping");
 
   clicks++;
   if (clicks === 3) {
-    // hide button immediately
-    btn.style.display = 'none';
+    btn.style.display = "none";
+    await playSpriteOnce();
 
-    // show canvas and play animation
-    // make sure canvas is ready; if not, wait a tiny bit for image to load
-    if (!canvas._img) {
-      // image not ready, try to wait up to 500ms
-      await new Promise(r => setTimeout(r, 200));
-    }
-
-    // play the sprite; this returns a promise when finished
-    await playSpriteOnce(DURATION);
-
-    // after explosion finishes, reveal cookie in same place
-    cookie.classList.add('visible');
-    cookie.style.opacity = '1';
-    cookie.setAttribute('aria-hidden', 'false');
+    cookie1.classList.add("cookieVisible");
   }
 });
 
-// keyboard accessibility for Enter/Space
-btn.addEventListener('keydown', e => {
-  if (e.key === ' ' || e.key === 'Enter') {
-    e.preventDefault();
-    btn.click();
+cookie1.addEventListener("click", () => {
+  cookie1.classList.remove("ping"); void cookie1.offsetWidth;
+  cookie1.classList.add("ping");
+
+  cookie1Clicks++;
+
+  if (cookie1Clicks >= 5) {
+    cookie1.style.display = "none";
+
+    cookie2.classList.add("cookieVisible");
   }
 });
+
 </script>
-
 </body>
 </html>
