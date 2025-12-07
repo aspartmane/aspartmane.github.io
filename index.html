@@ -39,18 +39,20 @@
         padding: 20px 40px;
         color: white;
         background: rgba(0,0,0,0.7);
-        border: 3px solid white;
+        border: none; /* removed white outline */
         border-radius: 10px;
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
         cursor: pointer;
-        transition: transform 0.1s ease;
+        transition: transform 0.07s ease;
+        box-shadow: 0 0 0px #fff;
     }
 
+    /* CLICK ANIMATION (Cookie Clicker style bounce) */
     #beginBtn:active {
-        transform: translate(-50%, -50%) scale(0.9);
+        transform: translate(-50%, -50%) scale(0.85);
     }
 
     /* EXPLOSION */
@@ -71,6 +73,12 @@
         left: 50%;
         transform: translate(-50%, -50%);
         display: none;
+        cursor: pointer;
+        transition: transform 0.07s ease;
+    }
+
+    #cookie:active {
+        transform: translate(-50%, -50%) scale(0.85);
     }
 </style>
 </head>
@@ -86,18 +94,25 @@
 <script>
 let clicks = 0;
 
-document.getElementById("beginBtn").onclick = function() {
+const beginBtn = document.getElementById("beginBtn");
+const explosion = document.getElementById("explosion");
+const cookie = document.getElementById("cookie");
+
+beginBtn.onclick = function() {
     clicks++;
 
     if (clicks === 3) {
-        // Show explosion
-        document.getElementById("explosion").style.display = "block";
+        explosion.style.display = "block";
 
-        // After 1s show cookie
         setTimeout(() => {
-            document.getElementById("cookie").style.display = "block";
+            cookie.style.display = "block";
         }, 1000);
     }
+};
+
+// Cookie is clickable but does nothing (for now)
+cookie.onclick = function() {
+    // intentionally empty
 };
 </script>
 
