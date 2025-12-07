@@ -13,10 +13,12 @@
     height: 100%;
     margin: 0;
     overflow: hidden;
+
     background-image: url("assets/dirt.png");
     background-size: 50px 50px;
     background-repeat: repeat;
     animation: slide 6s linear infinite;
+
     font-family: "Press Start 2P", monospace;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -37,7 +39,10 @@
     pointer-events: none;
   }
 
-  /* ⭐ NEW MINECRAFT GRASS-BLOCK BEGIN BUTTON ⭐ */
+  /* -----------------------------------------------------
+      MINECRAFT GRASS BLOCK STYLE BUTTON (with fallbacks)
+  ------------------------------------------------------*/
+
   #beginBtn {
     position: absolute;
     left: 50%;
@@ -45,41 +50,60 @@
     transform: translate(-50%,-50%);
     z-index: 20;
     pointer-events: auto;
-    padding: 20px 50px;
-    font-size: 20px;
     cursor: pointer;
     user-select: none;
+    display: inline-block;
+    padding: 22px 40px;
+    font-size: 18px;
+    color: #fff;
+    border: 4px solid #2d1f0f;
+    outline: none;
+    border-radius: 6px;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.9);
 
-    /* FONT */
     font-family: "Press Start 2P", monospace;
-    color: white;
-    text-shadow: 2px 2px 0px black;
 
-    /* MINECRAFT BLOCK LOOK */
-    background: linear-gradient(
-      to bottom,
-      #3fa63f 0%,      /* Grass top */
-      #3fa63f 22%,
-      #5e3b18 22%,     /* Dirt sides */
-      #5e3b18 100%
-    );
-    border: 4px solid #2d1f0f;  /* dark pixel border */
-    border-radius: 8px;
+    /* Try to use the detailed textures first; if they fail, fall back to the CSS gradient below */
+    background-image:
+      url("assets/grass_top.png"),
+      url("assets/grass_side.png"),
+      linear-gradient(
+        to bottom,
+        #3fa63f 0%,      /* grass top fallback */
+        #3fa63f 22%,
+        #5e3b18 22%,     /* dirt fallback */
+        #5e3b18 100%
+      );
 
-    transition: transform 0.1s, filter 0.1s;
+    /* sizes: first image is top strip, second fills the bottom; fallback gradient fills everywhere */
+    background-size: 100% 42px, 100% calc(100% - 42px), auto;
+    background-position: top, bottom, 0 0;
+    background-repeat: no-repeat, repeat, no-repeat;
+
+    /* solid backup color in case images and gradient are ignored (very rare) */
+    background-color: #5e3b18;
+
+    /* pixel-y look if textures are pixel art */
+    image-rendering: pixelated;
+
+    /* smooth-ish hover animation */
+    transition: transform 140ms cubic-bezier(.2,.9,.3,1), filter 120ms;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
   }
 
+  /* hover / active */
   #beginBtn:hover {
-    transform: translate(-50%,-50%) scale(1.07);
-    filter: brightness(1.25);
+    transform: translate(-50%,-50%) scale(1.05);
+    filter: brightness(1.15);
   }
-
   #beginBtn:active {
     transform: translate(-50%,-50%) scale(0.92);
-    filter: brightness(0.85);
+    filter: brightness(0.9);
   }
 
-  /* CLICK PING EFFECT (unchanged) */
+  /* CLICK PING EFFECT */
   @keyframes ping {
     0%   { transform: translate(-50%,-50%) scale(1); }
     40%  { transform: translate(-50%,-50%) scale(0.85); }
@@ -106,12 +130,12 @@
     transform: translate(-50%,-50%) scale(1);
     background-size: cover;
     background-position: center;
-    border-radius: 12px;
     display: none;
     opacity: 0;
     pointer-events: auto;
     transition: opacity 250ms ease, transform 160ms ease;
     z-index: 30;
+    image-rendering: pixelated;
   }
 
   #cookie1 { width: 260px; height: 260px; }
@@ -129,7 +153,7 @@
     z-index: 9999;
   }
 
-  /* GLITCH OVERLAY SYSTEM (unchanged) */
+  /* ========== GLITCH OVERLAY ========== */
   #glitchScreen {
     position: fixed;
     inset: 0;
@@ -139,7 +163,6 @@
     pointer-events: none;
     overflow: hidden;
   }
-
   .glash {
     position: absolute;
     inset: 0;
@@ -148,7 +171,6 @@
     mix-blend-mode: screen;
   }
   .glash.green { background: #00ff00; mix-blend-mode: screen; }
-
   .gl-block {
     position: absolute;
     background: #00ff22;
@@ -156,7 +178,6 @@
     pointer-events: none;
     mix-blend-mode: screen;
   }
-
   .scanline {
     position: absolute;
     inset: 0;
@@ -171,18 +192,17 @@
     pointer-events: none;
     mix-blend-mode: difference;
   }
-
   .tear {
     position: absolute;
     left: 0;
     width: 100%;
     height: 3px;
-    background: linear-gradient(90deg,#fff,#00ff00,#ff00ff);
+    background: linear-gradient(90deg,#fff, #00ff00, #ff00ff);
     opacity: 0;
     pointer-events: none;
     mix-blend-mode: screen;
+    transform: translateY(0);
   }
-
   .static {
     position: absolute;
     inset: 0;
@@ -193,7 +213,6 @@
     pointer-events: none;
     mix-blend-mode: screen;
   }
-
   .showBrief { opacity: 1 !important; transition: opacity 40ms linear !important; }
 </style>
 </head>
@@ -209,9 +228,10 @@
   <div id="cookie2" class="cookie" style="background-image:url('assets/cookie2.png');"></div>
 </div>
 
+<!-- GLITCH OVERLAY (DOM) -->
 <div id="glitchScreen" aria-hidden="true">
-  <div id="glash-white" class="glash"></div>
-  <div id="glash-green" class="glash green"></div>
+  <div id="glash-white" class="glash" ></div>
+  <div id="glash-green" class="glash green" ></div>
   <div id="scanline" class="scanline"></div>
   <div id="static" class="static"></div>
   <div id="tear" class="tear"></div>
@@ -219,7 +239,10 @@
 </div>
 
 <script>
-/* ----- Explosion system (unchanged) ----- */
+/* -------------------------------------------------------
+   EXPLOSION SYSTEM (unchanged)
+--------------------------------------------------------- */
+
 const btn = document.getElementById("beginBtn");
 const canvas = document.getElementById("explosionCanvas");
 
@@ -290,7 +313,10 @@ function playSpriteOnce(duration) {
   });
 }
 
-/* ---- Cookies + jumpscare → glitch ---- */
+/* -------------------------------------------------------
+   COOKIE SYSTEM & JUMPSCARE -> GLITCH (UNCHANGED)
+--------------------------------------------------------- */
+
 const cookie1 = document.getElementById("cookie1");
 const cookie2 = document.getElementById("cookie2");
 
@@ -303,6 +329,7 @@ function cookiePing(el){
   el.classList.add("ping");
 }
 
+/* BUTTON CLICK — explosion then cookie1 */
 btn.addEventListener("click", async () => {
   btn.classList.add("ping");
   btnClicks++;
@@ -314,6 +341,7 @@ btn.addEventListener("click", async () => {
   }
 });
 
+/* COOKIE 1 CLICKING — after 5 clicks -> cookie2 */
 cookie1.addEventListener("click", () => {
   cookiePing(cookie1);
   cookie1Clicks++;
@@ -327,19 +355,26 @@ cookie1.addEventListener("click", () => {
   }
 });
 
+/* COOKIE 2 CLICKING — after 10 clicks -> JUMPSCARE then GLITCH sequence */
 cookie2.addEventListener("click", () => {
   cookiePing(cookie2);
   cookie2Clicks++;
 
   if(cookie2Clicks >= 10){
+    // perform instant jumpscare zoom
     cookie2.classList.add("jumpscare");
+
+    // after 3 seconds freeze (keep zoom) then start the glitch blackout
     setTimeout(() => {
-      startGlitchVoid();
+      startGlitchVoid(); // run the silent ultra-glitch
     }, 3000);
   }
 });
 
-/* ---- Glitch system (unchanged) ---- */
+/* ---------------------------
+   GLITCH VOID IMPLEMENTATION
+--------------------------- */
+
 const glitchScreen = document.getElementById("glitchScreen");
 const glashWhite = document.getElementById("glash-white");
 const glashGreen = document.getElementById("glash-green");
@@ -348,56 +383,58 @@ const staticEl = document.getElementById("static");
 const tear = document.getElementById("tear");
 const blocksContainer = document.getElementById("blocks-container");
 
-function rand(a,b){ return Math.random()*(b-a)+a; }
-function randint(a,b){ return Math.floor(rand(a,b)); }
+function rand(min, max){ return Math.random() * (max - min) + min; }
+function randint(min, max){ return Math.floor(rand(min, max)); }
 
 function spawnBlock(duration=80){
   const b = document.createElement("div");
   b.className = "gl-block";
-  const w = randint(6,120);
-  const h = randint(4,80);
-  b.style.width = w+"px";
-  b.style.height = h+"px";
-  b.style.left = randint(0,window.innerWidth-w)+"px";
-  b.style.top = randint(0,window.innerHeight-h)+"px";
-  b.style.opacity = "0";
+  const w = randint(6, 120);
+  const h = randint(4, 80);
+  b.style.width = w + "px";
+  b.style.height = h + "px";
+  b.style.left = randint(0, window.innerWidth - w) + "px";
+  b.style.top = randint(0, window.innerHeight - h) + "px";
+  b.style.opacity = "0.0";
+  const colors = ["#00ff00", "#00ff88", "#88ff00", "#ff00ff", "#ffffff"];
+  b.style.background = colors[randint(0, colors.length)];
   blocksContainer.appendChild(b);
   requestAnimationFrame(()=> b.style.opacity = "1");
   setTimeout(()=> {
     b.style.opacity = "0";
-    setTimeout(()=> b.remove(), 80);
+    setTimeout(()=> { blocksContainer.removeChild(b); }, 80);
   }, duration);
 }
 
 async function startGlitchVoid(){
   glitchScreen.style.display = "block";
-  await new Promise(r=>setTimeout(r,10));
-
+  await new Promise(r=>setTimeout(r, 10));
   const GLITCH_DURATION = 6000;
   const start = performance.now();
 
   function glitchStep(){
-    const t = performance.now() - start;
-    if(t > GLITCH_DURATION){
+    const elapsed = performance.now() - start;
+    if(elapsed > GLITCH_DURATION){
       cleanupGlitch();
       return;
     }
 
-    const r = Math.random();
+    const choice = Math.random();
 
-    if(r < 0.15){
-      glashWhite.style.opacity = 1;
-      setTimeout(()=> glashWhite.style.opacity = 0, randint(30,120));
-    } else if(r < 0.30){
-      glashGreen.style.opacity = 1;
-      setTimeout(()=> glashGreen.style.opacity = 0, randint(30,120));
-    } else if(r < 0.55){
-      for(let i=0;i<randint(1,6);i++) spawnBlock(randint(40,140));
-    } else if(r < 0.7){
+    if(choice < 0.15){
+      glashWhite.style.opacity = "1";
+      setTimeout(()=> glashWhite.style.opacity = "0", randint(30,120));
+    } else if(choice < 0.30){
+      glashGreen.style.opacity = "1";
+      setTimeout(()=> glashGreen.style.opacity = "0", randint(30,120));
+    } else if(choice < 0.55){
+      const count = randint(1, 6);
+      for(let i=0;i<count;i++) spawnBlock(randint(40,140));
+    } else if(choice < 0.7){
       staticEl.style.opacity = 1;
       setTimeout(()=> staticEl.style.opacity = 0, randint(40,140));
-    } else if(r < 0.85){
-      tear.style.top = randint(0,window.innerHeight)+"px";
+    } else if(choice < 0.85){
+      tear.style.top = randint(0, window.innerHeight) + "px";
       tear.style.opacity = 1;
       setTimeout(()=> tear.style.opacity = 0, randint(30,160));
     } else {
@@ -405,14 +442,14 @@ async function startGlitchVoid(){
       setTimeout(()=> scanline.style.opacity = 0, randint(30,100));
     }
 
-    setTimeout(glitchStep, randint(40,170));
+    setTimeout(glitchStep, randint(40, 170));
   }
 
   glitchStep();
 }
 
 function cleanupGlitch(){
-  blocksContainer.querySelectorAll(".gl-block").forEach(n=>n.remove());
+  blocksContainer.querySelectorAll(".gl-block").forEach(n => n.remove());
   glashWhite.style.opacity = 0;
   glashGreen.style.opacity = 0;
   staticEl.style.opacity = 0;
@@ -421,7 +458,6 @@ function cleanupGlitch(){
   glitchScreen.style.display = "block";
   glitchScreen.style.background = "#000";
 }
-
 </script>
 
 </body>
