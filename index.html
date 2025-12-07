@@ -1,114 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8" />
 <title>Begin</title>
 
-<!-- PRESS START 2P -->
+<!-- PRESS START 2P FONT -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
-    html, body {
-        margin: 0;
-        height: 100%;
-        overflow: hidden;
+  html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
 
-        background: url("assets/dirt.png");
-        background-size: 50px 50px;
-        animation: slide 5s linear infinite;
+    /* dirt background */
+    background-image: url("assets/dirt.png");
+    background-size: 50px 50px;
+    background-repeat: repeat;
+    animation: slide 6s linear infinite;
 
-        font-family: 'Press Start 2P', monospace;
-    }
+    font-family: "Press Start 2P", monospace;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-    @keyframes slide {
-        from { background-position: 0 0; }
-        to { background-position: -200px -200px; }
-    }
+  @keyframes slide {
+    from { background-position: 0 0; }
+    to   { background-position: -200px -200px; }
+  }
 
-    /* Center container */
-    .center {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        text-align: center;
-    }
+  /* center everything */
+  .center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
 
-    /* BUTTON – transparent black with white text */
-    #beginBtn {
-        padding: 20px 40px;
-        font-size: 20px;
-        color: white;
-        background: rgba(0,0,0,0.6);
-        border: 3px solid white;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: transform 0.05s ease; /* FASTER CLICK */
-    }
+  /* BEGIN button: transparent black, white text, NO white outline */
+  #beginBtn {
+    padding: 18px 38px;
+    font-size: 20px;
+    color: #fff;
+    background: rgba(0,0,0,0.6);
+    border: none;              /* removed white outline */
+    border-radius: 10px;
+    cursor: pointer;
+    outline: none;
+    transform-origin: center;
+    /* remove default focus outline for clean look (you can add custom focus styles if needed) */
+    transition: transform 160ms cubic-bezier(.2,.9,.3,1), box-shadow 160ms;
+    user-select: none;
+  }
 
-    #beginBtn:active {
-        transform: scale(0.82);        /* fast bounce */
-    }
+  /* smooth "ping" animation using a temporary class */
+  @keyframes ping {
+    0%   { transform: translate(-50%,-50%) scale(1); }
+    40%  { transform: translate(-50%,-50%) scale(0.86); }
+    100% { transform: translate(-50%,-50%) scale(1); }
+  }
+  /* when JS adds .ping we use transform that includes the translate so keyframes play correctly */
+  #beginBtn.ping {
+    animation: ping 160ms cubic-bezier(.2,.9,.3,1);
+  }
 
-    /* COOKIE */
-    #cookie {
-        width: 260px;
-        display: none;
-        transition: opacity 0.3s ease;
-        cursor: pointer;
-    }
+  /* cookie (hidden at first; appears where the button was) */
+  #cookie {
+    width: 260px;
+    display: none;
+    opacity: 0;
+    transition: opacity 260ms ease, transform 260ms ease;
+    transform: translate(-50%,-50%) scale(1);
+    cursor: pointer;
+    border-radius: 8px;
+    background-image: url("assets/cookie.png");
+    background-size: cover;
+    background-position: center;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+  }
 
-    /* Explosion */
-    #explosion {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 350px;
-        display: none;
-        opacity: 0;
-        transition: opacity 0.25s ease;
-        pointer-events: none;
-    }
+  #cookie.visible {
+    display: block;
+    opacity: 1;
+  }
 
+  /* keep everything centered visually (button used as the initial visible element) */
+  /* ensure button is positioned relative to center container as well */
+  #beginBtn {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%); /* base translation; ping animation overrides with translate in keyframes */
+    z-index: 4;
+  }
+
+  /* reduce accidental selection highlight */
+  button:focus { outline: none; }
 </style>
 </head>
 <body>
 
-<div class="center">
-    <button id="beginBtn">BEGIN</button>
-    <img id="cookie" src="assets/cookie.png">
+<div class="center" aria-hidden="false">
+  <button id="beginBtn" aria-label="Begin">BEGIN</button>
+  <div id="cookie" aria-hidden="true"></div>
 </div>
 
-<img id="explosion" src="assets/Explosion.png">
-
 <script>
-let clicks = 0;
+  const btn = document.getElementById('beginBtn');
+  const cookie = document.getElementById('cookie');
+  let clicks = 0;
 
-const btn = document.getElementById("beginBtn");
-const explosion = document.getElementById("explosion");
-const cookie = document.getElementById("cookie");
+  // Faster, smoother ping: use a class that runs a short keyframe animation
+  btn.addEventListener('click', (e) => {
+    // add temporary ping class for smooth animation
+    btn.classList.remove('ping');
+    // force reflow so animation restarts reliably
+    void btn.offsetWidth;
+    btn.classList.add('ping');
 
-btn.onclick = function() {
     clicks++;
 
     if (clicks === 3) {
-        btn.style.display = "none";     // remove button
+      // remove button
+      btn.style.display = 'none';
 
-        explosion.style.display = "block";
-        explosion.style.opacity = 1;     // fade in explosion
-
-        setTimeout(() => {
-            explosion.style.opacity = 0; // fade out explosion
-        }, 500);
-
-        setTimeout(() => {
-            explosion.style.display = "none";
-            cookie.style.display = "block";
-            cookie.style.opacity = 1;    // cookie fades in
-        }, 900);
+      // show cookie at the same place
+      cookie.classList.add('visible');
+      cookie.setAttribute('aria-hidden', 'false');
     }
-};
+  });
+
+  // keep Enter/Space from accidentally triggering double-clicks via keyboard
+  btn.addEventListener('keydown', (e) => {
+    if (e.key === ' ' || e.key === 'Enter') {
+      e.preventDefault();
+      btn.click();
+    }
+  });
 </script>
 
 </body>
