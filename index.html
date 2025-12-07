@@ -20,8 +20,6 @@
     animation: slide 6s linear infinite;
 
     font-family: "Press Start 2P", monospace;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 
   @keyframes slide {
@@ -57,7 +55,6 @@
     font-size: 18px;
     color: #fff;
     border: 4px solid #2d1f0f;
-    outline: none;
     border-radius: 6px;
     text-shadow: 2px 2px 0px rgba(0,0,0,0.9);
 
@@ -124,6 +121,32 @@
     display: block;
     opacity: 1;
   }
+
+  /* ------------ COOKIE 2 LOADING MASK ------------- */
+  #cookie2Mask {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    width: 320px;
+    height: 320px;
+    background-image: url("assets/cookie2.png");
+    background-size: cover;
+    background-position: top;
+    image-rendering: pixelated;
+    display: none;
+    z-index: 35;
+    pointer-events: none;
+    clip-path: inset(0 0 100% 0); /* start hidden */
+  }
+
+  /* JUMPSCARE ZOOM 2009 STYLE */
+  .jumpscare {
+    transform: translate(-50%, -50%) scale(12) !important;
+    opacity: 1 !important;
+    transition: transform 40ms linear;
+    z-index: 9999;
+  }
 </style>
 </head>
 <body>
@@ -133,6 +156,7 @@
   <button id="beginBtn">START</button>
 
   <div id="cookie1" class="cookie" style="background-image:url('assets/cookie1.png');"></div>
+  <div id="cookie2Mask"></div>
   <div id="cookie2" class="cookie" style="background-image:url('assets/cookie2.png');"></div>
 
 </div>
@@ -145,11 +169,11 @@
 const btn = document.getElementById("beginBtn");
 const cookie1 = document.getElementById("cookie1");
 const cookie2 = document.getElementById("cookie2");
+const cookie2Mask = document.getElementById("cookie2Mask");
 
 let cookie1Clicks = 0;
 let cookie2Clicks = 0;
 
-/* tiny click animation */
 function cookiePing(el){
   el.classList.remove("ping");
   void el.offsetWidth;
@@ -164,7 +188,7 @@ btn.addEventListener("click", () => {
   cookie1.classList.add("visible");
 });
 
-/* COOKIE 1 → after 5 clicks → cookie2 */
+/* COOKIE 1 → after 5 clicks → cookie2 loading mask */
 cookie1.addEventListener("click", () => {
   cookiePing(cookie1);
   cookie1Clicks++;
@@ -173,19 +197,58 @@ cookie1.addEventListener("click", () => {
     cookie1.style.opacity = "0";
     setTimeout(()=>{
       cookie1.style.display = "none";
-      cookie2.classList.add("visible");
+
+      /* show cookie2 loading mask instead */
+      cookie2Mask.style.display = "block";
+      animateCookie2Load();
     }, 250);
   }
 });
 
-/* COOKIE 2 → after 10 clicks → (now NOTHING happens) */
+/* -------------------------------------------------------
+   COOKIE 2 LOADING 3s VERTICAL WIPE
+--------------------------------------------------------- */
+
+function animateCookie2Load(){
+  let progress = 0;
+  const duration = 3000;
+  const start = performance.now();
+
+  function step(now){
+    const t = now - start;
+    progress = Math.min(t / duration, 1);
+
+    const reveal = 100 - progress * 100;
+    cookie2Mask.style.clipPath = `inset(0 0 ${reveal}% 0)`;
+
+    if(progress < 1){
+      requestAnimationFrame(step);
+    } else {
+      cookie2Mask.style.display = "none";
+      cookie2.classList.add("visible");
+    }
+  }
+
+  requestAnimationFrame(step);
+}
+
+/* -------------------------------------------------------
+   COOKIE 2 LOGIC
+--------------------------------------------------------- */
+
 cookie2.addEventListener("click", () => {
   cookiePing(cookie2);
   cookie2Clicks++;
 
+  /* 5th click = FREEZE GLITCH (0.5s) */
+  if(cookie2Clicks === 5){
+    cookie2.style.opacity = "0";
+    setTimeout(()=> cookie2.style.opacity = "1", 500);
+  }
+
+  /* 10th click = 2009 jumpscare zoom */
   if(cookie2Clicks >= 10){
-    /* No jumpscare. No glitch.  
-       Just… nothing :) */
+    cookie2.classList.add("jumpscare");
   }
 });
 </script>
