@@ -50,15 +50,15 @@
         box-shadow: 0 0 0px #fff;
     }
 
-    /* CLICK ANIMATION (Cookie Clicker style bounce) */
+    /* CLICK BOUNCE */
     #beginBtn:active {
         transform: translate(-50%, -50%) scale(0.85);
     }
 
-    /* EXPLOSION — using your 16-frame sheet */
+    /* EXPLOSION */
     #explosion {
         position: absolute;
-        width: 128px;      /* bigger explosion */
+        width: 128px;      /* size of explosion */
         height: 128px;
         top: 50%;
         left: 50%;
@@ -68,9 +68,11 @@
         background-repeat: no-repeat;
         image-rendering: pixelated;
 
-        /* 16 frames → stretch horizontally */
+        /* 16 frames → stretched horizontally */
         background-size: 1600% 100%;
-        animation: explode 0.7s steps(16) forwards;
+
+        /* Slow explosion */
+        animation: explode 1.6s steps(16) forwards;
     }
 
     @keyframes explode {
@@ -115,23 +117,18 @@ beginBtn.onclick = function() {
     clicks++;
 
     if (clicks === 3) {
-        // hide the button
-        beginBtn.style.display = "none";
+        beginBtn.style.display = "none";          // hide button
+        explosion.style.display = "block";        // show explosion
 
-        // show explosion
-        explosion.style.display = "block";
-
-        // after explosion is done → show cookie (same place as button)
         setTimeout(() => {
-            cookie.style.display = "block";
-        }, 700);
+            explosion.style.display = "none";     // hide explosion
+            cookie.style.display = "block";       // show cookie
+        }, 1600); // same as animation duration
     }
 };
 
-// Cookie is clickable but does nothing (for now)
-cookie.onclick = function() {
-    // intentionally empty
-};
+// cookie does nothing yet
+cookie.onclick = function() {};
 </script>
 
 </body>
