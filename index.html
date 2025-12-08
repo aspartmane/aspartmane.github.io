@@ -18,11 +18,11 @@
         transform: translate(-50%, -50%);
         cursor: pointer;
         image-rendering: pixelated;
-        transition: transform 0.15s ease;
+        transition: transform 0.12s cubic-bezier(.25,.8,.25,1);
     }
 
-    #cookie1:active {
-        transform: translate(-50%, -50%) scale(0.92);
+    #cookie1:active, #cookie2:active {
+        transform: translate(-50%, -50%) scale(0.95);
     }
 
     #cookie2 {
@@ -47,6 +47,7 @@
         height: 100vh;
         object-fit: cover;
         z-index: 999;
+        image-rendering: pixelated;
     }
 </style>
 </head>
@@ -68,12 +69,13 @@ const jump = document.getElementById("jumpscare");
 
 
 // ------------------------
-// FIRST COOKIE – 5 CLICKS
+// COOKIE 1 – SMOOTHER CLICK
 // ------------------------
 c1.onclick = () => {
     click1++;
 
-    // click squeeze
+    // smooth squish animation
+    c1.style.transition = "transform 0.12s cubic-bezier(.25,.8,.25,1)";
     c1.style.transform = "translate(-50%, -50%) scale(0.9)";
     setTimeout(() => {
         c1.style.transform = "translate(-50%, -50%) scale(1)";
@@ -101,11 +103,11 @@ function loadCookie2() {
         progress -= 2;
         mask.style.height = progress + "%";
 
-        // random micro-pauses to make it feel like slow wifi
-        if (progress === 80 || progress === 55 || progress === 30) {
-            setTimeout(step, 300);
+        // random pauses to simulate lag
+        if ([80, 55, 30].includes(progress)) {
+            setTimeout(step, 350);
         } else if (progress > 0) {
-            setTimeout(step, 40);
+            setTimeout(step, 45);
         } else {
             mask.style.display = "none";
         }
@@ -116,15 +118,15 @@ function loadCookie2() {
 
 
 // ------------------------
-// COOKIE 2 – GROWS EACH CLICK
+// COOKIE 2 – ZOOMS SLOWLY WITH EACH CLICK
 // ------------------------
 c2.onclick = () => {
     click2++;
 
-    // tiny click squish
-    c2.style.transform = `translate(-50%, -50%) scale(${1 + click2 * 0.02})`;
+    // zoom grows smoothly each click
+    const zoom = 1 + click2 * 0.03;
+    c2.style.transform = `translate(-50%, -50%) scale(${zoom})`;
 
-    // after 10 clicks → jumpscare
     if (click2 >= 10) {
         triggerJumpscare();
     }
@@ -132,22 +134,25 @@ c2.onclick = () => {
 
 
 // ------------------------
-// JUMPSCARE (INSTANT ZOOM)
+// JUMPSCARE FIX (GUARANTEED TO WORK)
 // ------------------------
 function triggerJumpscare() {
     c2.style.display = "none";
     jump.style.display = "block";
 
-    jump.animate(
-        [
-            { transform: "scale(1)" },
-            { transform: "scale(3)" }
-        ],
-        {
-            duration: 80,
-            fill: "forwards"
-        }
-    );
+    // zero-delay to ensure the image is visible BEFORE animation starts
+    requestAnimationFrame(() => {
+        jump.animate(
+            [
+                { transform: "scale(1)" },
+                { transform: "scale(3)" }
+            ],
+            {
+                duration: 90,
+                fill: "forwards"
+            }
+        );
+    });
 }
 </script>
 
