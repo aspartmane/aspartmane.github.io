@@ -19,6 +19,7 @@
         transform: translate(-50%, -50%);
         cursor: pointer;
         transition: transform 0.12s cubic-bezier(.25,.8,.25,1);
+        z-index: 10;
     }
 
     #loadingMask {
@@ -29,17 +30,7 @@
         height: 100%;
         background: black;
         display: none;
-        z-index: 2000;
-    }
-
-    #jumpscare {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 140%;
-        transform: translate(-50%, -50%);
-        display: none;
-        z-index: 9999;
+        z-index: 50;
     }
 </style>
 </head>
@@ -55,9 +46,6 @@
 <!-- LOADING MASK -->
 <div id="loadingMask"></div>
 
-<!-- JUMPSCARE -->
-<img id="jumpscare" src="assets/jumpscare.png">
-
 <script>
 window.onload = () => {
     let click1 = 0;
@@ -66,14 +54,14 @@ window.onload = () => {
     const c1 = document.getElementById("cookie1");
     const c2 = document.getElementById("cookie2");
     const mask = document.getElementById("loadingMask");
-    const jump = document.getElementById("jumpscare");
 
     // ------------------------
-    // COOKIE 1 CLICK ANIMATION
+    // COOKIE 1 CLICK
     // ------------------------
     c1.onclick = () => {
         click1++;
 
+        // click animation
         c1.style.transform = "translate(-50%, -50%) scale(0.9)";
         setTimeout(() => {
             c1.style.transform = "translate(-50%, -50%) scale(1)";
@@ -86,7 +74,7 @@ window.onload = () => {
     };
 
     // ------------------------
-    // COOKIE 2 LOADING MASK
+    // LOADING MASK
     // ------------------------
     function loadCookie2() {
         c2.style.display = "block";
@@ -113,9 +101,10 @@ window.onload = () => {
     }
 
     // ------------------------
-    // COOKIE 2 ZOOM CLICK
+    // COOKIE 2 CLICK → ZOOM
     // ------------------------
     c2.onclick = () => {
+        // do not allow clicking until mask is gone
         if (mask.style.display === "block") return;
 
         click2++;
@@ -124,33 +113,25 @@ window.onload = () => {
         c2.style.transform = `translate(-50%, -50%) scale(${zoom})`;
 
         if (click2 >= 10) {
-            triggerJumpscare();
+            jumpscareCookie();
         }
     };
 
     // ------------------------
-    // JUMPSCARE
+    // COOKIE 2 ZOOMS LIKE A JUMPSCARE
     // ------------------------
-    function triggerJumpscare() {
-        c2.style.display = "none";
+    function jumpscareCookie() {
+        // bring cookie to front
+        c2.style.zIndex = "9999";
 
-        jump.style.display = "block";
-        jump.style.zIndex = "9999";
-        jump.style.transform = "translate(-50%, -50%) scale(1)";
+        // reset first
+        c2.style.transform = "translate(-50%, -50%) scale(1)";
 
-        requestAnimationFrame(() => {
-            jump.animate(
-                [
-                    { transform: "translate(-50%, -50%) scale(1)" },
-                    { transform: "translate(-50%, -50%) scale(4)" }
-                ],
-                {
-                    duration: 100,
-                    easing: "ease-out",
-                    fill: "forwards"
-                }
-            );
-        });
+        // small delay so browser applies the reset
+        setTimeout(() => {
+            c2.style.transition = "transform 0.08s ease-out";
+            c2.style.transform = "translate(-50%, -50%) scale(6)";
+        }, 20);
     }
 };
 </script>
