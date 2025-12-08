@@ -11,7 +11,6 @@
         overflow: hidden;
     }
 
-    /* Centered image base style */
     .cookie {
         position: absolute;
         top: 50%;
@@ -22,7 +21,6 @@
         transition: transform 0.12s cubic-bezier(.25,.8,.25,1);
     }
 
-    /* Loading mask */
     #loadingMask {
         position: absolute;
         top: 0;
@@ -31,19 +29,21 @@
         height: 100%;
         background: black;
         display: none;
+        z-index: 2000;
     }
 
-    /* Jumpscare */
     #jumpscare {
         position: absolute;
         top: 50%;
         left: 50%;
-        width: 100%;
+        width: 140%;
         transform: translate(-50%, -50%);
         display: none;
+        z-index: 9999;
     }
 </style>
 </head>
+
 <body>
 
 <!-- COOKIE 1 -->
@@ -74,7 +74,6 @@ window.onload = () => {
     c1.onclick = () => {
         click1++;
 
-        // click animation
         c1.style.transform = "translate(-50%, -50%) scale(0.9)";
         setTimeout(() => {
             c1.style.transform = "translate(-50%, -50%) scale(1)";
@@ -110,12 +109,11 @@ window.onload = () => {
                 mask.style.display = "none";
             }
         }
-
         step();
     }
 
     // ------------------------
-    // COOKIE 2 ZOOM PER CLICK
+    // COOKIE 2 ZOOM CLICK
     // ------------------------
     c2.onclick = () => {
         if (mask.style.display === "block") return;
@@ -131,20 +129,24 @@ window.onload = () => {
     };
 
     // ------------------------
-    // JUMPSCARE ANIMATION
+    // JUMPSCARE
     // ------------------------
     function triggerJumpscare() {
         c2.style.display = "none";
+
         jump.style.display = "block";
+        jump.style.zIndex = "9999";
+        jump.style.transform = "translate(-50%, -50%) scale(1)";
 
         requestAnimationFrame(() => {
             jump.animate(
                 [
                     { transform: "translate(-50%, -50%) scale(1)" },
-                    { transform: "translate(-50%, -50%) scale(3.5)" }
+                    { transform: "translate(-50%, -50%) scale(4)" }
                 ],
                 {
-                    duration: 90,
+                    duration: 100,
+                    easing: "ease-out",
                     fill: "forwards"
                 }
             );
