@@ -17,8 +17,8 @@
         left: 50%;
         transform: translate(-50%, -50%);
         cursor: pointer;
-        transition: transform 0.1s ease;
         image-rendering: pixelated;
+        transition: transform 0.15s ease;
     }
 
     #cookie1:active {
@@ -27,7 +27,6 @@
 
     #cookie2 {
         display: none;
-        filter: contrast(140%) brightness(70%) saturate(150%);
     }
 
     #loadingMask {
@@ -35,11 +34,11 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: 0%;
+        height: 100%;
         background: black;
-        pointer-events: none;
         z-index: 5;
         display: none;
+        pointer-events: none;
     }
 
     #jumpscare {
@@ -47,7 +46,6 @@
         width: 100vw;
         height: 100vh;
         object-fit: cover;
-        transform: none !important;
         z-index: 999;
     }
 </style>
@@ -55,7 +53,7 @@
 <body>
 
 <img id="cookie1" src="assets/cookie1.png" width="230">
-<img id="cookie2" src="assets/cookie2.png" width="260">
+<img id="cookie2" src="assets/cookie2.png" width="240">
 <div id="loadingMask"></div>
 <img id="jumpscare" src="assets/jumpscare.png">
 
@@ -75,14 +73,13 @@ const jump = document.getElementById("jumpscare");
 c1.onclick = () => {
     click1++;
 
-    // small click animation
+    // click squeeze
     c1.style.transform = "translate(-50%, -50%) scale(0.9)";
     setTimeout(() => {
         c1.style.transform = "translate(-50%, -50%) scale(1)";
     }, 120);
 
     if (click1 >= 5) {
-        // Replace with cookie 2
         c1.style.display = "none";
         loadCookie2();
     }
@@ -90,48 +87,44 @@ c1.onclick = () => {
 
 
 // ------------------------
-// COOKIE 2 LOADING SEQUENCE
+// COOKIE 2 LOADING (TOP → BOTTOM)
 // ------------------------
 function loadCookie2() {
     c2.style.display = "block";
 
     mask.style.display = "block";
     mask.style.height = "100%";
-    
-    // FULL loading time around 3 seconds with stutters
+
     let progress = 100;
 
-    function loadStep() {
+    function step() {
         progress -= 2;
         mask.style.height = progress + "%";
 
-        if (progress === 70 || progress === 40) {
-            // tiny pauses
-            setTimeout(loadStep, 350);
+        // random micro-pauses to make it feel like slow wifi
+        if (progress === 80 || progress === 55 || progress === 30) {
+            setTimeout(step, 300);
         } else if (progress > 0) {
-            setTimeout(loadStep, 40);
+            setTimeout(step, 40);
         } else {
-            // Fully loaded
             mask.style.display = "none";
         }
     }
 
-    loadStep();
+    step();
 }
 
 
-// -------------------------
-// COOKIE 2 CLICKING → 10x
-// -------------------------
+// ------------------------
+// COOKIE 2 – GROWS EACH CLICK
+// ------------------------
 c2.onclick = () => {
     click2++;
 
-    // click animation
-    c2.style.transform = "translate(-50%, -50%) scale(0.94)";
-    setTimeout(() => {
-        c2.style.transform = "translate(-50%, -50%) scale(1)";
-    }, 120);
+    // tiny click squish
+    c2.style.transform = `translate(-50%, -50%) scale(${1 + click2 * 0.02})`;
 
+    // after 10 clicks → jumpscare
     if (click2 >= 10) {
         triggerJumpscare();
     }
@@ -139,7 +132,7 @@ c2.onclick = () => {
 
 
 // ------------------------
-// JUMPSCARE (ZOOM ONLY)
+// JUMPSCARE (INSTANT ZOOM)
 // ------------------------
 function triggerJumpscare() {
     c2.style.display = "none";
@@ -148,10 +141,10 @@ function triggerJumpscare() {
     jump.animate(
         [
             { transform: "scale(1)" },
-            { transform: "scale(2.8)" }
+            { transform: "scale(3)" }
         ],
         {
-            duration: 90,
+            duration: 80,
             fill: "forwards"
         }
     );
