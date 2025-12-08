@@ -1,3 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Cookie Game</title>
+
+<style>
+    body {
+        margin: 0;
+        background: black;
+        overflow: hidden;
+    }
+
+    /* Centered image base style */
+    .cookie {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 220px;
+        transform: translate(-50%, -50%);
+        cursor: pointer;
+        transition: transform 0.12s cubic-bezier(.25,.8,.25,1);
+    }
+
+    /* Loading mask */
+    #loadingMask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: black;
+        display: none;
+    }
+
+    /* Jumpscare */
+    #jumpscare {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        transform: translate(-50%, -50%);
+        display: none;
+    }
+</style>
+</head>
+<body>
+
+<!-- COOKIE 1 -->
+<img id="cookie1" class="cookie" src="assets/cookie1.png">
+
+<!-- COOKIE 2 -->
+<img id="cookie2" class="cookie" src="assets/cookie2.png" style="display:none;">
+
+<!-- LOADING MASK -->
+<div id="loadingMask"></div>
+
+<!-- JUMPSCARE -->
+<img id="jumpscare" src="assets/jumpscare.png">
+
 <script>
 window.onload = () => {
     let click1 = 0;
@@ -8,18 +68,13 @@ window.onload = () => {
     const mask = document.getElementById("loadingMask");
     const jump = document.getElementById("jumpscare");
 
-    if (!c1 || !c2 || !mask || !jump) {
-        console.error("ERROR: One or more elements are missing in HTML.");
-        return;
-    }
-
     // ------------------------
-    // COOKIE 1 – SMOOTHER CLICK
+    // COOKIE 1 CLICK ANIMATION
     // ------------------------
     c1.onclick = () => {
         click1++;
 
-        c1.style.transition = "transform 0.12s cubic-bezier(.25,.8,.25,1)";
+        // click animation
         c1.style.transform = "translate(-50%, -50%) scale(0.9)";
         setTimeout(() => {
             c1.style.transform = "translate(-50%, -50%) scale(1)";
@@ -31,9 +86,8 @@ window.onload = () => {
         }
     };
 
-
     // ------------------------
-    // COOKIE 2 LOADING
+    // COOKIE 2 LOADING MASK
     // ------------------------
     function loadCookie2() {
         c2.style.display = "block";
@@ -60,9 +114,8 @@ window.onload = () => {
         step();
     }
 
-
     // ------------------------
-    // COOKIE 2 – ZOOM EFFECT
+    // COOKIE 2 ZOOM PER CLICK
     // ------------------------
     c2.onclick = () => {
         if (mask.style.display === "block") return;
@@ -77,9 +130,8 @@ window.onload = () => {
         }
     };
 
-
     // ------------------------
-    // JUMPSCARE
+    // JUMPSCARE ANIMATION
     // ------------------------
     function triggerJumpscare() {
         c2.style.display = "none";
@@ -88,8 +140,8 @@ window.onload = () => {
         requestAnimationFrame(() => {
             jump.animate(
                 [
-                    { transform: "scale(1)" },
-                    { transform: "scale(3.5)" }
+                    { transform: "translate(-50%, -50%) scale(1)" },
+                    { transform: "translate(-50%, -50%) scale(3.5)" }
                 ],
                 {
                     duration: 90,
@@ -100,3 +152,6 @@ window.onload = () => {
     }
 };
 </script>
+
+</body>
+</html>
