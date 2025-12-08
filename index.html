@@ -1,204 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>Begin</title>
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-
+<meta charset="UTF-8">
+<title>Cookie Horror</title>
 <style>
-  html, body {
-    height: 100%;
-    margin: 0;
-    overflow: hidden;
-    background: #000; /* BLACK BACKGROUND */
-    font-family: "Press Start 2P", monospace;
-  }
+    html, body {
+        margin: 0;
+        background: black;
+        overflow: hidden;
+        height: 100%;
+    }
 
-  .center {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);
-    width: 320px;
-    height: 320px;
-    pointer-events: none;
-  }
+    #cookie1, #cookie2, #jumpscare {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        cursor: pointer;
+        transition: transform 0.1s ease;
+        image-rendering: pixelated;
+    }
 
-  .cookie {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%) scale(1);
-    background-size: cover;
-    background-position: center;
-    display: none;
-    opacity: 0;
-    pointer-events: auto;
-    transition: opacity 250ms ease, transform 160ms ease;
-    z-index: 30;
-    image-rendering: pixelated;
-  }
+    #cookie1:active {
+        transform: translate(-50%, -50%) scale(0.92);
+    }
 
-  #cookie1 { width: 260px; height: 260px; }
-  #cookie2 { width: 320px; height: 320px; }
+    #cookie2 {
+        display: none;
+        filter: contrast(140%) brightness(70%) saturate(150%);
+    }
 
-  .cookie.visible {
-    display: block;
-    opacity: 1;
-  }
+    #loadingMask {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 0%;
+        background: black;
+        pointer-events: none;
+        z-index: 5;
+        display: none;
+    }
 
-  /* CRT OVERLAY WHEN COOKIE2 APPEARS */
-  #crtOverlay {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background: repeating-linear-gradient(
-      to bottom,
-      rgba(0,0,0,0.3) 0px,
-      rgba(0,0,0,0.3) 2px,
-      rgba(0,0,0,0.35) 2px,
-      rgba(0,0,0,0.35) 3px
-    );
-    opacity: 0;
-    mix-blend-mode: multiply;
-    transition: opacity 800ms ease;
-    z-index: 200;
-  }
-
-  /* GLITCH FLASHES */
-  .flash {
-    position: fixed;
-    inset: 0;
-    background: #fff;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 500;
-  }
-
-  #flash2 { background: #0f0; }
+    #jumpscare {
+        display: none;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        transform: none !important;
+        z-index: 999;
+    }
 </style>
 </head>
 <body>
 
-<div class="center">
-
-  <!-- cookie 1 -->
-  <div id="cookie1" class="cookie" style="background-image:url('assets/cookie1.png');"></div>
-
-  <!-- cookie 2 -->
-  <div id="cookie2" class="cookie" style="background-image:url('assets/cookie2.png');"></div>
-
-</div>
-
-<div id="crtOverlay"></div>
-<div id="flash1" class="flash"></div>
-<div id="flash2" class="flash"></div>
-
-<audio id="bgm" src="poem panic.mp3" preload="auto"></audio>
+<img id="cookie1" src="assets/cookie1.png" width="230">
+<img id="cookie2" src="assets/cookie2.png" width="260">
+<div id="loadingMask"></div>
+<img id="jumpscare" src="assets/jumpscare.png">
 
 <script>
-/* COOKIES */
-const cookie1 = document.getElementById("cookie1");
-const cookie2 = document.getElementById("cookie2");
+let click1 = 0;
+let click2 = 0;
 
-const crt = document.getElementById("crtOverlay");
-const flash1 = document.getElementById("flash1");
-const flash2 = document.getElementById("flash2");
-const bgm = document.getElementById("bgm");
+const c1 = document.getElementById("cookie1");
+const c2 = document.getElementById("cookie2");
+const mask = document.getElementById("loadingMask");
+const jump = document.getElementById("jumpscare");
 
-let cookie1Clicks = 0;
-let cookie2Clicks = 0;
 
-/* CLICK ANIMATION */
-function cookiePing(el){
-  el.classList.remove("ping");
-  void el.offsetWidth;
-  el.classList.add("ping");
-}
+// ------------------------
+// FIRST COOKIE – 5 CLICKS
+// ------------------------
+c1.onclick = () => {
+    click1++;
 
-/* AUTO-SHOW COOKIE1 ON LOAD */
-window.onload = () => {
-  cookie1.style.display = "block";
-  requestAnimationFrame(()=> cookie1.style.opacity = "1");
-  bgm.volume = 0.4;
-  bgm.play().catch(()=>{});
+    // small click animation
+    c1.style.transform = "translate(-50%, -50%) scale(0.9)";
+    setTimeout(() => {
+        c1.style.transform = "translate(-50%, -50%) scale(1)";
+    }, 120);
+
+    if (click1 >= 5) {
+        // Replace with cookie 2
+        c1.style.display = "none";
+        loadCookie2();
+    }
 };
 
-/* COOKIE 1 → after 5 clicks → cookie2 */
-cookie1.addEventListener("click", () => {
-  cookiePing(cookie1);
-  cookie1Clicks++;
 
-  if(cookie1Clicks >= 5){
-    cookie1.style.opacity = "0";
-    setTimeout(()=>{
-      cookie1.style.display = "none";
+// ------------------------
+// COOKIE 2 LOADING SEQUENCE
+// ------------------------
+function loadCookie2() {
+    c2.style.display = "block";
 
-      cookie2.classList.add("visible");
+    mask.style.display = "block";
+    mask.style.height = "100%";
+    
+    // FULL loading time around 3 seconds with stutters
+    let progress = 100;
 
-      /* darken + crt + glitch flashes */
-      setTimeout(()=> { crt.style.opacity = 1; }, 200);
+    function loadStep() {
+        progress -= 2;
+        mask.style.height = progress + "%";
 
-      setTimeout(()=>{
-        flash1.style.opacity = 1;
-        setTimeout(()=> flash1.style.opacity = 0, 150);
-      }, 400);
-
-      setTimeout(()=>{
-        flash2.style.opacity = 1;
-        setTimeout(()=> flash2.style.opacity = 0, 120);
-      }, 900);
-
-      startCookie2Loading();
-
-    }, 250);
-  }
-});
-
-/* COOKIE2 LOADING BAR + STUTTERS */
-let loadProgress = 0;
-let loadingActive = false;
-
-function startCookie2Loading(){
-  if(loadingActive) return;
-  loadingActive = true;
-
-  const interval = setInterval(()=>{
-    loadProgress += Math.random() * 8; // variable speed
-
-    /* RANDOM STUTTER */
-    if(Math.random() < 0.15){
-      setTimeout(()=>{}, 300); // half-second freeze
-      return;
+        if (progress === 70 || progress === 40) {
+            // tiny pauses
+            setTimeout(loadStep, 350);
+        } else if (progress > 0) {
+            setTimeout(loadStep, 40);
+        } else {
+            // Fully loaded
+            mask.style.display = "none";
+        }
     }
 
-    if(loadProgress >= 100){
-      loadProgress = 100;
-      clearInterval(interval);
-    }
-
-    cookie2.style.transform =
-      `translate(-50%, -50%) scale(${1 + loadProgress/300})`;
-
-  }, 120);
+    loadStep();
 }
 
-/* COOKIE 2 → jumpscare at 10 clicks */
-cookie2.addEventListener("click", () => {
-  cookiePing(cookie2);
-  cookie2Clicks++;
 
-  if(cookie2Clicks >= 10){
-    // HUGE instant zoom jumpscare
-    cookie2.style.transition = "transform 60ms linear";
-    cookie2.style.transform = "translate(-50%, -50%) scale(10)";
+// -------------------------
+// COOKIE 2 CLICKING → 10x
+// -------------------------
+c2.onclick = () => {
+    click2++;
 
-    flash1.style.opacity = 1;
-    setTimeout(()=> flash1.style.opacity = 0, 200);
-  }
-});
+    // click animation
+    c2.style.transform = "translate(-50%, -50%) scale(0.94)";
+    setTimeout(() => {
+        c2.style.transform = "translate(-50%, -50%) scale(1)";
+    }, 120);
+
+    if (click2 >= 10) {
+        triggerJumpscare();
+    }
+};
+
+
+// ------------------------
+// JUMPSCARE (ZOOM ONLY)
+// ------------------------
+function triggerJumpscare() {
+    c2.style.display = "none";
+    jump.style.display = "block";
+
+    jump.animate(
+        [
+            { transform: "scale(1)" },
+            { transform: "scale(2.8)" }
+        ],
+        {
+            duration: 90,
+            fill: "forwards"
+        }
+    );
+}
 </script>
 
 </body>
