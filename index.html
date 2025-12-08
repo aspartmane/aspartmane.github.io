@@ -5,7 +5,6 @@
 <title>Begin</title>
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-<!-- PRESS START 2P -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
@@ -20,8 +19,6 @@
     animation: slide 6s linear infinite;
 
     font-family: "Press Start 2P", monospace;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 
   @keyframes slide {
@@ -29,6 +26,45 @@
     to   { background-position: -200px -200px; }
   }
 
+  /* wrapper for all glitch effects */
+  #glitchWrap {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    top: 0;
+    left: 0;
+  }
+
+  /* darken layer */
+  #darken {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    pointer-events: none;
+    z-index: 200;
+    transition: background 600ms ease;
+  }
+
+  /* glitch keyframes */
+  @keyframes glitch {
+    0%   { transform: translate(0,0); filter: hue-rotate(0deg); }
+    10%  { transform: translate(2px, -2px); }
+    20%  { transform: translate(-3px, 1px); filter: hue-rotate(20deg); }
+    30%  { transform: translate(1px, 2px); }
+    40%  { transform: translate(-2px, -1px); filter: hue-rotate(-20deg); }
+    50%  { transform: translate(0,0); }
+    60%  { transform: translate(2px, 1px); }
+    70%  { transform: translate(-1px, -2px); }
+    80%  { transform: translate(3px, 0px); filter: hue-rotate(10deg); }
+    100% { transform: translate(0,0); filter: hue-rotate(0deg); }
+  }
+
+  .glitching {
+    animation: glitch 120ms steps(2) infinite;
+  }
+
+  /* content center */
   .center {
     position: absolute;
     left: 50%;
@@ -37,71 +73,41 @@
     width: 320px;
     height: 320px;
     pointer-events: none;
+    z-index: 40;
   }
 
-  /* -----------------------------------------------------
-      MINECRAFT GRASS BLOCK STYLE BUTTON
-  ------------------------------------------------------*/
-
+  /* the START button */
   #beginBtn {
     position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%,-50%);
-    z-index: 20;
+    z-index: 50;
     pointer-events: auto;
     cursor: pointer;
-    user-select: none;
-    display: inline-block;
     padding: 22px 40px;
     font-size: 18px;
     color: #fff;
     border: 4px solid #2d1f0f;
-    outline: none;
     border-radius: 6px;
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.9);
-
-    font-family: "Press Start 2P", monospace;
-
     background-image:
       url("assets/grass_top.png"),
       url("assets/grass_side.png"),
-      linear-gradient(
-        to bottom,
-        #3fa63f 0%,
-        #3fa63f 22%,
-        #5e3b18 22%,
-        #5e3b18 100%
-      );
-
-    background-size: 100% 42px, 100% calc(100% - 42px), auto;
-    background-position: top, bottom, 0 0;
-    background-repeat: no-repeat, repeat, no-repeat;
-
-    background-color: #5e3b18;
-
+      linear-gradient(to bottom, #3fa63f 0%, #3fa63f 22%, #5e3b18 22%, #5e3b18 100%);
+    background-size: 100% 42px, 100% calc(100% - 42px);
+    background-position: top, bottom;
+    background-repeat: no-repeat;
     image-rendering: pixelated;
-
-    transition: transform 140ms cubic-bezier(.2,.9,.3,1), filter 120ms;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.9);
+    transition: transform 140ms, filter 120ms;
   }
+  #beginBtn:hover { transform: translate(-50%,-50%) scale(1.05); filter: brightness(1.15); }
+  #beginBtn:active { transform: translate(-50%,-50%) scale(0.92); filter: brightness(0.9); }
 
-  #beginBtn:hover {
-    transform: translate(-50%,-50%) scale(1.05);
-    filter: brightness(1.15);
-  }
-  #beginBtn:active {
-    transform: translate(-50%,-50%) scale(0.92);
-    filter: brightness(0.9);
-  }
+  @keyframes ping { 0%{transform:translate(-50%,-50%) scale(1);}40%{transform:translate(-50%,-50%) scale(0.85);}100%{transform:translate(-50%,-50%) scale(1);} }
+  .ping { animation: ping 140ms; }
 
-  @keyframes ping {
-    0%   { transform: translate(-50%,-50%) scale(1); }
-    40%  { transform: translate(-50%,-50%) scale(0.85); }
-    100% { transform: translate(-50%,-50%) scale(1); }
-  }
-  .ping { animation: ping 140ms cubic-bezier(.2,.9,.3,1); }
-
-  /* COOKIE SYSTEM */
+  /* cookies */
   .cookie {
     position: absolute;
     left: 50%;
@@ -113,41 +119,36 @@
     opacity: 0;
     pointer-events: auto;
     transition: opacity 250ms ease, transform 160ms ease;
-    z-index: 30;
+    z-index: 60;
     image-rendering: pixelated;
   }
-
   #cookie1 { width: 260px; height: 260px; }
   #cookie2 { width: 320px; height: 320px; }
+  .visible { display: block; opacity: 1; }
 
-  .cookie.visible {
-    display: block;
-    opacity: 1;
-  }
-
-  /* Cookie2 loading mask */
+  /* mask for loading */
   #cookie2Mask {
     position: absolute;
     width: 320px;
     height: 320px;
-    background: #000;
+    background: black;
     left: 50%;
     top: 50%;
     transform: translate(-50%,-50%);
-    z-index: 31;
+    z-index: 70;
     display: none;
     pointer-events: none;
   }
-
 </style>
 </head>
 <body>
 
-<!-- Background music -->
 <audio id="bgMusic" src="assets/poem panic.mp3"></audio>
 
-<div class="center">
+<div id="glitchWrap">
+<div id="darken"></div>
 
+<div class="center">
   <button id="beginBtn">START</button>
 
   <div id="cookie1" class="cookie" style="background-image:url('assets/cookie1.png');"></div>
@@ -156,43 +157,37 @@
   <div id="cookie2Mask"></div>
 </div>
 
+</div>
+
 <script>
 const btn = document.getElementById("beginBtn");
 const cookie1 = document.getElementById("cookie1");
 const cookie2 = document.getElementById("cookie2");
 const mask = document.getElementById("cookie2Mask");
+const darken = document.getElementById("darken");
+const glitchWrap = document.getElementById("glitchWrap");
 const bgMusic = document.getElementById("bgMusic");
 
 let cookie1Clicks = 0;
 let cookie2Clicks = 0;
 
-/* tiny click animation */
-function cookiePing(el){
-  el.classList.remove("ping");
-  void el.offsetWidth;
-  el.classList.add("ping");
-}
+function cookiePing(el){ el.classList.remove("ping"); void el.offsetWidth; el.classList.add("ping"); }
 
-/* START → cookie1 */
+/* START */
 btn.addEventListener("click", () => {
-  btn.classList.add("ping");
   btn.style.display = "none";
 
-  // fade in background music
   bgMusic.volume = 0;
-  bgMusic.play().catch(()=>{});  
-  let vol = 0;
+  bgMusic.play().catch(()=>{});
+  let v = 0;
   const fade = setInterval(()=>{
-    if(vol < 0.25){
-      vol += 0.01;
-      bgMusic.volume = vol;
-    } else clearInterval(fade);
+    if(v < 0.25){ v+=0.01; bgMusic.volume=v; } else clearInterval(fade);
   },100);
 
   cookie1.classList.add("visible");
 });
 
-/* COOKIE 1 → after 5 clicks → cookie2 */
+/* COOKIE1 → COOKIE2 */
 cookie1.addEventListener("click", () => {
   cookiePing(cookie1);
   cookie1Clicks++;
@@ -206,18 +201,20 @@ cookie1.addEventListener("click", () => {
   }
 });
 
-/* ---------------------------------------------------------
-   COOKIE 2 LOADING (top → bottom with pauses)
----------------------------------------------------------- */
-
+/* LOADING COOKIE2 + DARKEN + GLITCH */
 function startCookie2Loading(){
   cookie2.classList.add("visible");
-
   mask.style.display = "block";
   mask.style.height = "320px";
 
+  // darken background
+  darken.style.background = "rgba(0,0,0,0.6)";
+
+  // apply glitch effect
+  glitchWrap.classList.add("glitching");
+
   let h = 320;
-  let pauses = [260, 180, 110, 40]; // stops at these heights
+  let pauses = [260, 180, 110, 40];
   let nextPause = 0;
 
   let loader = setInterval(() => {
@@ -226,14 +223,12 @@ function startCookie2Loading(){
 
     mask.style.height = h + "px";
 
-    // pause moments
     if(nextPause < pauses.length && h < pauses[nextPause]){
       clearInterval(loader);
-      let pauseTime = 300 + Math.random()*400; 
       setTimeout(()=>{
         nextPause++;
         loader = setInterval(arguments.callee, 35);
-      }, pauseTime);
+      }, 300 + Math.random()*300);
     }
 
     if(h <= 0){
@@ -243,7 +238,7 @@ function startCookie2Loading(){
   }, 35);
 }
 
-/* COOKIE 2 → 10 clicks → jumpscare */
+/* COOKIE2 → JUMPSCARE */
 cookie2.addEventListener("click", () => {
   cookiePing(cookie2);
   cookie2Clicks++;
