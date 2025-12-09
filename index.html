@@ -1,74 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Cookie Game</title>
+    <meta charset="UTF-8">
+    <title>Cookie Game</title>
 
-  <style>
-    /* full-screen layout */
-    body {
-      margin: 0;
-      padding: 0;
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
 
-      /* Correct RAW GitHub background link */
-      background: url("https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/fielddd.jpg?raw=true") 
-                  no-repeat center center fixed;
-      background-size: cover;
+            height: 100vh;
+            width: 100vw;
 
-      /* creepy old camera filter */
-      filter: contrast(85%) brightness(85%) sepia(40%) saturate(70%) blur(1px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+            background-image: url("assets/fielddd.jpg");
+            background-size: cover;
+            background-position: center;
 
-      /* slight vignette */
-      position: relative;
-    }
+            /* creepy old camera filter */
+            filter:
+                contrast(1.6)
+                brightness(0.6)
+                saturate(0.35)
+                sepia(0.4)
+                blur(1.5px)
+                hue-rotate(-20deg)
+                drop-shadow(0 0 35px #000);
+        }
 
-    /* vignette effect */
-    body::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      background: radial-gradient(
-        circle,
-        rgba(0,0,0,0) 50%,
-        rgba(0,0,0,0.35) 100%
-      );
-    }
+        /* COOKIE */
+        #cookie {
+            width: 200px;
+            height: auto;
+            image-rendering: pixelated;
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
 
-    /* cookie styling */
-    #cookie {
-      width: 250px;
-
-      filter: contrast(90%) brightness(85%) sepia(25%) blur(0.5px);
-      z-index: 10; /* makes sure it's above the vignette */
-    }
-
-    /* add static / noise overlay */
-    .static {
-      position: fixed;
-      pointer-events: none;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      background-image: url("https://upload.wikimedia.org/wikipedia/commons/3/3c/TV_static_noise.gif");
-      mix-blend-mode: overlay;
-      opacity: 0.15;
-      z-index: 5;
-    }
-  </style>
+        #cookie:active {
+            transform: scale(0.95);
+        }
+    </style>
 </head>
 
 <body>
-  <div class="static"></div>
-  <img id="cookie" src="assets/cookie1.png" alt="Cookie">
+    <img id="cookie" src="assets/cookie1.png" alt="cookie">
 </body>
 </html>
