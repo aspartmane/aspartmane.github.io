@@ -8,8 +8,12 @@
     body {
       margin: 0;
       padding: 0;
-      background: url("assets/field.png") no-repeat center center fixed;
+      background: url("assets/fielddd.png") no-repeat center center fixed;
       background-size: cover;
+
+      /* 2009 filter for the whole scene */
+      filter: sepia(35%) contrast(90%) brightness(95%) saturate(80%);
+      
       display: flex;
       justify-content: center;
       align-items: center;
@@ -17,8 +21,11 @@
     }
 
     #cookie {
-      width: 250px; /* adjust size if needed */
+      width: 250px;
       user-select: none;
+
+      /* extra filter on the cookie to match 2009 look */
+      filter: sepia(25%) brightness(90%) contrast(85%);
     }
   </style>
 </head>
