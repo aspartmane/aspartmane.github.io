@@ -17,7 +17,7 @@
         transform: translate(-50%, -50%) scale(1);
         width: 220px;
         cursor: pointer;
-        transition: transform 0.15s ease;
+        transition: transform 0.12s ease;
     }
 
     #cookie2 {
@@ -38,13 +38,18 @@ const c1 = document.getElementById("cookie1");
 const c2 = document.getElementById("cookie2");
 
 
-// ----------------------------
-// FIRST COOKIE – 5 CLICKS
-// ----------------------------
+// ---------------------------------------------
+// FIRST COOKIE — 5 clicks, NO ZOOM, just bounce
+// ---------------------------------------------
 c1.onclick = () => {
     c1Clicks++;
 
-    // After 5 clicks → switch cookies
+    // small click bounce (NOT a zoom)
+    c1.style.transform = "translate(-50%, -50%) scale(0.9)";
+    setTimeout(() => {
+        c1.style.transform = "translate(-50%, -50%) scale(1)";
+    }, 120);
+
     if (c1Clicks >= 5) {
         c1.style.display = "none";
         c2.style.display = "block";
@@ -53,21 +58,20 @@ c1.onclick = () => {
 };
 
 
-// ----------------------------
-// SECOND COOKIE – ZOOM EACH CLICK
-// ----------------------------
+// -----------------------------------------------------
+// SECOND COOKIE — zooms slowly, 10th click = fullscreen
+// -----------------------------------------------------
 c2.onclick = () => {
     c2Clicks++;
 
-    // zoom a little each click
-    const zoom = 1 + c2Clicks * 0.04; // small growth
+    // zoom slightly each click
+    const zoom = 1 + c2Clicks * 0.04;
     c2.style.transform = `translate(-50%, -50%) scale(${zoom})`;
 
-    // On 10th click → jumpscare
+    // 10th click → jumpscare fullscreen
     if (c2Clicks === 10) {
-        // make it jump to fullscreen (but NOT too huge)
         c2.style.transition = "transform 0.35s ease";
-        c2.style.transform = "translate(-50%, -50%) scale(6)"; // fullscreen but not crazy
+        c2.style.transform = "translate(-50%, -50%) scale(6)"; // fullscreen but not insane
     }
 };
 </script>
