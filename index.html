@@ -16,37 +16,95 @@
             justify-content: center;
             align-items: center;
 
-            background-image: url("assets/fielddd.jpg");
-            background-size: cover;
-            background-position: center;
-
-            /* creepy old camera filter */
-            filter:
-                contrast(1.6)
-                brightness(0.6)
-                saturate(0.35)
-                sepia(0.4)
-                blur(1.5px)
-                hue-rotate(-20deg)
-                drop-shadow(0 0 35px #000);
+            background: black;
+            overflow: hidden;
         }
 
-        /* COOKIE */
+        /* BACKGROUND WITH SCARY FILTER + BREATHING EFFECT */
+        #bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+
+            filter:
+                contrast(1.9)
+                brightness(0.55)
+                saturate(0.25)
+                sepia(0.45)
+                blur(2px)
+                hue-rotate(-30deg)
+                drop-shadow(0 0 40px #000);
+
+            animation: breathe 7s ease-in-out infinite;
+        }
+
+        /* BREATHING KEYFRAMES */
+        @keyframes breathe {
+            0% {
+                transform: scale(1);
+                filter:
+                    contrast(1.9)
+                    brightness(0.55)
+                    saturate(0.25)
+                    sepia(0.45)
+                    blur(2px)
+                    hue-rotate(-30deg)
+                    drop-shadow(0 0 50px #000);
+            }
+
+            50% {
+                transform: scale(1.04); /* subtle zoom, creepy */
+                filter:
+                    contrast(2.1)
+                    brightness(0.45)
+                    saturate(0.15)
+                    sepia(0.55)
+                    blur(3px)
+                    hue-rotate(-40deg)
+                    drop-shadow(0 0 70px #000);
+            }
+
+            100% {
+                transform: scale(1);
+                filter:
+                    contrast(1.9)
+                    brightness(0.55)
+                    saturate(0.25)
+                    sepia(0.45)
+                    blur(2px)
+                    hue-rotate(-30deg)
+                    drop-shadow(0 0 50px #000);
+            }
+        }
+
+        /* COOKIE (normal colors) */
         #cookie {
             width: 200px;
             height: auto;
             image-rendering: pixelated;
             cursor: pointer;
-            transition: transform 0.1s ease;
+            transition: transform 0.12s ease;
+            z-index: 10;
         }
 
+        /* CLICK ANIMATION */
         #cookie:active {
-            transform: scale(0.95);
+            transform: scale(0.88) rotate(-2deg);
         }
     </style>
 </head>
 
 <body>
+
+    <!-- Background -->
+    <img id="bg" src="assets/fielddd.jpg">
+
+    <!-- Cookie -->
     <img id="cookie" src="assets/cookie1.png" alt="cookie">
+
 </body>
 </html>
