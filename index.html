@@ -41,38 +41,48 @@
 <div id="loadingMask"></div>
 
 <script>
-let clicks = 0;
+let cookie1Clicks = 0;
+let cookie2Clicks = 0;
 
 const cookie1 = document.getElementById("cookie1");
 const cookie2 = document.getElementById("cookie2");
 const mask = document.getElementById("loadingMask");
 
-// --- COOKIE 1 ---
+// --- COOKIE 1 LOGIC ---
 cookie1.addEventListener("click", () => {
-    clicks++;
+    cookie1Clicks++;
 
-    // cookie1 gets slightly bigger each click
-    cookie1.style.width = (200 + clicks * 12) + "px";
+    // cookie1 grows slightly
+    cookie1.style.width = (200 + cookie1Clicks * 15) + "px";
 
-    // after 10 clicks switch to cookie2
-    if (clicks >= 10) {
+    // after 5 clicks → switch to cookie2
+    if (cookie1Clicks >= 5) {
         cookie1.style.display = "none";
         cookie2.style.display = "block";
-        cookie2.style.width = "200px";
+        cookie2.style.width = "200px"; // reset size
     }
 });
 
-// --- COOKIE 2 ---
+// --- COOKIE 2 LOGIC ---
 cookie2.addEventListener("click", () => {
-    // first click on cookie2 = zoom fullscreen
-    cookie2.style.transition = "transform 0.4s ease, width 0.4s ease";
-    cookie2.style.width = "2000px";           // fullscreen zoom
-    cookie2.style.transform = "translate(-50%, -50%) scale(10)";
+    cookie2Clicks++;
 
-    // after zoom → fade to black
-    setTimeout(() => {
-        mask.style.display = "block";
-    }, 450);
+    // cookie2 grows gradually too
+    cookie2.style.width = (200 + cookie2Clicks * 20) + "px";
+
+    // on the 5th click of cookie2 → do jumpscare
+    if (cookie2Clicks === 5) {
+        cookie2.style.transition = "transform 0.35s ease, width 0.35s ease";
+
+        // zoom in but smaller than fullscreen
+        cookie2.style.transform = "translate(-50%, -50%) scale(4)";
+        cookie2.style.width = "800px";
+
+        // after zoom → fade to black
+        setTimeout(() => {
+            mask.style.display = "block";
+        }, 350);
+    }
 });
 </script>
 
