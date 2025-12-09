@@ -1,80 +1,29 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Cookies</title>
-<style>
+  <meta charset="UTF-8" />
+  <title>Cookie Game</title>
+
+  <style>
     body {
-        margin: 0;
-        background: black;
-        overflow: hidden;
+      margin: 0;
+      padding: 0;
+      background: url("assets/field.png") no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
-    #cookie1, #cookie2 {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(1);
-        width: 220px;
-        cursor: pointer;
-        transition: transform 0.12s ease;
+    #cookie {
+      width: 250px; /* adjust size if needed */
+      user-select: none;
     }
-
-    #cookie2 {
-        display: none;
-    }
-</style>
+  </style>
 </head>
+
 <body>
-
-<img id="cookie1" src="assets/cookie1.png">
-<img id="cookie2" src="assets/cookie2.png">
-
-<script>
-let c1Clicks = 0;
-let c2Clicks = 0;
-
-const c1 = document.getElementById("cookie1");
-const c2 = document.getElementById("cookie2");
-
-
-// ---------------------------------------------
-// FIRST COOKIE — 5 clicks, NO ZOOM, just bounce
-// ---------------------------------------------
-c1.onclick = () => {
-    c1Clicks++;
-
-    // small click bounce (NOT a zoom)
-    c1.style.transform = "translate(-50%, -50%) scale(0.9)";
-    setTimeout(() => {
-        c1.style.transform = "translate(-50%, -50%) scale(1)";
-    }, 120);
-
-    if (c1Clicks >= 5) {
-        c1.style.display = "none";
-        c2.style.display = "block";
-        c2.style.transform = "translate(-50%, -50%) scale(1)";
-    }
-};
-
-
-// -----------------------------------------------------
-// SECOND COOKIE — zooms slowly, 10th click = fullscreen
-// -----------------------------------------------------
-c2.onclick = () => {
-    c2Clicks++;
-
-    // zoom slightly each click
-    const zoom = 1 + c2Clicks * 0.04;
-    c2.style.transform = `translate(-50%, -50%) scale(${zoom})`;
-
-    // 10th click → jumpscare fullscreen
-    if (c2Clicks === 10) {
-        c2.style.transition = "transform 0.35s ease";
-        c2.style.transform = "translate(-50%, -50%) scale(6)"; // fullscreen but not insane
-    }
-};
-</script>
-
+  <img id="cookie" src="assets/cookie1.png" alt="Cookie">
 </body>
 </html>
