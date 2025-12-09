@@ -5,32 +5,70 @@
   <title>Cookie Game</title>
 
   <style>
+    /* full-screen layout */
     body {
       margin: 0;
       padding: 0;
-      background: url("assets/fielddd.png") no-repeat center center fixed;
+
+      /* Correct RAW GitHub background link */
+      background: url("https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/fielddd.jpg?raw=true") 
+                  no-repeat center center fixed;
       background-size: cover;
 
-      /* 2009 filter for the whole scene */
-      filter: sepia(35%) contrast(90%) brightness(95%) saturate(80%);
-      
+      /* creepy old camera filter */
+      filter: contrast(85%) brightness(85%) sepia(40%) saturate(70%) blur(1px);
+
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+
+      /* slight vignette */
+      position: relative;
     }
 
+    /* vignette effect */
+    body::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: radial-gradient(
+        circle,
+        rgba(0,0,0,0) 50%,
+        rgba(0,0,0,0.35) 100%
+      );
+    }
+
+    /* cookie styling */
     #cookie {
       width: 250px;
-      user-select: none;
 
-      /* extra filter on the cookie to match 2009 look */
-      filter: sepia(25%) brightness(90%) contrast(85%);
+      filter: contrast(90%) brightness(85%) sepia(25%) blur(0.5px);
+      z-index: 10; /* makes sure it's above the vignette */
+    }
+
+    /* add static / noise overlay */
+    .static {
+      position: fixed;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background-image: url("https://upload.wikimedia.org/wikipedia/commons/3/3c/TV_static_noise.gif");
+      mix-blend-mode: overlay;
+      opacity: 0.15;
+      z-index: 5;
     }
   </style>
 </head>
 
 <body>
+  <div class="static"></div>
   <img id="cookie" src="assets/cookie1.png" alt="Cookie">
 </body>
 </html>
