@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>YearN</title>
+<title>Yearn</title>
 <style>
     html, body {
         margin: 0;
@@ -20,9 +20,10 @@
         width: 260px;
         height: 260px;
         transform: translate(-50%, -50%);
-        transition: opacity 0.35s ease, transform 0.2s ease;
+        transition: opacity 1.2s linear, transform 0.25s ease;
         image-rendering: pixelated;
         cursor: pointer;
+        opacity: 1;
     }
 </style>
 </head>
@@ -33,7 +34,7 @@
 <script>
     const blob = document.getElementById("blob");
 
-    // Your 4-frame breathing cycle images
+    // Breathing frames
     const frames = [
         "assets/blob1.png",
         "assets/blob2.png",
@@ -43,35 +44,45 @@
 
     let frameIndex = 0;
 
-    // Preload all images (prevents the “only one image appears” bug)
-    const preloaded = [];
-    for (let src of frames) {
-        const img = new Image();
-        img.src = src;
-        preloaded.push(img);
-    }
-
-    // Smooth breathing cycle
-    function breathe() {
-        blob.style.opacity = "0";
+    // Smooth crossfade function
+    function nextFrame() {
+        blob.style.opacity = "0.4"; // fade halfway down
 
         setTimeout(() => {
             frameIndex = (frameIndex + 1) % frames.length;
             blob.src = frames[frameIndex];
-            blob.style.opacity = "1";
-        }, 350);
+            blob.style.opacity = "1"; // fade up
+        }, 1200); // halfway through cycle
     }
 
-    // Blob breathes automatically
-    setInterval(breathe, 1300);
+    // Slow breathing loop (2.4s)
+    setInterval(nextFrame, 2400);
 
-    // On click, add a tiny pulse animation
+    // CLICK DISTORTION
+    let clickTimes = [];
+
     blob.addEventListener("click", () => {
-        blob.style.transform = "translate(-50%, -50%) scale(0.94)";
+        const now = Date.now();
+        clickTimes.push(now);
 
+        clickTimes = clickTimes.filter(t => now - t < 800); // keep recent 800ms
+
+        // Normal click pulse
+        blob.style.transform = "translate(-50%, -50%) scale(0.94)";
         setTimeout(() => {
             blob.style.transform = "translate(-50%, -50%) scale(1)";
-        }, 120);
+        }, 130);
+
+        // Too-fast clicking = distorted breathing creature
+        if (clickTimes.length >= 3) {
+            blob.style.transition = "transform 0.1s ease";
+            blob.style.transform = "translate(-50%, -50%) scale(1.15) skewX(8deg)";
+
+            setTimeout(() => {
+                blob.style.transform = "translate(-50%, -50%) scale(1)";
+                blob.style.transition = "transform 0.25s ease";
+            }, 150);
+        }
     });
 </script>
 
