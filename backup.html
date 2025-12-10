@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cookie</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+
+            height: 100vh;
+            width: 100vw;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: black;
+            overflow: hidden;
+        }
+
+        /* BACKGROUND IMAGE WITH SCARY FILTER */
+        #bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+
+            filter:
+                contrast(1.9)
+                brightness(0.55)
+                saturate(0.25)
+                sepia(0.45)
+                blur(2px)
+                hue-rotate(-30deg)
+                drop-shadow(0 0 40px #000);
+
+        }
+
+        /* COOKIE – CLEAN COLORS */
+        #cookie {
+            width: 200px;
+            height: auto;
+            image-rendering: pixelated;
+            cursor: pointer;
+            transition: transform 0.12s ease;
+            z-index: 10;
+        }
+
+        /* CLICK ANIMATION (BOUNCE) */
+        #cookie:active {
+            transform: scale(0.88) rotate(-2deg);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Background separated so filter applies ONLY to it -->
+    <img id="bg" src="assets/fielddd.jpg">
+
+    <!-- Cookie -->
+    <img id="cookie" src="assets/cookie1.png" alt="cookie">
+
+</body>
+</html>
