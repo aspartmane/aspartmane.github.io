@@ -1,70 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Cookie</title>
+<meta charset="UTF-8">
+<title>YearN</title>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        background: url('assets/background.png') no-repeat center center fixed;
+        background-size: cover;
+    }
 
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-
-            height: 100vh;
-            width: 100vw;
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-
-            background: black;
-            overflow: hidden;
-        }
-
-        /* BACKGROUND IMAGE WITH SCARY FILTER */
-        #bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -1;
-
-            filter:
-                contrast(1.9)
-                brightness(0.55)
-                saturate(0.25)
-                sepia(0.45)
-                blur(2px)
-                hue-rotate(-30deg)
-                drop-shadow(0 0 40px #000);
-
-        }
-
-        /* COOKIE – CLEAN COLORS */
-        #cookie {
-            width: 200px;
-            height: auto;
-            image-rendering: pixelated;
-            cursor: pointer;
-            transition: transform 0.12s ease;
-            z-index: 10;
-        }
-
-        /* CLICK ANIMATION (BOUNCE) */
-        #cookie:active {
-            transform: scale(0.88) rotate(-2deg);
-        }
-    </style>
+    #blob {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 260px;
+        height: 260px;
+        transform: translate(-50%, -50%);
+        transition: opacity 0.35s ease, transform 0.2s ease;
+        image-rendering: pixelated;
+        cursor: pointer;
+    }
+</style>
 </head>
-
 <body>
 
-    <!-- Background separated so filter applies ONLY to it -->
-    <img id="bg" src="assets/fielddd.jpg">
+<img id="blob" src="assets/blob1.png">
 
-    <!-- Cookie -->
-    <img id="cookie" src="assets/cookie1.png" alt="cookie">
+<script>
+    const blob = document.getElementById("blob");
+
+    // Your 4-frame breathing cycle images
+    const frames = [
+        "assets/blob1.png",
+        "assets/blob2.png",
+        "assets/blob3.png",
+        "assets/blob4.png"
+    ];
+
+    let frameIndex = 0;
+
+    // Preload all images (prevents the “only one image appears” bug)
+    const preloaded = [];
+    for (let src of frames) {
+        const img = new Image();
+        img.src = src;
+        preloaded.push(img);
+    }
+
+    // Smooth breathing cycle
+    function breathe() {
+        blob.style.opacity = "0";
+
+        setTimeout(() => {
+            frameIndex = (frameIndex + 1) % frames.length;
+            blob.src = frames[frameIndex];
+            blob.style.opacity = "1";
+        }, 350);
+    }
+
+    // Blob breathes automatically
+    setInterval(breathe, 1300);
+
+    // On click, add a tiny pulse animation
+    blob.addEventListener("click", () => {
+        blob.style.transform = "translate(-50%, -50%) scale(0.94)";
+
+        setTimeout(() => {
+            blob.style.transform = "translate(-50%, -50%) scale(1)";
+        }, 120);
+    });
+</script>
 
 </body>
 </html>
