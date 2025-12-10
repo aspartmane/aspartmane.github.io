@@ -9,8 +9,8 @@
         padding: 0;
         height: 100%;
         overflow: hidden;
-        background: url('assets/background.png') no-repeat center center fixed;
-        background-size: cover;
+        background: url('assets/background.png') no-repeat top center fixed;
+        background-size: 120% 120%; /* stretch more */
     }
 
     #blob {
@@ -20,7 +20,7 @@
         width: 260px;
         height: 260px;
         transform: translate(-50%, -50%) scale(1);
-        transition: transform 1.2s ease-in-out;
+        transition: transform 0.9s ease-in-out;
         image-rendering: pixelated;
         cursor: pointer;
     }
@@ -44,102 +44,106 @@
     let breathing = true;
     let irregularCycle = false;
 
-    // --- SMOOTH NORMAL BREATHING ---
+    // --- STRONGER, FASTER NORMAL BREATHING ---
     function normalBreath() {
         if (!breathing) return;
 
-        blob.style.transition = "transform 1.4s ease-in-out";
-        blob.style.transform = "translate(-50%, -50%) scale(1.075)";
+        // Inhale (more noticeable)
+        blob.style.transition = "transform 0.9s ease-in-out";
+        blob.style.transform = "translate(-50%, -50%) scale(1.12)";
 
+        // Swap frame at inhale peak
         setTimeout(() => {
             if (!breathing) return;
             index = (index + 1) % frames.length;
             blob.src = frames[index];
-        }, 700);
+        }, 450);
 
+        // Exhale
         setTimeout(() => {
             if (!breathing) return;
             blob.style.transform = "translate(-50%, -50%) scale(1)";
-        }, 1400);
+        }, 900);
     }
 
-    setInterval(normalBreath, 1400);
+    // Faster breathing cycle
+    setInterval(normalBreath, 900);
 
-    // --- IRREGULAR, SHAKY, TOO-REAL BREATHING MOMENTS ---
+
+    // --- EXTREME IRREGULAR BREATHING TWITCH ---
     function irregularBreathingEvent() {
         if (irregularCycle) return;
         irregularCycle = true;
 
+        // Hard twitch inhale
+        blob.style.transition = "transform 0.18s ease";
+        blob.style.transform = "translate(-50%, -50%) scale(1.22) rotate(4deg)";
+
         setTimeout(() => {
-            // shaky inhale
-            blob.style.transition = "transform 0.45s ease";
-            blob.style.transform = "translate(-50%, -50%) scale(1.11) rotate(1deg)";
+            // sudden collapse
+            blob.style.transition = "transform 0.12s ease";
+            blob.style.transform = "translate(-50%, -50%) scale(0.88) rotate(-5deg)";
 
             setTimeout(() => {
-                // glitchy exhale
-                blob.style.transition = "transform 0.25s ease";
-                blob.style.transform = "translate(-50%, -50%) scale(0.96) rotate(-2deg)";
+                // recover with a shake
+                blob.style.transition = "transform 1.1s ease-in-out";
+                blob.style.transform = "translate(-50%, -50%) scale(1) rotate(0deg)";
+                irregularCycle = false;
+            }, 240);
 
-                setTimeout(() => {
-                    // recover slowly
-                    blob.style.transition = "transform 1.6s ease-in-out";
-                    blob.style.transform = "translate(-50%, -50%) scale(1) rotate(0deg)";
-                    irregularCycle = false;
-                }, 500);
-
-            }, 550);
-
-        }, 100);
+        }, 200);
     }
 
-    // triggers irregular breathing every 12–18 seconds
+    // Trigger irregular glitch every ~10–14 seconds
     setInterval(() => {
-        if (Math.random() < 0.6) irregularBreathingEvent();
-    }, 15000);
+        if (Math.random() < 0.45) irregularBreathingEvent();
+    }, 12000);
 
 
-    // --- CLICK REACTIONS ---
+    // --- CLICK REACTIVITY ---
     let clickTimes = [];
 
     blob.addEventListener("click", () => {
         const now = Date.now();
         clickTimes.push(now);
-        clickTimes = clickTimes.filter(t => now - t < 2000);
+        clickTimes = clickTimes.filter(t => now - t < 1800);
 
-        // normal click pulse
-        blob.style.transition = "transform 0.15s ease";
-        blob.style.transform = "translate(-50%, -50%) scale(0.94)";
+        // normal click compression
+        blob.style.transition = "transform 0.12s ease";
+        blob.style.transform = "translate(-50%, -50%) scale(0.9)";
 
         setTimeout(() => {
-            blob.style.transition = "transform 0.6s ease";
+            blob.style.transition = "transform 0.5s ease";
             blob.style.transform = "translate(-50%, -50%) scale(1)";
-        }, 160);
+        }, 140);
 
-        // if too many interactions → IT WATCHES YOU
-        if (clickTimes.length >= 12) {
+        // too much clicking triggers HARD tweak
+        if (clickTimes.length >= 10) {
             clickTimes = []; 
-            creatureStare();
+            creatureStareTweak();
         }
     });
 
-    // --- THE WATCHING EVENT ---
-    function creatureStare() {
-        breathing = false; // stop normal breathing
+    // --- STARE / TWEAK EVENT (NO GHOST YET) ---
+    function creatureStareTweak() {
+        breathing = false;
 
-        // hard freeze
-        blob.style.transition = "transform 0.2s ease";
-        blob.style.transform = "translate(-50%, -50%) scale(1.11) rotate(1.5deg)";
+        // freeze, jolt forward
+        blob.style.transition = "transform 0.18s ease";
+        blob.style.transform = "translate(-50%, -50%) scale(1.3) rotate(-3deg)";
 
         setTimeout(() => {
-            blob.style.transform = "translate(-50%, -50%) scale(1.14) rotate(0deg)";
-        }, 250);
+            // tighter stare position
+            blob.style.transition = "transform 0.25s ease";
+            blob.style.transform = "translate(-50%, -50%) scale(1.32) rotate(0deg)";
+        }, 240);
 
         // hold the stare
         setTimeout(() => {
             breathing = true;
-            blob.style.transition = "transform 1.6s ease-in-out";
+            blob.style.transition = "transform 1.4s ease";
             blob.style.transform = "translate(-50%, -50%) scale(1)";
-        }, 1600);
+        }, 1500);
     }
 </script>
 
