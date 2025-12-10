@@ -1,102 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Blob</title>
+<meta charset="UTF-8" />
+<title>Blob Test</title>
 <style>
     body {
         margin: 0;
         overflow: hidden;
-        background: black;
+        background: url("background.png") center/cover no-repeat;
+        height: 100vh;
+        animation: breathe 6s ease-in-out infinite;
     }
 
-    #bg {
-        position: fixed;
-        top: -80px; /* move it up a bit */
-        left: 0;
-        width: 100vw;
-        height: 110vh;
-        object-fit: cover;
-        z-index: -1;
-        filter: brightness(0.6);
+    @keyframes breathe {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+        100% { transform: scale(1); }
     }
 
     #blob {
-        position: fixed;
+        position: absolute;
+        width: 350px;
         left: 50%;
         top: 50%;
-        transform: translate(-50%, -50%) scale(1);
-        width: 380px;
-        transition: transform 0.25s ease-out;
+        transform: translate(-50%, -50%);
+        transition: opacity 0.3s ease;
     }
 </style>
 </head>
 <body>
 
-<img id="bg" src="background.png">
-<img id="blob" src="blob1.png">
+<img id="blob" src="blob1.png" alt="blob">
 
 <script>
-    const blob = document.getElementById("blob");
+const blob = document.getElementById("blob");
+const frames = ["blob1.png", "blob2.png", "blob4.png"];
+let i = 0;
 
-    const frames = {
-        normalInhale: "blob1.png",
-        normalExhale: "blob2.png",
-        stare: "blob4.png"
-    };
+setInterval(() => {
+    i = (i + 1) % frames.length;
+    blob.style.opacity = 0;
 
-    let clickCount = 0;
-    let breathing = true;
-
-    function breathe() {
-        if (!breathing) return;
-
-        // inhale
-        blob.src = frames.normalInhale;
-        blob.style.transform = "translate(-50%, -50%) scale(1)";
-
-        setTimeout(() => {
-            // exhale (zoom a little)
-            blob.src = frames.normalExhale;
-            blob.style.transform = "translate(-50%, -50%) scale(1.07)";
-        }, 350);
-
-        setTimeout(breathe, 700); // fast noticeable rhythm
-    }
-
-    breathe(); // start breathing immediately
-
-    // ---- tweaking event after some time ----
     setTimeout(() => {
-        breathing = false;
-        blob.src = frames.stare;
-        blob.style.transform = "translate(-50%, -50%) scale(1.05)";
-        
-        setTimeout(() => {
-            breathing = true;
-            breathe();
-        }, 1500);
-    }, 8000); // tweak after 8 seconds
-
-
-
-    // ---- clicking interaction ----
-    blob.addEventListener("click", () => {
-        clickCount++;
-
-        // tiny clickable bob
-        blob.style.transform = "translate(-50%, -50%) scale(0.95)";
-        setTimeout(() => {
-            blob.style.transform = "translate(-50%, -50%) scale(1)";
-        }, 120);
-
-        // after too much clicking, it stares
-        if (clickCount > 12) {
-            breathing = false;
-            blob.src = frames.stare;
-            blob.style.transform = "translate(-50%, -50%) scale(1.1)";
-        }
-    });
+        blob.src = frames[i];
+        blob.style.opacity = 1;
+    }, 300);
+}, 2000);
 </script>
 
 </body>
