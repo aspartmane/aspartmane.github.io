@@ -1,105 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>YEAR N</title>
-    <style>
-        body {
-            margin: 0;
-            background: url('background.png') center top;
-            background-size: cover;
-            height: 100vh;
-            overflow: hidden;
-        }
+<meta charset="UTF-8">
+<title>Blob</title>
+<style>
+    body {
+        margin: 0;
+        overflow: hidden;
+        background: black;
+    }
 
-        #blob {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%) scale(1);
-            image-rendering: pixelated;
-            width: 260px;
-            height: auto;
-            transition: transform 0.12s linear;
-        }
-    </style>
+    #bg {
+        position: fixed;
+        top: -80px; /* move it up a bit */
+        left: 0;
+        width: 100vw;
+        height: 110vh;
+        object-fit: cover;
+        z-index: -1;
+        filter: brightness(0.6);
+    }
+
+    #blob {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%) scale(1);
+        width: 380px;
+        transition: transform 0.25s ease-out;
+    }
+</style>
 </head>
 <body>
 
-    <img id="blob" src="blob1.png">
+<img id="bg" src="background.png">
+<img id="blob" src="blob1.png">
 
-    <script>
-        const frames = ["blob1.png", "blob2.png", "blob4.png", "blob2.png"];
-        let frameIndex = 0;
+<script>
+    const blob = document.getElementById("blob");
 
-        let breathing = true;
-        let clickingFast = false;
-        let lastClickTime = 0;
-        let stareTimeout = null;
+    const frames = {
+        normalInhale: "blob1.png",
+        normalExhale: "blob2.png",
+        stare: "blob4.png"
+    };
 
-        const blob = document.getElementById("blob");
+    let clickCount = 0;
+    let breathing = true;
 
-        // Breathing Animation
-        function breathe() {
-            if (!breathing) return;
+    function breathe() {
+        if (!breathing) return;
 
-            frameIndex = (frameIndex + 1) % frames.length;
-            blob.src = frames[frameIndex];
+        // inhale
+        blob.src = frames.normalInhale;
+        blob.style.transform = "translate(-50%, -50%) scale(1)";
 
-            // Zoom logic:
-            // blob1 → normal
-            // blob2 → slight inhale zoom-out
-            // blob4 → exhale zoom-in
+        setTimeout(() => {
+            // exhale (zoom a little)
+            blob.src = frames.normalExhale;
+            blob.style.transform = "translate(-50%, -50%) scale(1.07)";
+        }, 350);
 
-            if (blob.src.includes("blob1")) {
-                blob.style.transform = "translate(-50%, -50%) scale(1)";
-            }
-            else if (blob.src.includes("blob2")) {
-                blob.style.transform = "translate(-50%, -50%) scale(0.97)";
-            }
-            else if (blob.src.includes("blob4")) {
-                blob.style.transform = "translate(-50%, -50%) scale(1.05)";
-            }
+        setTimeout(breathe, 700); // fast noticeable rhythm
+    }
 
-            setTimeout(breathe, 550); // slow breathing rhythm
-        }
+    breathe(); // start breathing immediately
 
-        breathe();
+    // ---- tweaking event after some time ----
+    setTimeout(() => {
+        breathing = false;
+        blob.src = frames.stare;
+        blob.style.transform = "translate(-50%, -50%) scale(1.05)";
+        
+        setTimeout(() => {
+            breathing = true;
+            breathe();
+        }, 1500);
+    }, 8000); // tweak after 8 seconds
 
-        // CLICK INTERACTION
-        document.body.addEventListener("click", () => {
-            const now = Date.now();
 
-            // Detect fast clicking
-            if (now - lastClickTime < 250) {
-                clickingFast = true;
-                triggerStare();
-            }
 
-            lastClickTime = now;
-        });
+    // ---- clicking interaction ----
+    blob.addEventListener("click", () => {
+        clickCount++;
 
-        function triggerStare() {
-            if (!breathing) return; // already staring
+        // tiny clickable bob
+        blob.style.transform = "translate(-50%, -50%) scale(0.95)";
+        setTimeout(() => {
+            blob.style.transform = "translate(-50%, -50%) scale(1)";
+        }, 120);
 
+        // after too much clicking, it stares
+        if (clickCount > 12) {
             breathing = false;
-
-            // Freeze on blob4
-            blob.src = "blob4.png";
+            blob.src = frames.stare;
             blob.style.transform = "translate(-50%, -50%) scale(1.1)";
-
-            // Clear old timeout if spam continues
-            if (stareTimeout) clearTimeout(stareTimeout);
-
-            // Wait until player stops clicking
-            stareTimeout = setTimeout(() => {
-                clickingFast = false;
-                breathing = true;
-                frameIndex = 0;
-                breathe();
-            }, 3200); // must stop clicking ~3 sec
         }
-    </script>
+    });
+</script>
 
 </body>
 </html>
