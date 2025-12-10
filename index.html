@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>YeArN</title>
+<title>Yearn</title>
 <style>
     html, body {
         margin: 0;
@@ -41,69 +41,106 @@
     ];
 
     let index = 0;
+    let breathing = true;
+    let irregularCycle = false;
 
-    // Smooth breathing — NO fading, only morph-like scaling
-    function breathe() {
-        // inhale (grow slightly)
-        blob.style.transform = "translate(-50%, -50%) scale(1.08)";
+    // --- SMOOTH NORMAL BREATHING ---
+    function normalBreath() {
+        if (!breathing) return;
 
-        // halfway through inhale -> switch frame quietly
+        blob.style.transition = "transform 1.4s ease-in-out";
+        blob.style.transform = "translate(-50%, -50%) scale(1.075)";
+
         setTimeout(() => {
+            if (!breathing) return;
             index = (index + 1) % frames.length;
             blob.src = frames[index];
-        }, 1200);
+        }, 700);
 
-        // exhale (back to normal)
         setTimeout(() => {
+            if (!breathing) return;
             blob.style.transform = "translate(-50%, -50%) scale(1)";
-        }, 2400);
+        }, 1400);
     }
 
-    setInterval(breathe, 2400);
+    setInterval(normalBreath, 1400);
 
-    // --- CLICK DISTORTION ---
+    // --- IRREGULAR, SHAKY, TOO-REAL BREATHING MOMENTS ---
+    function irregularBreathingEvent() {
+        if (irregularCycle) return;
+        irregularCycle = true;
+
+        setTimeout(() => {
+            // shaky inhale
+            blob.style.transition = "transform 0.45s ease";
+            blob.style.transform = "translate(-50%, -50%) scale(1.11) rotate(1deg)";
+
+            setTimeout(() => {
+                // glitchy exhale
+                blob.style.transition = "transform 0.25s ease";
+                blob.style.transform = "translate(-50%, -50%) scale(0.96) rotate(-2deg)";
+
+                setTimeout(() => {
+                    // recover slowly
+                    blob.style.transition = "transform 1.6s ease-in-out";
+                    blob.style.transform = "translate(-50%, -50%) scale(1) rotate(0deg)";
+                    irregularCycle = false;
+                }, 500);
+
+            }, 550);
+
+        }, 100);
+    }
+
+    // triggers irregular breathing every 12–18 seconds
+    setInterval(() => {
+        if (Math.random() < 0.6) irregularBreathingEvent();
+    }, 15000);
+
+
+    // --- CLICK REACTIONS ---
     let clickTimes = [];
+
     blob.addEventListener("click", () => {
         const now = Date.now();
         clickTimes.push(now);
-        clickTimes = clickTimes.filter(t => now - t < 800);
+        clickTimes = clickTimes.filter(t => now - t < 2000);
 
         // normal click pulse
+        blob.style.transition = "transform 0.15s ease";
         blob.style.transform = "translate(-50%, -50%) scale(0.94)";
+
         setTimeout(() => {
+            blob.style.transition = "transform 0.6s ease";
             blob.style.transform = "translate(-50%, -50%) scale(1)";
-        }, 150);
+        }, 160);
 
-        // too-fast clicking = distortion
-        if (clickTimes.length >= 3) {
-            blob.style.transition = "transform 0.15s ease";
-            blob.style.transform = "translate(-50%, -50%) scale(1.2) skewX(10deg)";
-
-            setTimeout(() => {
-                blob.style.transition = "transform 1.2s ease-in-out";
-                blob.style.transform = "translate(-50%, -50%) scale(1)";
-            }, 180);
+        // if too many interactions → IT WATCHES YOU
+        if (clickTimes.length >= 12) {
+            clickTimes = []; 
+            creatureStare();
         }
     });
 
-    // --- RANDOM "SHIFT TOWARD YOU" MOMENTS ---
-    function stareEvent() {
-        blob.style.transition = "transform 1.4s ease";
-        blob.style.transform = "translate(-50%, -50%) scale(1.15) translateY(-10px)";
+    // --- THE WATCHING EVENT ---
+    function creatureStare() {
+        breathing = false; // stop normal breathing
 
-        // return to normal slowly
+        // hard freeze
+        blob.style.transition = "transform 0.2s ease";
+        blob.style.transform = "translate(-50%, -50%) scale(1.11) rotate(1.5deg)";
+
         setTimeout(() => {
+            blob.style.transform = "translate(-50%, -50%) scale(1.14) rotate(0deg)";
+        }, 250);
+
+        // hold the stare
+        setTimeout(() => {
+            breathing = true;
+            blob.style.transition = "transform 1.6s ease-in-out";
             blob.style.transform = "translate(-50%, -50%) scale(1)";
-        }, 2600);
+        }, 1600);
     }
-
-    // every 10–20 seconds it randomly "leans toward" the player
-    setInterval(() => {
-        if (Math.random() < 0.4) {
-            stareEvent();
-        }
-    }, 10000);
-
 </script>
 
 </body>
