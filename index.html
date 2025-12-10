@@ -1,62 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Creepy Blob</title>
+<meta charset="UTF-8">
+<title>YearN</title>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        background: url('assets/background.png') no-repeat center center fixed;
+        background-size: cover;
+    }
 
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: url("assets/field.png") center/cover no-repeat fixed;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #blob {
-            width: 320px;
-            user-select: none;
-            transition: opacity 0.35s ease, transform 4s ease-in-out;
-            animation: breathe 5.5s ease-in-out infinite;
-            opacity: 1;
-        }
-
-        /* slow creepy breathing */
-        @keyframes breathe {
-            0%   { transform: scale(1); }
-            50%  { transform: scale(1.08); }
-            100% { transform: scale(1); }
-        }
-    </style>
+    #blob {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 260px;
+        height: 260px;
+        transform: translate(-50%, -50%);
+        transition: opacity 0.35s ease, transform 0.2s ease;
+        image-rendering: pixelated;
+        cursor: pointer;
+    }
+</style>
 </head>
-
 <body>
 
-    <img id="blob" src="assets/blob1.png" alt="blob">
+<img id="blob" src="assets/blob1.png">
 
-    <script>
-        const frames = [
-            "assets/blob1.png",
-            "assets/blob2.png",
-            "assets/blob3.png",
-            "assets/blob4.png"
-        ];
+<script>
+    const blob = document.getElementById("blob");
 
-        const blob = document.getElementById("blob");
-        let frame = 0;
+    // Your 4-frame breathing cycle images
+    const frames = [
+        "assets/blob1.png",
+        "assets/blob2.png",
+        "assets/blob3.png",
+        "assets/blob4.png"
+    ];
 
-        blob.addEventListener("click", () => {
-            blob.style.opacity = 0;
+    let frameIndex = 0;
 
-            setTimeout(() => {
-                frame = (frame + 1) % frames.length;
-                blob.src = frames[frame];
-                blob.style.opacity = 1;
-            }, 200);
-        });
-    </script>
+    // Preload all images (prevents the “only one image appears” bug)
+    const preloaded = [];
+    for (let src of frames) {
+        const img = new Image();
+        img.src = src;
+        preloaded.push(img);
+    }
+
+    // Smooth breathing cycle
+    function breathe() {
+        blob.style.opacity = "0";
+
+        setTimeout(() => {
+            frameIndex = (frameIndex + 1) % frames.length;
+            blob.src = frames[frameIndex];
+            blob.style.opacity = "1";
+        }, 350);
+    }
+
+    // Blob breathes automatically
+    setInterval(breathe, 1300);
+
+    // On click, add a tiny pulse animation
+    blob.addEventListener("click", () => {
+        blob.style.transform = "translate(-50%, -50%) scale(0.94)";
+
+        setTimeout(() => {
+            blob.style.transform = "translate(-50%, -50%) scale(1)";
+        }, 120);
+    });
+</script>
 
 </body>
 </html>
