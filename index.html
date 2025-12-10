@@ -19,11 +19,10 @@
         left: 50%;
         width: 260px;
         height: 260px;
-        transform: translate(-50%, -50%);
-        transition: opacity 1.2s linear, transform 0.25s ease;
+        transform: translate(-50%, -50%) scale(1);
+        transition: transform 1.2s ease-in-out;
         image-rendering: pixelated;
         cursor: pointer;
-        opacity: 1;
     }
 </style>
 </head>
@@ -34,7 +33,6 @@
 <script>
     const blob = document.getElementById("blob");
 
-    // Breathing frames
     const frames = [
         "assets/blob1.png",
         "assets/blob2.png",
@@ -42,48 +40,70 @@
         "assets/blob4.png"
     ];
 
-    let frameIndex = 0;
+    let index = 0;
 
-    // Smooth crossfade function
-    function nextFrame() {
-        blob.style.opacity = "0.4"; // fade halfway down
+    // Smooth breathing — NO fading, only morph-like scaling
+    function breathe() {
+        // inhale (grow slightly)
+        blob.style.transform = "translate(-50%, -50%) scale(1.08)";
 
+        // halfway through inhale -> switch frame quietly
         setTimeout(() => {
-            frameIndex = (frameIndex + 1) % frames.length;
-            blob.src = frames[frameIndex];
-            blob.style.opacity = "1"; // fade up
-        }, 1200); // halfway through cycle
+            index = (index + 1) % frames.length;
+            blob.src = frames[index];
+        }, 1200);
+
+        // exhale (back to normal)
+        setTimeout(() => {
+            blob.style.transform = "translate(-50%, -50%) scale(1)";
+        }, 2400);
     }
 
-    // Slow breathing loop (2.4s)
-    setInterval(nextFrame, 2400);
+    setInterval(breathe, 2400);
 
-    // CLICK DISTORTION
+    // --- CLICK DISTORTION ---
     let clickTimes = [];
-
     blob.addEventListener("click", () => {
         const now = Date.now();
         clickTimes.push(now);
+        clickTimes = clickTimes.filter(t => now - t < 800);
 
-        clickTimes = clickTimes.filter(t => now - t < 800); // keep recent 800ms
-
-        // Normal click pulse
+        // normal click pulse
         blob.style.transform = "translate(-50%, -50%) scale(0.94)";
         setTimeout(() => {
             blob.style.transform = "translate(-50%, -50%) scale(1)";
-        }, 130);
+        }, 150);
 
-        // Too-fast clicking = distorted breathing creature
+        // too-fast clicking = distortion
         if (clickTimes.length >= 3) {
-            blob.style.transition = "transform 0.1s ease";
-            blob.style.transform = "translate(-50%, -50%) scale(1.15) skewX(8deg)";
+            blob.style.transition = "transform 0.15s ease";
+            blob.style.transform = "translate(-50%, -50%) scale(1.2) skewX(10deg)";
 
             setTimeout(() => {
+                blob.style.transition = "transform 1.2s ease-in-out";
                 blob.style.transform = "translate(-50%, -50%) scale(1)";
-                blob.style.transition = "transform 0.25s ease";
-            }, 150);
+            }, 180);
         }
     });
+
+    // --- RANDOM "SHIFT TOWARD YOU" MOMENTS ---
+    function stareEvent() {
+        blob.style.transition = "transform 1.4s ease";
+        blob.style.transform = "translate(-50%, -50%) scale(1.15) translateY(-10px)";
+
+        // return to normal slowly
+        setTimeout(() => {
+            blob.style.transform = "translate(-50%, -50%) scale(1)";
+        }, 2600);
+    }
+
+    // every 10–20 seconds it randomly "leans toward" the player
+    setInterval(() => {
+        if (Math.random() < 0.4) {
+            stareEvent();
+        }
+    }, 10000);
+
 </script>
 
 </body>
