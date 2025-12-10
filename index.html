@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Cookie Game</title>
+    <title>Cookie</title>
 
     <style>
         body {
@@ -20,7 +20,7 @@
             overflow: hidden;
         }
 
-        /* BACKGROUND IMAGE WITH SCARY FILTER */
+        /* BACKGROUND IMAGE WITH SCARY FILTER + BREATHING */
         #bg {
             position: absolute;
             top: 0;
@@ -39,6 +39,21 @@
                 hue-rotate(-30deg)
                 drop-shadow(0 0 40px #000);
 
+            /* breathing effect */
+            animation: breathe 7s ease-in-out infinite;
+        }
+
+        /* BREATHING KEYFRAMES */
+        @keyframes breathe {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.04); /* slight zoom in = breathing */
+            }
+            100% {
+                transform: scale(1);
+            }
         }
 
         /* COOKIE – CLEAN COLORS */
