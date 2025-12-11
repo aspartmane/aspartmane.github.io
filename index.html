@@ -1,104 +1,231 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>YEARN</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>YEARN — base</title>
 <style>
-    html, body {
-        margin: 0;
-        padding: 0;
-        height: 100%;
-        overflow: hidden;
-        background: black;
-        font-family: sans-serif;
-    }
+  :root { --blob-size: 360px; }
 
-    /* Background */
-    #background {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: url('background.png');
-        background-size: cover;
-        background-position: center;
-        animation: breatheBg 6s ease-in-out infinite;
-        opacity: 0.9;
-    }
+  html,body{
+    height:100%;
+    margin:0;
+    background:#000;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color:#ddd;
+  }
 
-    /* Background breathing animation */
-    @keyframes breatheBg {
-        0% { transform: scale(1); opacity: 0.85; }
-        50% { transform: scale(1.03); opacity: 1; }
-        100% { transform: scale(1); opacity: 0.85; }
-    }
+  /* background layer */
+  #bg {
+    position:fixed;
+    inset:0;
+    background-image: url('./assets/background.png');
+    background-size: cover;
+    background-position: center;
+    filter: contrast(0.9) saturate(0.7) brightness(0.85);
+    z-index:0;
+    transform-origin:center;
+    animation: breatheBg 8s ease-in-out infinite;
+    opacity:0.98;
+  }
+  @keyframes breatheBg {
+    0% { transform: scale(1); opacity:0.88; }
+    50% { transform: scale(1.04); opacity:1; }
+    100% { transform: scale(1); opacity:0.88; }
+  }
 
-    /* Blob image */
-    #blob {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        width: 300px;
-        image-rendering: pixelated;
-        animation: breatheBlob 3s ease-in-out infinite;
-        transition: transform 0.15s ease, filter 0.3s ease;
-        cursor: pointer;
-    }
+  /* center stage for blob */
+  #stage {
+    position:relative;
+    z-index:1;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none; /* allow blob to get clicks only where it lies */
+  }
 
-    /* Blob breathing animation */
-    @keyframes breatheBlob {
-        0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
-        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); }
-        100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
-    }
+  /* blob itself */
+  #blob {
+    pointer-events:auto;
+    width: var(--blob-size);
+    max-width: 70vw;
+    height: auto;
+    user-select: none;
+    image-rendering: pixelated;
+    transform-origin: 50% 50%;
+    transition: transform 220ms cubic-bezier(.2,.9,.2,1), filter 180ms linear;
+    animation: breatheBlob 3.6s ease-in-out infinite;
+    cursor:pointer;
+    display:block;
+    will-change: transform, opacity, filter;
+    mix-blend-mode: normal;
+  }
 
-    /* Stretch effect when clicked too fast */
-    .stretched {
-        transform: translate(-50%, -50%) scale(1.12, 0.92);
-        filter: blur(1px);
-    }
+  @keyframes breatheBlob {
+    0%   { transform: translateY(0) scale(1); opacity:0.82; filter: blur(0px) saturate(1); }
+    40%  { transform: translateY(-6px) scale(1.03); opacity:1; filter: blur(0.2px) saturate(1.06); }
+    70%  { transform: translateY(0) scale(1.01); opacity:0.95; }
+    100% { transform: translateY(0) scale(1); opacity:0.82; }
+  }
+
+  /* stretched / glitch class after too many fast clicks */
+  .stretched {
+    transform: scaleX(1.14) scaleY(0.94) translateY(-2px) !important;
+    filter: blur(0.9px) saturate(1.2);
+    transition-duration: 140ms !important;
+  }
+
+  /* on missing assets: small overlay */
+  #notice {
+    position:fixed;
+    left:12px;
+    bottom:12px;
+    z-index: 3;
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding:10px 12px;
+    border-radius:8px;
+    font-size:13px;
+    color:#f6f6f6;
+    max-width:calc(100% - 40px);
+  }
+
+  /* accessibility: hide if everything ok */
+  #notice.hidden { display:none; }
 </style>
 </head>
 <body>
 
-<div id="background"></div>
-<img id="blob" src="blob1.png">
+<div id="bg" aria-hidden="true"></div>
+
+<div id="stage">
+  <img id="blob" alt="YEARN blob" src="./assets/blob1.png" />
+</div>
+
+<!-- small visible notice for asset loading problems -->
+<div id="notice" class="hidden">Loading assets...</div>
 
 <script>
-    const blob = document.getElementById("blob");
-    const blobFrames = ["blob1.png", "blob2.png", "blob3.png"];
-    let frame = 0;
+(function(){
+  const blob = document.getElementById('blob');
+  const notice = document.getElementById('notice');
 
-    // Animation loop for the blob frames
-    setInterval(() => {
+  const assetsPath = './assets/';
+  const blobFrames = [
+    assetsPath + 'blob1.png',
+    assetsPath + 'blob2.png',
+    assetsPath + 'blob3.png'
+  ];
+  const bgPath = assetsPath + 'background.png';
+
+  // Preload images and report failures
+  let toLoad = [...blobFrames, bgPath];
+  let failed = [];
+  let loaded = 0;
+
+  notice.classList.remove('hidden');
+  notice.textContent = 'Preloading assets...';
+
+  toLoad.forEach(src => {
+    const i = new Image();
+    i.onload = () => {
+      loaded++;
+      if (loaded === toLoad.length) {
+        notice.classList.add('hidden');
+        startBlobLoop();
+      } else {
+        notice.textContent = `Preloading assets... (${loaded}/${toLoad.length})`;
+      }
+    };
+    i.onerror = () => {
+      failed.push(src);
+      loaded++;
+      notice.textContent = 'Asset load failed: ' + failed.map(p => p.split('/').pop()).join(', ');
+      // still continue so you see console errors and a helpful message
+      if (loaded === toLoad.length) {
+        // show message but keep trying to run
+        notice.textContent = 'Some assets failed to load: ' + failed.map(p=>p.split('/').pop()).join(', ');
+      }
+    };
+    i.src = src;
+  });
+
+  // Blob frame loop (slow, organic)
+  let frame = 0;
+  let frameInterval = 600; // ms between frame swaps (slow)
+  let frameTimer = null;
+
+  function startBlobLoop(){
+    // ensure initial src is the first frame
+    blob.src = blobFrames[0];
+
+    // change frames slowly to create the breathing/pulse effect
+    frameTimer = setInterval(() => {
+      frame = (frame + 1) % blobFrames.length;
+      blob.src = blobFrames[frame];
+    }, frameInterval);
+  }
+
+  // Fast click detection for stretching (five clicks within 1.2s)
+  let clickTimestamps = [];
+  const WINDOW_MS = 1200;
+  const REQUIRED = 5;
+
+  blob.addEventListener('click', () => {
+    const now = Date.now();
+    clickTimestamps.push(now);
+    // keep last WINDOW_MS ms only
+    clickTimestamps = clickTimestamps.filter(t => now - t <= WINDOW_MS);
+
+    // small click feedback (nudge)
+    blob.style.transform = 'translateY(-2px) scale(1.005)';
+    setTimeout(()=> blob.style.transform = '', 110);
+
+    if (clickTimestamps.length >= REQUIRED) {
+      triggerStretch();
+      clickTimestamps = []; // reset after stretch
+    }
+  });
+
+  function triggerStretch(){
+    // quick stretch / glitch
+    blob.classList.add('stretched');
+    // optional very fast frame-flicker to make it feel wrong
+    const oldInterval = frameInterval;
+    // speed up frame changes briefly
+    if (frameTimer) clearInterval(frameTimer);
+    frameInterval = 90;
+    frameTimer = setInterval(() => {
+      frame = (frame + 1) % blobFrames.length;
+      blob.src = blobFrames[frame];
+    }, frameInterval);
+
+    setTimeout(() => {
+      blob.classList.remove('stretched');
+      // restore slower breathing frames
+      if (frameTimer) clearInterval(frameTimer);
+      frameInterval = 600;
+      frameTimer = setInterval(() => {
         frame = (frame + 1) % blobFrames.length;
         blob.src = blobFrames[frame];
-    }, 350); // slow, organic frame rate
+      }, frameInterval);
+    }, 180); // how long the stretch lasts
+  }
 
-    // Fast click detection
-    let clickTimes = [];
+  // if any asset failed, provide console help + visible notice
+  setTimeout(() => {
+    // if notice still visible and contains failures, keep it for user to see
+    if (!notice.classList.contains('hidden')) {
+      console.warn('YEARN: some assets failed to load. Check filenames & path. Expected files in /assets/:', toLoad);
+      // keep the notice visible with guidance
+      notice.innerHTML = '<strong>Asset load issue:</strong> check that the files are named exactly:<br>' +
+        blobFrames.map(s=> s.split('/').pop()).join(', ') +
+        '<br>and background.png are present in the <code>/assets/</code> folder.';
+    }
+  }, 900);
 
-    blob.addEventListener("click", () => {
-        const now = Date.now();
-        clickTimes.push(now);
-
-        // Keep only last 1.5 seconds of clicks
-        clickTimes = clickTimes.filter(t => now - t < 1500);
-
-        // If 5 fast clicks → stretch
-        if (clickTimes.length >= 5) {
-            blob.classList.add("stretched");
-
-            setTimeout(() => {
-                blob.classList.remove("stretched");
-            }, 180);
-
-            clickTimes = []; // reset
-        }
-    });
+})();
 </script>
-
 </body>
 </html>
