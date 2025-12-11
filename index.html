@@ -1,51 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Blob Test</title>
+<meta charset="UTF-8">
+<title>YEARN</title>
 <style>
-    body {
+    html, body {
         margin: 0;
+        padding: 0;
+        height: 100%;
         overflow: hidden;
-        background: url("background.png") center/cover no-repeat;
-        height: 100vh;
-        animation: breathe 6s ease-in-out infinite;
+        background: black;
+        font-family: sans-serif;
     }
 
-    @keyframes breathe {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.03); }
-        100% { transform: scale(1); }
+    /* Background */
+    #background {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('background.png');
+        background-size: cover;
+        background-position: center;
+        animation: breatheBg 6s ease-in-out infinite;
+        opacity: 0.9;
     }
 
+    /* Background breathing animation */
+    @keyframes breatheBg {
+        0% { transform: scale(1); opacity: 0.85; }
+        50% { transform: scale(1.03); opacity: 1; }
+        100% { transform: scale(1); opacity: 0.85; }
+    }
+
+    /* Blob image */
     #blob {
         position: absolute;
-        width: 350px;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        transition: opacity 0.3s ease;
+        width: 300px;
+        image-rendering: pixelated;
+        animation: breatheBlob 3s ease-in-out infinite;
+        transition: transform 0.15s ease, filter 0.3s ease;
+        cursor: pointer;
+    }
+
+    /* Blob breathing animation */
+    @keyframes breatheBlob {
+        0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); }
+        100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    /* Stretch effect when clicked too fast */
+    .stretched {
+        transform: translate(-50%, -50%) scale(1.12, 0.92);
+        filter: blur(1px);
     }
 </style>
 </head>
 <body>
 
-<img id="blob" src="blob1.png" alt="blob">
+<div id="background"></div>
+<img id="blob" src="blob1.png">
 
 <script>
-const blob = document.getElementById("blob");
-const frames = ["blob1.png", "blob2.png", "blob4.png"];
-let i = 0;
+    const blob = document.getElementById("blob");
+    const blobFrames = ["blob1.png", "blob2.png", "blob3.png"];
+    let frame = 0;
 
-setInterval(() => {
-    i = (i + 1) % frames.length;
-    blob.style.opacity = 0;
+    // Animation loop for the blob frames
+    setInterval(() => {
+        frame = (frame + 1) % blobFrames.length;
+        blob.src = blobFrames[frame];
+    }, 350); // slow, organic frame rate
 
-    setTimeout(() => {
-        blob.src = frames[i];
-        blob.style.opacity = 1;
-    }, 300);
-}, 2000);
+    // Fast click detection
+    let clickTimes = [];
+
+    blob.addEventListener("click", () => {
+        const now = Date.now();
+        clickTimes.push(now);
+
+        // Keep only last 1.5 seconds of clicks
+        clickTimes = clickTimes.filter(t => now - t < 1500);
+
+        // If 5 fast clicks → stretch
+        if (clickTimes.length >= 5) {
+            blob.classList.add("stretched");
+
+            setTimeout(() => {
+                blob.classList.remove("stretched");
+            }, 180);
+
+            clickTimes = []; // reset
+        }
+    });
 </script>
 
 </body>
