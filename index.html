@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>YEARN — base</title>
+<title>YEARN — breathing + heartbeat</title>
 <style>
   :root { 
-    --blob-size: 260px;  /* smaller blob */
+    --blob-size: 260px;
   }
 
   html,body{
@@ -17,15 +17,16 @@
     color:#ddd;
   }
 
-  /* background (NO movement) */
+  /* static background + heartbeat dim pulse */
   #bg {
     position:fixed;
     inset:0;
     background-image: url('./assets/background.png');
     background-size: cover;
     background-position: center;
-    opacity:0.95;
+    opacity:0.92;
     z-index:0;
+    transition: opacity 120ms ease;
   }
 
   #stage {
@@ -38,27 +39,29 @@
     pointer-events:none;
   }
 
-  /* smaller blob + breathing only */
+  /* deeper breathing + heartbeat blend */
   #blob {
     pointer-events:auto;
     width: var(--blob-size);
     height:auto;
     user-select:none;
     image-rendering:pixelated;
-    transform-origin: 50% 50%;
+    transform-origin: 50% 55%;
     cursor:pointer;
 
-    animation: breatheBlob 3.6s ease-in-out infinite;
-    transition: transform 180ms ease, filter 200ms ease;
+    animation: deepBreathe 4.6s ease-in-out infinite;
+    transition: transform 180ms ease, filter 200ms ease, opacity 200ms ease;
   }
 
-  @keyframes breatheBlob {
-    0%   { opacity:0.82; transform: scale(1); }
-    45%  { opacity:1; transform: scale(1.03); }
-    100% { opacity:0.82; transform: scale(1); }
+  /* deep, uncomfortable breathing */
+  @keyframes deepBreathe {
+    0%   { transform: scale(1);      opacity:0.80; filter:brightness(0.9); }
+    35%  { transform: scale(1.06);   opacity:1;    filter:brightness(1); }
+    55%  { transform: scale(1.03);   opacity:0.93; filter:brightness(0.96); }
+    100% { transform: scale(1);      opacity:0.80; filter:brightness(0.9); }
   }
 
-  /* New diagonal stretched effect */
+  /* diagonal stretch glitch */
   .stretched {
     transform: 
        perspective(600px)
@@ -101,61 +104,45 @@
 <script>
 (function(){
   const blob = document.getElementById("blob");
+  const bg = document.getElementById("bg");
   const notice = document.getElementById("notice");
 
-  const assets = [
-    "./assets/blob1.png",
-    "./assets/blob2.png",
-    "./assets/blob3.png",
-    "./assets/background.png"
-  ];
-
-  // preload
-  let loaded = 0, failed = [];
-
-  assets.forEach(src => {
-    const i = new Image();
-    i.onload = () => {
-      loaded++;
-      if (loaded === assets.length) notice.classList.add("hidden");
-    };
-    i.onerror = () => {
-      failed.push(src);
-      loaded++;
-      notice.textContent = "Failed: " + failed.join(", ");
-    };
-    i.src = src;
-  });
-
-  // animation loop
   const frames = [
     "./assets/blob1.png",
     "./assets/blob2.png",
     "./assets/blob3.png"
   ];
+  const preload = [...frames, "./assets/background.png"];
 
+  // preload
+  let done = 0;
+  let failed = [];
+  preload.forEach(src => {
+    const i = new Image();
+    i.onload = () => { done++; if(done === preload.length) notice.classList.add("hidden"); };
+    i.onerror = () => { failed.push(src); done++; };
+    i.src = src;
+  });
+
+  /* blob animation loop */
   let idx = 0;
-  let interval = 600;
-  let timer = setInterval(() => {
+  let frameInterval = 600;
+  let loop = setInterval(() => {
     idx = (idx + 1) % frames.length;
     blob.src = frames[idx];
-  }, interval);
+  }, frameInterval);
 
-  // fast click stretch
+  /* fast click: diagonal stretch */
   let clicks = [];
-  const CLICK_WINDOW = 1200;
-  const CLICK_REQ = 5;
-
   blob.addEventListener("click", () => {
     const now = Date.now();
     clicks.push(now);
-    clicks = clicks.filter(t => now - t <= CLICK_WINDOW);
+    clicks = clicks.filter(t => now - t < 1200);
 
-    // tiny feedback
     blob.style.transform = "scale(1.02)";
     setTimeout(()=> blob.style.transform = "", 90);
 
-    if (clicks.length >= CLICK_REQ) {
+    if(clicks.length >= 5){
       doStretch();
       clicks = [];
     }
@@ -163,24 +150,54 @@
 
   function doStretch(){
     blob.classList.add("stretched");
-
-    // speed frames briefly
-    clearInterval(timer);
-    timer = setInterval(() => {
+    clearInterval(loop);
+    loop = setInterval(()=>{
       idx = (idx + 1) % frames.length;
       blob.src = frames[idx];
     }, 90);
 
-    setTimeout(() => {
+    setTimeout(()=>{
       blob.classList.remove("stretched");
-
-      clearInterval(timer);
-      timer = setInterval(() => {
+      clearInterval(loop);
+      loop = setInterval(()=>{
         idx = (idx + 1) % frames.length;
         blob.src = frames[idx];
-      }, interval);
-    }, 160);
+      }, frameInterval);
+    },160);
   }
+
+  /* HEARTBEAT: thump–thump every 2.7 seconds */
+  function heartbeat(){
+    // thump 1
+    blob.style.transform = "scale(1.07)";
+    blob.style.filter = "brightness(1.12) saturate(1.2) blur(0.6px)";
+    bg.style.opacity = "0.86";
+
+    setTimeout(()=>{
+      blob.style.transform = "";
+      blob.style.filter = "";
+      bg.style.opacity = "0.92";
+
+      // thump 2 (quick, weaker)
+      setTimeout(()=>{
+        blob.style.transform = "scale(1.03)";
+        blob.style.filter = "brightness(1.05) blur(0.3px)";
+        bg.style.opacity = "0.88";
+
+        setTimeout(()=>{
+          blob.style.transform = "";
+          blob.style.filter = "";
+          bg.style.opacity = "0.92";
+        },120);
+
+      },170);
+
+    },140);
+  }
+
+  // run heartbeat loop
+  setInterval(heartbeat, 2700);
+
 })();
 </script>
 
