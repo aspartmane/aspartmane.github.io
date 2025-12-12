@@ -21,14 +21,15 @@
         width: 280px;
         image-rendering: pixelated;
         position: absolute;
-        filter: drop-shadow(0 0 10px #000);
-        transition: transform 0.1s ease-out;
+        filter: drop-shadow(0 0 15px #300);
+        transition: transform 0.08s ease-out;
         animation: heartbeat 3.5s infinite ease-in-out;
     }
 
+    /* base heartbeat — will be overridden dynamically when close */
     @keyframes heartbeat {
         0%   { transform: scale(1); }
-        12%  { transform: scale(1.055); }
+        12%  { transform: scale(1.06); }
         20%  { transform: scale(1); }
         22%  { transform: scale(1.03); }
         35%  { transform: scale(1); }
@@ -46,52 +47,53 @@
     let targetX = 0, targetY = 0;
     let currentX = 0, currentY = 0;
 
-    let shiverStrength = 0; // 0 = none, 1 = full shiver
+    let shiverStrength = 0;
+
+    let heartbeatSpeed = 3.5; // default slower pulse
 
     document.addEventListener("mousemove", (e) => {
-        // cursor-follow target position
-        targetX = (e.clientX / window.innerWidth - 0.5) * 30;
-        targetY = (e.clientY / window.innerHeight - 0.5) * 30;
-
-        // detect proximity for shiver
         const rect = logo.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
 
         const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
 
-        // within 120px → activate shiver
-        shiverStrength = dist < 120 ? 1 : 0;
+        // Recoil (moves away from cursor slightly)
+        const recoilMult = Math.min(1, 200 / (dist + 1));  
+        targetX = (e.clientX - centerX) * -0.1 * recoilMult;
+        targetY = (e.clientY - centerY) * -0.1 * recoilMult;
+
+        // Shiver activation
+        if (dist < 150) shiverStrength = (150 - dist) / 150;  
+        else shiverStrength = 0;
+
+        // Heartbeat gets faster when close
+        heartbeatSpeed = 3.5 - shiverStrength * 2.2;
+        logo.style.animationDuration = heartbeatSpeed + "s";
     });
 
     function animate() {
-        // smooth follow
-        currentX += (targetX - currentX) * 0.08;
-        currentY += (targetY - currentY) * 0.08;
+        // smoothing for movement
+        currentX += (targetX - currentX) * 0.1;
+        currentY += (targetY - currentY) * 0.1;
 
-        // tilt
-        const tiltX = currentX * 0.15;
-        const tiltY = currentY * -0.15;
-
-        // random shiver (tiny high-frequency jitter)
-        let shiverX = 0;
-        let shiverY = 0;
-        let shiverRot = 0;
-
+        // visible shiver — stronger when closer
+        let shiverX = 0, shiverY = 0, shiverRot = 0;
         if (shiverStrength > 0) {
-            shiverX = (Math.random() - 0.5) * 4;     // ±2px
-            shiverY = (Math.random() - 0.5) * 4;
-            shiverRot = (Math.random() - 0.5) * 2;   // ±1°
+            const s = shiverStrength * 8;  // bigger and more visible
+            shiverX = (Math.random() - 0.5) * s;
+            shiverY = (Math.random() - 0.5) * s;
+            shiverRot = (Math.random() - 0.5) * (s * 0.5);
         }
 
+        // apply transforms
         logo.style.transform =
             `translate(${currentX + shiverX}px, ${currentY + shiverY}px)
-             rotateX(${tiltY + shiverRot / 2}deg)
-             rotateY(${tiltX + shiverRot / 2}deg)
              rotate(${shiverRot}deg)`;
 
         requestAnimationFrame(animate);
     }
+
     animate();
 </script>
 
