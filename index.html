@@ -25,13 +25,14 @@
         z-index: -10;
     }
 
-    /* LOGO — centered + bigger */
+    /* LOGO — stretched side to side */
     #logo {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -65%);
-        width: 600px; /* ← bigger + stretched */
+        width: 80vw;      /* ← stretches to screen sides */
+        max-width: 900px; /* safety cap on large screens */
         image-rendering: pixelated;
     }
 
@@ -53,10 +54,10 @@
 <!-- background -->
 <img id="bg" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/intro_flesh.png?raw=true" alt="Background">
 
-<!-- centered logo -->
+<!-- centered wide logo -->
 <img id="logo" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/logo.png?raw=true" alt="YEARN logo">
 
-<!-- hold Y below it -->
+<!-- hold Y -->
 <img id="holdY" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/Y.png?raw=true" alt="Hold Y">
 
 </body>
