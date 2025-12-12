@@ -3,60 +3,54 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Yearn Intro</title>
+    <title>YEARN — Intro</title>
+
     <style>
         body {
             margin: 0;
             padding: 0;
+            background: #000;
             overflow: hidden;
-            background: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
 
-        #container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-        }
-
+        /* background stays pinned */
         #bg {
-            position: absolute;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
-            top: 0;
-            left: 0;
-            z-index: 1;
+            z-index: -10;
         }
 
+        /* LOGO — this layout worked for your screen */
         #logo {
             position: absolute;
-            top: 22%;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            width: 55%;
-            z-index: 2;
+            transform: translate(-50%, -65%); /* this fixed it last time */
+            width: 420px;
+            image-rendering: pixelated;
         }
 
+        /* HOLD Y — exactly below the logo */
         #holdY {
             position: absolute;
-            top: 68%;
+            top: calc(50% + 150px); 
             left: 50%;
             transform: translateX(-50%);
-            width: 38%;
-            z-index: 3;
+            width: 290px;
+            image-rendering: pixelated;
         }
     </style>
 </head>
 
 <body>
-    <div id="container">
-        <img id="bg" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/intro_flesh.png">
-        <img id="logo" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/logo.png">
-        <img id="holdY" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/Y.png">
-    </div>
+
+    <img id="bg" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/intro_flesh.png" />
+    <img id="logo" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/logo.png" />
+    <img id="holdY" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/Y.png" />
+
 </body>
 </html>
