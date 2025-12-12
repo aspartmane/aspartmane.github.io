@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Intro</title>
+<title>YEARN Intro</title>
 
 <style>
     html, body {
@@ -15,6 +15,7 @@
         width: 100%;
     }
 
+    /* ==== BACKGROUND ==== */
     #background {
         position: fixed;
         top: 0;
@@ -22,55 +23,84 @@
         width: 100vw;
         height: 100vh;
         object-fit: cover;
-        z-index: 1;
         opacity: 1;
+        z-index: 0;
         animation: bgBreath 6s ease-in-out infinite;
     }
 
     @keyframes bgBreath {
-        0%   { filter: brightness(0.85) blur(2px); }
-        50%  { filter: brightness(1.0) blur(1px); }
-        100% { filter: brightness(0.85) blur(2px); }
+        0% { filter: brightness(0.8) blur(1.5px); }
+        50% { filter: brightness(1.0) blur(0.5px); }
+        100% { filter: brightness(0.8) blur(1.5px); }
     }
 
+    /* ==== LOGO ==== */
     #logo {
         position: absolute;
-        top: 25vh;
+        top: 22vh; /* centered vertically better */
         left: 50%;
         transform: translateX(-50%);
-        width: 70vw;
-        max-width: 950px;
-        filter: brightness(0.55) contrast(1.3);
+        width: 70vw;   /* long horizontal stretch */
+        max-width: 920px;
         z-index: 3;
-        transition: transform 0.08s ease-out;
-        animation: heavyHeart 1.5s infinite;
+
+        filter: brightness(0.65) contrast(1.25) drop-shadow(0 0 20px #0008);
+        transition: transform 0.08s ease-out, filter 0.1s ease-out;
+
+        animation: heartbeat 1.4s infinite;
     }
 
-    @keyframes heavyHeart {
+    @keyframes heartbeat {
         0%   { transform: translateX(-50%) scale(1); }
-        10%  { transform: translateX(-50%) scale(1.06); }
-        14%  { transform: translateX(-50%) scale(0.94); }
-        20%  { transform: translateX(-50%) scale(1.07); }
-        28%  { transform: translateX(-50%) scale(1); }
+        8%   { transform: translateX(-50%) scale(1.06); }
+        16%  { transform: translateX(-50%) scale(0.96); }
+        26%  { transform: translateX(-50%) scale(1.08); }
+        40%  { transform: translateX(-50%) scale(1); }
         100% { transform: translateX(-50%) scale(1); }
     }
 
+    /* Shine overlay */
+    #logo::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -50%;
+        width: 200%;
+        height: 100%;
+        background: linear-gradient(
+            75deg,
+            transparent 0%,
+            rgba(255,255,255,0.15) 45%,
+            transparent 90%
+        );
+        animation: shine 3.5s infinite;
+        pointer-events: none;
+    }
+
+    @keyframes shine {
+        0%   { transform: translateX(-80%); }
+        100% { transform: translateX(80%); }
+    }
+
+    /* ==== HOLD Y PROMPT ==== */
     #yPrompt {
         position: absolute;
-        top: 62vh;
+        top: 65vh;
         left: 50%;
         transform: translateX(-50%);
         width: 42vw;
         max-width: 600px;
         z-index: 3;
+
         opacity: 0.95;
-        transition: transform 0.1s ease-out, filter 0.1s ease-out;
-        animation: yPulseSlow 2.2s infinite;
+        transition: transform 0.12s ease-out, filter 0.12s ease-out;
+
+        animation: ySlowPulse 2.5s infinite;
     }
 
-    @keyframes yPulseSlow {
-        0%   { transform: translateX(-50%) scale(1); filter: brightness(0.9); }
-        50%  { transform: translateX(-50%) scale(1.03); filter: brightness(1.1); }
+    @keyframes ySlowPulse {
+        0% { transform: translateX(-50%) scale(1); filter: brightness(0.9); }
+        50% { transform: translateX(-50%) scale(1.03); filter: brightness(1.15); }
         100% { transform: translateX(-50%) scale(1); filter: brightness(0.9); }
     }
 </style>
@@ -87,53 +117,52 @@ const logo = document.getElementById("logo");
 const yPrompt = document.getElementById("yPrompt");
 
 document.addEventListener("mousemove", (e) => {
-    const r = logo.getBoundingClientRect();
-    const cx = r.left + r.width / 2;
-    const cy = r.top + r.height / 2;
+    const rect = logo.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
 
     const dx = e.clientX - cx;
     const dy = e.clientY - cy;
     const dist = Math.hypot(dx, dy);
 
-    const intensity = Math.max(0, 1 - dist / 700);
+    const intensity = Math.max(0, 1 - dist / 750);
 
-    const jitterX = (Math.random() - 0.5) * intensity * 3;
+    const jitterX = (Math.random() - 0.5) * intensity * 4;
     const jitterY = (Math.random() - 0.5) * intensity * 3;
 
     const sx = 1 + intensity * 0.22;
     const sy = 1 - intensity * 0.10;
 
     logo.style.transform =
-        `translateX(-50%) scale(${sx}, ${sy}) translate(${jitterX}px, ${jitterY}px)`;
+        `translateX(-50%) scale(${sx},${sy}) translate(${jitterX}px,${jitterY}px)`;
 
     logo.style.filter =
-        `brightness(${0.6 + intensity * 0.3}) contrast(1.4) saturate(${1 + intensity * 0.4}) ` +
-        `drop-shadow(0 0 ${10 * intensity}px rgba(255,0,0,${0.4 * intensity}))`;
+        `brightness(${0.6 + intensity * 0.4}) contrast(1.35) saturate(${1 + intensity * 0.5})
+         drop-shadow(0 0 ${18 * intensity}px rgba(255,0,0,${0.4 * intensity}))`;
 
-    const yScale = 1 + intensity * 0.25;
+    const yScale = 1 + intensity * 0.23;
     yPrompt.style.transform = `translateX(-50%) scale(${yScale})`;
 
-    yPrompt.style.filter = `
-        brightness(${1 + intensity * 0.9})
-        drop-shadow(0 0 ${25 * intensity}px rgba(255,80,80,${0.5 * intensity}))
-    `;
+    yPrompt.style.filter =
+        `brightness(${1 + intensity * 1.0})
+         drop-shadow(0 0 ${30 * intensity}px rgba(255,80,80,${0.55 * intensity}))`;
 
     if (intensity > 0.45) {
-        yPrompt.style.animation = "yPulseFast 0.45s infinite";
+        yPrompt.style.animation = "yFastPulse 0.45s infinite";
     } else {
-        yPrompt.style.animation = "yPulseSlow 2.2s infinite";
+        yPrompt.style.animation = "ySlowPulse 2.5s infinite";
     }
 });
 
-const style = document.createElement("style");
-style.innerHTML = `
-@keyframes yPulseFast {
+const extraStyle = document.createElement("style");
+extraStyle.innerHTML = `
+@keyframes yFastPulse {
     0%   { transform: translateX(-50%) scale(1); }
-    30%  { transform: translateX(-50%) scale(1.13); }
-    60%  { transform: translateX(-50%) scale(0.97); }
+    30%  { transform: translateX(-50%) scale(1.15); }
+    55%  { transform: translateX(-50%) scale(0.94); }
     100% { transform: translateX(-50%) scale(1); }
 }`;
-document.head.appendChild(style);
+document.head.appendChild(extraStyle);
 </script>
 
 </body>
