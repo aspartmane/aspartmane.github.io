@@ -1,1 +1,62 @@
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8" /> <meta name="viewport" content="width=device-width, initial-scale=1.0" /> <title>YEARN — Intro</title> <style> body { margin: 0; padding: 0; background: #000; overflow: hidden; cursor: default; } /* Background */ #bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: -10; } /* LOGO — perfectly centered */ #logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -65%); width: 420px; /* stretched nicely */ image-rendering: pixelated; filter: drop-shadow(0 0 15px rgba(255, 40, 40, 0.4)); animation: heartbeat 2.8s infinite ease-in-out; transition: transform 0.2s ease-out; } /* HOLD Y — under the logo */ #holdY { position: absolute; top: calc(50% + 150px); left: 50%; transform: translateX(-50%); width: 290px; image-rendering: pixelated; opacity: 0.9; filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.5)); animation: pulseY 1.8s infinite ease-in-out; } /* heartbeat for logo */ @keyframes heartbeat { 0% { transform: translate(-50%, -65%) scale(1); } 8% { transform: translate(-50%, -65%) scale(1.07); } 14% { transform: translate(-50%, -65%) scale(0.97); } 20% { transform: translate(-50%, -65%) scale(1.05); } 28% { transform: translate(-50%, -65%) scale(1); } 100% { transform: translate(-50%, -65%) scale(1); } } /* pulsing for Y */ @keyframes pulseY { 0% { transform: translateX(-50%) scale(1); opacity: 0.75; } 50% { transform: translateX(-50%) scale(1.07); opacity: 1; } 100% { transform: translateX(-50%) scale(1); opacity: 0.75; } } </style> </head> <body> <!-- background --> <img id="bg" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/intro_flesh.png?raw=true" alt="Background"> <!-- centered logo --> <img id="logo" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/logo.png?raw=true" alt="YEARN logo"> <!-- hold Y below it --> <img id="holdY" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/Y.png?raw=true" alt="Hold Y"> <script> const logo = document.getElementById("logo"); // Cursor-reactive stretch / recoil document.addEventListener("mousemove", (e) => { const xNorm = (e.clientX / window.innerWidth - 0.5); // -0.5 to 0.5 const yNorm = (e.clientY / window.innerHeight - 0.5); const stretchX = xNorm * 6; // how much it stretches const stretchY = yNorm * 6; logo.style.transform = translate(-50%, -65%) scale(1.02) translate(${stretchX}px, ${stretchY}px); }); </script> </body> </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yearn Intro</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        #bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        #logo {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 55%;
+            z-index: 2;
+        }
+
+        #holdY {
+            position: absolute;
+            top: 68%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40%;
+            z-index: 3;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <img id="bg" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/intro_flesh.png">
+        <img id="logo" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/logo.png">
+        <img id="holdY" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/YY.png">
+    </div>
+</body>
+</html>
