@@ -1,45 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>YEARN</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Intro</title>
+
 <style>
-    body {
+    html, body {
         margin: 0;
         padding: 0;
+        width: 100%;
+        height: 100%;
         overflow: hidden;
+        background: black;
+        cursor: url("assets/cursor_64.png") 0 0, auto;
+    }
 
-        background: url("assets/intro_flesh.png") no-repeat center center fixed;
-        background-size: cover;
+    /* Make everything pixel-perfect */
+    img {
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        user-select: none;
+        -webkit-user-drag: none;
+        pointer-events: none;
+        position: absolute;
+    }
 
-        cursor: url("assets/cursor_64.png") 32 32, auto;
+    #bg {
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        top: 0;
+        left: 0;
     }
 
     #logo {
-        position: absolute;
-        top: 40%;
+        width: 90vw;               /* make it big */
         left: 50%;
-        transform: translate(-50%, -50%);
-
-        width: 85vw;       /* horizontal stretch — adjust this */
-        height: auto;      /* keep natural height */
+        top: 50%;
+        transform: translate(-50%, -60%); /* centered but slightly higher */
     }
 
-    #holdy {
-        position: absolute;
-        top: 68%;          /* under the logo */
+    #holdY {
+        width: 70px;
         left: 50%;
+        top: 80%;
         transform: translateX(-50%);
-
-        width: 30vw;       /* adjustable */
-        height: auto;
     }
 </style>
+
 </head>
 <body>
 
-    <img id="logo" src="assets/logo.png">
-    <img id="holdy" src="assets/YY.png">
+    <img id="bg" src="assets/intro_flesh.png" />
+    <img id="logo" src="assets/logo.png" />
+    <img id="holdY" src="assets/Y.png" />
 
 </body>
 </html>
