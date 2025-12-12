@@ -17,84 +17,90 @@
         cursor: default;
     }
 
+    /* ✦ BACKGROUND FLESH ✦ */
+    #flesh {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 115%;
+        height: 115%;
+        transform: translate(-50%, -50%);
+        z-index: -1;
+        image-rendering: pixelated;
+        opacity: 0.7;
+        animation: fleshPulse 4.5s ease-in-out infinite;
+        filter: brightness(0.45) contrast(1.3) saturate(1.4);
+    }
+
+    @keyframes fleshPulse {
+        0%   { transform: translate(-50%, -50%) scale(1); }
+        50%  { transform: translate(-50%, -50%) scale(1.04); }
+        100% { transform: translate(-50%, -50%) scale(1); }
+    }
+
+    /* ✦ LOGO ✦ */
     #logo {
         width: 280px;
         image-rendering: pixelated;
         position: absolute;
-        filter: drop-shadow(0 0 15px #300);
-        transition: transform 0.08s ease-out;
-        animation: heartbeat 3.5s infinite ease-in-out;
+        transition: transform 0.12s ease-out, filter 0.12s ease-out;
+        filter: drop-shadow(0 0 8px #000);
+        animation: heartbeat 2.8s infinite ease-in-out;
     }
 
-    /* base heartbeat — will be overridden dynamically when close */
+    /* heavy, wet heartbeat */
     @keyframes heartbeat {
-        0%   { transform: scale(1); }
-        12%  { transform: scale(1.06); }
-        20%  { transform: scale(1); }
-        22%  { transform: scale(1.03); }
-        35%  { transform: scale(1); }
+        0%   { transform: scale(1); filter: brightness(1); }
+        12%  { transform: scale(1.10); filter: brightness(1.2); }
+        20%  { transform: scale(0.97); }
+        28%  { transform: scale(1.05); }
         100% { transform: scale(1); }
     }
 </style>
 </head>
+
 <body>
 
+<img id="flesh" src="assets/intro_flesh.png" alt="Flesh Background">
 <img id="logo" src="assets/logo.png" alt="YEARN Logo">
 
 <script>
     const logo = document.getElementById("logo");
 
-    let targetX = 0, targetY = 0;
-    let currentX = 0, currentY = 0;
-
-    let shiverStrength = 0;
-
-    let heartbeatSpeed = 3.5; // default slower pulse
-
     document.addEventListener("mousemove", (e) => {
-        const rect = logo.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
 
-        const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+        const dx = (e.clientX - cx) / 50;
+        const dy = (e.clientY - cy) / 50;
 
-        // Recoil (moves away from cursor slightly)
-        const recoilMult = Math.min(1, 200 / (dist + 1));  
-        targetX = (e.clientX - centerX) * -0.1 * recoilMult;
-        targetY = (e.clientY - centerY) * -0.1 * recoilMult;
-
-        // Shiver activation
-        if (dist < 150) shiverStrength = (150 - dist) / 150;  
-        else shiverStrength = 0;
-
-        // Heartbeat gets faster when close
-        heartbeatSpeed = 3.5 - shiverStrength * 2.2;
-        logo.style.animationDuration = heartbeatSpeed + "s";
+        logo.style.transform = `translate(${dx}px, ${dy}px) scale(1)`;
     });
 
-    function animate() {
-        // smoothing for movement
-        currentX += (targetX - currentX) * 0.1;
-        currentY += (targetY - currentY) * 0.1;
+    /* ✦ RECOIL + SHIVER WHEN CLOSE ✦ */
+    document.addEventListener("mousemove", (e) => {
+        const rect = logo.getBoundingClientRect();
+        const lx = rect.left + rect.width / 2;
+        const ly = rect.top + rect.height / 2;
 
-        // visible shiver — stronger when closer
-        let shiverX = 0, shiverY = 0, shiverRot = 0;
-        if (shiverStrength > 0) {
-            const s = shiverStrength * 8;  // bigger and more visible
-            shiverX = (Math.random() - 0.5) * s;
-            shiverY = (Math.random() - 0.5) * s;
-            shiverRot = (Math.random() - 0.5) * (s * 0.5);
+        const distX = e.clientX - lx;
+        const distY = e.clientY - ly;
+
+        const distance = Math.sqrt(distX * distX + distY * distY);
+
+        if (distance < 160) {
+            const recoil = Math.min(20, (160 - distance) / 8);
+            const jitterX = (Math.random() - 0.5) * 4;
+            const jitterY = (Math.random() - 0.5) * 4;
+
+            logo.style.transform =
+                `translate(${distX / -20 + jitterX}px, ${distY / -20 + jitterY}px) scale(1.12)`;
+
+            logo.style.filter = "brightness(1.3) drop-shadow(0 0 14px #ff0000aa)";
+        } else {
+            logo.style.filter = "drop-shadow(0 0 10px #000)";
         }
-
-        // apply transforms
-        logo.style.transform =
-            `translate(${currentX + shiverX}px, ${currentY + shiverY}px)
-             rotate(${shiverRot}deg)`;
-
-        requestAnimationFrame(animate);
-    }
-
-    animate();
+    });
 </script>
 
 </body>
