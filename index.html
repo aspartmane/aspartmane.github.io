@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>YEARN — Intro</title>
+
 <style>
     body {
         margin: 0;
@@ -13,22 +14,25 @@
         justify-content: center;
         align-items: center;
         height: 100vh;
-        cursor: none; /* makes it feel more eerie */
+        cursor: default; /* cursor visible again */
     }
 
     #logo {
-        width: 280px; /* adjust if too big/small */
+        width: 280px;
         image-rendering: pixelated;
         position: absolute;
-        transition: transform 0.15s ease-out;
         filter: drop-shadow(0 0 10px #000);
-        animation: heartbeat 2.3s infinite ease-in-out;
+        transition: transform 0.1s ease-out;
+        animation: heartbeat 3.5s infinite ease-in-out; /* slower & heavier */
     }
 
+    /* slower, more realistic, irregular heartbeat */
     @keyframes heartbeat {
         0%   { transform: scale(1); }
-        10%  { transform: scale(1.06); }
+        12%  { transform: scale(1.055); }
         20%  { transform: scale(1); }
+        22%  { transform: scale(1.03); }  /* tiny secondary pulse */
+        35%  { transform: scale(1); }
         100% { transform: scale(1); }
     }
 </style>
@@ -40,25 +44,32 @@
 <script>
     const logo = document.getElementById("logo");
 
-    // subtle cursor-reactive movement
-    document.addEventListener("mousemove", (e) => {
-        const x = (e.clientX / window.innerWidth - 0.5) * 8;  // horizontal tilt
-        const y = (e.clientY / window.innerHeight - 0.5) * 8; // vertical tilt
+    // Smoothed target values
+    let targetX = 0, targetY = 0;
+    let currentX = 0, currentY = 0;
 
-        logo.style.transform = `translate(${x}px, ${y}px) scale(1)`; 
+    document.addEventListener("mousemove", (e) => {
+        // range -15px to +15px movement
+        targetX = (e.clientX / window.innerWidth - 0.5) * 30;
+        targetY = (e.clientY / window.innerHeight - 0.5) * 30;
     });
 
-    // slight enlargement on hover effect (cursor proximity)
-    document.addEventListener("mousemove", (e) => {
-        const rect = logo.getBoundingClientRect();
-        const distX = Math.abs(e.clientX - (rect.left + rect.width / 2));
-        const distY = Math.abs(e.clientY - (rect.top + rect.height / 2));
-        const distance = Math.sqrt(distX * distX + distY * distY);
+    function animate() {
+        // smooth interpolation for gooey movement
+        currentX += (targetX - currentX) * 0.08;
+        currentY += (targetY - currentY) * 0.08;
 
-        if (distance < 150) {
-            logo.style.transform += " scale(1.05)";
-        }
-    });
+        // tilt slightly toward cursor
+        const tiltX = currentX * 0.15;
+        const tiltY = currentY * -0.15;
+
+        // combine all transforms – heartbeat is added automatically
+        logo.style.transform = 
+            `translate(${currentX}px, ${currentY}px) rotateX(${tiltY}deg) rotateY(${tiltX}deg)`;
+
+        requestAnimationFrame(animate);
+    }
+    animate();
 </script>
 
 </body>
