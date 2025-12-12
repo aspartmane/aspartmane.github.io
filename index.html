@@ -1,10 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>YEARN — Intro</title>
-
 <style>
     body {
         margin: 0;
@@ -12,9 +5,10 @@
         background: #000;
         overflow: hidden;
         cursor: default;
+        font-family: monospace;
     }
 
-    /* Background */
+    /* Background with soft vignette for depth */
     #bg {
         position: fixed;
         top: 0;
@@ -23,79 +17,72 @@
         height: 100%;
         object-fit: cover;
         z-index: -10;
+        filter: brightness(0.92) contrast(1.15) saturate(1.1);
     }
 
-    /* LOGO — perfectly centered */
+    /* DARK VIGNETTE LAYER */
+    body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        background: radial-gradient(circle, rgba(0,0,0,0) 40%, rgba(0,0,0,0.45) 100%);
+        z-index: -5;
+    }
+
+    /* LOGO — larger, more centered, cleaner glow */
     #logo {
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -65%);
-        width: 420px; /* stretched nicely */
+        transform: translate(-50%, -62%);
+        width: 540px; /* increased from 420px */
         image-rendering: pixelated;
-        filter: drop-shadow(0 0 15px rgba(255, 40, 40, 0.4));
-        animation: heartbeat 2.8s infinite ease-in-out;
-        transition: transform 0.2s ease-out;
+
+        /* stacked glows for depth */
+        filter:
+            drop-shadow(0 0 25px rgba(255, 0, 0, 0.25))
+            drop-shadow(0 0 8px rgba(255, 0, 0, 0.4))
+            drop-shadow(0 0 3px rgba(255, 60, 60, 0.8));
+
+        animation: heartbeat 3s infinite ease-in-out;
+        transition: transform 0.15s ease-out;
     }
 
-    /* HOLD Y — under the logo */
+    /* HOLD Y — cleaner spacing + subtle glow */
     #holdY {
         position: absolute;
-        top: calc(50% + 150px);
+        top: calc(50% + 200px);
         left: 50%;
         transform: translateX(-50%);
-        width: 290px;
+        width: 320px; /* slightly larger */
+        opacity: 0.85;
         image-rendering: pixelated;
-        opacity: 0.9;
-        filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.5));
+
+        filter:
+            drop-shadow(0 0 15px rgba(200, 0, 0, 0.55))
+            drop-shadow(0 0 4px rgba(255, 40, 40, 0.4));
+
         animation: pulseY 1.8s infinite ease-in-out;
     }
 
     /* heartbeat for logo */
     @keyframes heartbeat {
-        0%   { transform: translate(-50%, -65%) scale(1); }
-        8%   { transform: translate(-50%, -65%) scale(1.07); }
-        14%  { transform: translate(-50%, -65%) scale(0.97); }
-        20%  { transform: translate(-50%, -65%) scale(1.05); }
-        28%  { transform: translate(-50%, -65%) scale(1); }
-        100% { transform: translate(-50%, -65%) scale(1); }
+        0%   { transform: translate(-50%, -62%) scale(1); }
+        8%   { transform: translate(-50%, -62%) scale(1.10); }
+        14%  { transform: translate(-50%, -62%) scale(0.96); }
+        20%  { transform: translate(-50%, -62%) scale(1.06); }
+        30%  { transform: translate(-50%, -62%) scale(1); }
+        100% { transform: translate(-50%, -62%) scale(1); }
     }
 
     /* pulsing for Y */
     @keyframes pulseY {
-        0%   { transform: translateX(-50%) scale(1); opacity: 0.75; }
-        50%  { transform: translateX(-50%) scale(1.07); opacity: 1; }
-        100% { transform: translateX(-50%) scale(1); opacity: 0.75; }
+        0%   { transform: translateX(-50%) scale(1); opacity: 0.7; }
+        50%  { transform: translateX(-50%) scale(1.08); opacity: 1; }
+        100% { transform: translateX(-50%) scale(1); opacity: 0.7; }
     }
-
 </style>
-</head>
-<body>
-
-<!-- background -->
-<img id="bg" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/intro_flesh.png?raw=true" alt="Background">
-
-<!-- centered logo -->
-<img id="logo" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/logo.png?raw=true" alt="YEARN logo">
-
-<!-- hold Y below it -->
-<img id="holdY" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/Y.png?raw=true" alt="Hold Y">
-
-<script>
-    const logo = document.getElementById("logo");
-
-    // Cursor-reactive stretch / recoil
-    document.addEventListener("mousemove", (e) => {
-        const xNorm = (e.clientX / window.innerWidth - 0.5);  // -0.5 to 0.5
-        const yNorm = (e.clientY / window.innerHeight - 0.5);
-
-        const stretchX = xNorm * 6;   // how much it stretches
-        const stretchY = yNorm * 6;
-
-        logo.style.transform =
-            `translate(-50%, -65%) scale(1.02) translate(${stretchX}px, ${stretchY}px)`;
-    });
-</script>
-
-</body>
-</html>
