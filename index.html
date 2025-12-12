@@ -1,221 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>YeArN</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>YEARN — Intro</title>
+
 <style>
-  :root{
-    --logo-max: 920px;
-    --logo-w: 70vw;
-    --y-w: 42vw;
-  }
+    body {
+        margin: 0;
+        padding: 0;
+        background: #000;
+        overflow: hidden;
+        cursor: default;
+    }
 
-  html,body{
-    height:100%;
-    margin:0;
-    background:#000;
-    font-family: system-ui, sans-serif;
-  }
+    /* Background */
+    #bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -10;
+    }
 
-  /* background full-screen */
-  #background {
-    position:fixed;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    z-index:0;
-  }
+    /* LOGO — perfectly centered */
+    #logo {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -65%);
+        width: 420px; /* stretched nicely */
+        image-rendering: pixelated;
+        filter: drop-shadow(0 0 15px rgba(255, 40, 40, 0.4));
+        animation: heartbeat 2.8s infinite ease-in-out;
+        transition: transform 0.2s ease-out;
+    }
 
-  /* center column for logo + prompt */
-  #center {
-    position:relative;
-    z-index:2;
-    height:100%;
-    width:100%;
-    display:flex;
-    align-items:center;      /* vertical center */
-    justify-content:center;  /* horizontal center */
-    pointer-events:none;     /* allow pointer events only on imgs if needed */
-  }
+    /* HOLD Y — under the logo */
+    #holdY {
+        position: absolute;
+        top: calc(50% + 150px);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 290px;
+        image-rendering: pixelated;
+        opacity: 0.9;
+        filter: drop-shadow(0 0 8px rgba(255, 0, 0, 0.5));
+        animation: pulseY 1.8s infinite ease-in-out;
+    }
 
-  .stack {
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap: 3.5vh;
-    pointer-events:auto; /* enable mouse interactions inside */
-    transform-origin:center;
-  }
+    /* heartbeat for logo */
+    @keyframes heartbeat {
+        0%   { transform: translate(-50%, -65%) scale(1); }
+        8%   { transform: translate(-50%, -65%) scale(1.07); }
+        14%  { transform: translate(-50%, -65%) scale(0.97); }
+        20%  { transform: translate(-50%, -65%) scale(1.05); }
+        28%  { transform: translate(-50%, -65%) scale(1); }
+        100% { transform: translate(-50%, -65%) scale(1); }
+    }
 
-  /* logo styling */
-  #logo {
-    width: var(--logo-w);
-    max-width: var(--logo-max);
-    image-rendering: pixelated;
-    filter: brightness(0.65) contrast(1.25);
-    transition: transform 0.08s ease-out, filter 0.12s ease-out;
-    animation: heartbeat 1.4s infinite;
-    will-change: transform, filter;
-    display:block;
-  }
-
-  /* heartbeat */
-  @keyframes heartbeat {
-    0%   { transform: scale(1); }
-    8%   { transform: scale(1.06); }
-    16%  { transform: scale(0.96); }
-    26%  { transform: scale(1.08); }
-    40%  { transform: scale(1); }
-    100% { transform: scale(1); }
-  }
-
-  /* subtle shine overlay using a pseudo-element on a wrapper */
-  .logoWrap {
-    position: relative;
-    width: var(--logo-w);
-    max-width: var(--logo-max);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    overflow:visible;
-  }
-  .logoWrap::after{
-    content: "";
-    position: absolute;
-    top: -10%;
-    left: -50%;
-    width: 200%;
-    height: 120%;
-    pointer-events: none;
-    background: linear-gradient(75deg,
-      rgba(255,255,255,0) 0%,
-      rgba(255,255,255,0.14) 45%,
-      rgba(255,255,255,0) 90%);
-    transform: translateX(-80%);
-    animation: shine 3.8s linear infinite;
-    mix-blend-mode: screen;
-    opacity: 0.6;
-  }
-  @keyframes shine {
-    0% { transform: translateX(-80%); }
-    100% { transform: translateX(80%); }
-  }
-
-  /* Y prompt styling */
-  #yPrompt {
-    width: var(--y-w);
-    max-width: 600px;
-    image-rendering: pixelated;
-    transition: transform 0.12s ease-out, filter 0.12s ease-out;
-    animation: yPulseSlow 2.5s infinite;
-    will-change: transform, filter;
-    display:block;
-  }
-
-  @keyframes yPulseSlow {
-    0% { transform: scale(1); filter: brightness(0.95); }
-    50% { transform: scale(1.03); filter: brightness(1.12); }
-    100% { transform: scale(1); filter: brightness(0.95); }
-  }
-
-  /* small responsive tweaks */
-  @media (max-width:600px){
-    :root { --logo-w: 86vw; --y-w: 78vw; }
-    .stack { gap: 4vh; }
-  }
+    /* pulsing for Y */
+    @keyframes pulseY {
+        0%   { transform: translateX(-50%) scale(1); opacity: 0.75; }
+        50%  { transform: translateX(-50%) scale(1.07); opacity: 1; }
+        100% { transform: translateX(-50%) scale(1); opacity: 0.75; }
+    }
 
 </style>
 </head>
 <body>
 
-<!-- background (raw URLs) -->
-<img id="background" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/intro_flesh.png" alt="flesh">
+<!-- background -->
+<img id="bg" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/intro_flesh.png?raw=true" alt="Background">
 
-<!-- centered column -->
-<div id="center">
-  <div class="stack" id="stack">
-    <div class="logoWrap">
-      <img id="logo" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/logo.png" alt="YEARN logo">
-    </div>
+<!-- centered logo -->
+<img id="logo" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/logo.png?raw=true" alt="YEARN logo">
 
-    <img id="yPrompt" src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/Y.png" alt="Hold Y prompt">
-  </div>
-</div>
+<!-- hold Y below it -->
+<img id="holdY" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/Y.png?raw=true" alt="Hold Y">
 
 <script>
-  const logo = document.getElementById('logo');
-  const yPrompt = document.getElementById('yPrompt');
-  const stack = document.getElementById('stack');
-  const logoWrap = document.querySelector('.logoWrap');
+    const logo = document.getElementById("logo");
 
-  // Mouse interaction: affect logo and Y prompt.
-  document.addEventListener('mousemove', (e) => {
-    // logo center
-    const lr = logo.getBoundingClientRect();
-    const lx = lr.left + lr.width/2;
-    const ly = lr.top + lr.height/2;
+    // Cursor-reactive stretch / recoil
+    document.addEventListener("mousemove", (e) => {
+        const xNorm = (e.clientX / window.innerWidth - 0.5);  // -0.5 to 0.5
+        const yNorm = (e.clientY / window.innerHeight - 0.5);
 
-    // pointer vector
-    const dx = e.clientX - lx;
-    const dy = e.clientY - ly;
-    const dist = Math.hypot(dx, dy);
+        const stretchX = xNorm * 6;   // how much it stretches
+        const stretchY = yNorm * 6;
 
-    // intensity 0..1 (closer => bigger)
-    const intensity = Math.max(0, 1 - dist / 700);
-
-    // main transforms
-    // tilt/lean: make it look like it's reacting toward/away
-    const leanX = (dx / window.innerWidth) * 12 * intensity;  // small tilt effect
-    const leanY = (dy / window.innerHeight) * 8 * intensity;
-
-    // stretch toward cursor horizontally and compress vertically slightly
-    const stretchX = 1 + intensity * 0.20;
-    const stretchY = 1 - intensity * 0.08;
-
-    // jitter/shiver when very close
-    let jitterX = 0, jitterY = 0, rotate = 0;
-    if (dist < 180) {
-      jitterX = (Math.random() - 0.5) * 6 * (1 - dist/180);
-      jitterY = (Math.random() - 0.5) * 6 * (1 - dist/180);
-      rotate = (Math.random() - 0.5) * 2 * (1 - dist/180);
-    }
-
-    // apply transform to logo (centered by wrapper)
-    logo.style.transform = `translate(${jitterX}px, ${jitterY}px) rotate(${rotate}deg) scale(${stretchX}, ${stretchY})`;
-
-    // brighter / more contrast when close
-    logo.style.filter = `brightness(${0.6 + intensity * 0.45}) contrast(${1.15 + intensity*0.35}) saturate(${1 + intensity*0.45}) drop-shadow(0 0 ${12*intensity}px rgba(255,50,50,${0.5*intensity}))`;
-
-    // Y prompt reacts differently: pumps and glows more strongly
-    const yScale = 1 + intensity * 0.30;
-    yPrompt.style.transform = `translateY(${Math.min(20, -10 * intensity)}px) scale(${yScale})`;
-    yPrompt.style.filter = `brightness(${1 + intensity * 0.9}) drop-shadow(0 0 ${28*intensity}px rgba(255,80,80,${0.6*intensity}))`;
-
-    // speed-up the y-pulse animation when close
-    if (intensity > 0.45) {
-      yPrompt.style.animation = 'yPulseFast 0.48s infinite';
-    } else {
-      yPrompt.style.animation = 'yPulseSlow 2.5s infinite';
-    }
-  });
-
-  // Add fast pulse keyframes for Y prompt dynamically
-  const style = document.createElement('style');
-  style.innerHTML = `
-  @keyframes yPulseFast {
-    0% { transform: scale(1); filter: brightness(1); }
-    30% { transform: scale(1.16); filter: brightness(1.35); }
-    60% { transform: scale(0.95); filter: brightness(0.9); }
-    100% { transform: scale(1); filter: brightness(1); }
-  }`;
-  document.head.appendChild(style);
-
-  // Ensure initial placement and responsiveness (in case window size changes)
-  window.addEventListener('resize', () => {
-    // no-op placeholder: layout uses flexbox so it auto-centers
-  });
+        logo.style.transform =
+            `translate(-50%, -65%) scale(1.02) translate(${stretchX}px, ${stretchY}px)`;
+    });
 </script>
 
 </body>
