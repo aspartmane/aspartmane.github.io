@@ -14,7 +14,7 @@
         justify-content: center;
         align-items: center;
         height: 100vh;
-        cursor: default; /* cursor visible again */
+        cursor: default;
     }
 
     #logo {
@@ -23,15 +23,14 @@
         position: absolute;
         filter: drop-shadow(0 0 10px #000);
         transition: transform 0.1s ease-out;
-        animation: heartbeat 3.5s infinite ease-in-out; /* slower & heavier */
+        animation: heartbeat 3.5s infinite ease-in-out;
     }
 
-    /* slower, more realistic, irregular heartbeat */
     @keyframes heartbeat {
         0%   { transform: scale(1); }
         12%  { transform: scale(1.055); }
         20%  { transform: scale(1); }
-        22%  { transform: scale(1.03); }  /* tiny secondary pulse */
+        22%  { transform: scale(1.03); }
         35%  { transform: scale(1); }
         100% { transform: scale(1); }
     }
@@ -44,28 +43,52 @@
 <script>
     const logo = document.getElementById("logo");
 
-    // Smoothed target values
     let targetX = 0, targetY = 0;
     let currentX = 0, currentY = 0;
 
+    let shiverStrength = 0; // 0 = none, 1 = full shiver
+
     document.addEventListener("mousemove", (e) => {
-        // range -15px to +15px movement
+        // cursor-follow target position
         targetX = (e.clientX / window.innerWidth - 0.5) * 30;
         targetY = (e.clientY / window.innerHeight - 0.5) * 30;
+
+        // detect proximity for shiver
+        const rect = logo.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
+
+        // within 120px → activate shiver
+        shiverStrength = dist < 120 ? 1 : 0;
     });
 
     function animate() {
-        // smooth interpolation for gooey movement
+        // smooth follow
         currentX += (targetX - currentX) * 0.08;
         currentY += (targetY - currentY) * 0.08;
 
-        // tilt slightly toward cursor
+        // tilt
         const tiltX = currentX * 0.15;
         const tiltY = currentY * -0.15;
 
-        // combine all transforms – heartbeat is added automatically
-        logo.style.transform = 
-            `translate(${currentX}px, ${currentY}px) rotateX(${tiltY}deg) rotateY(${tiltX}deg)`;
+        // random shiver (tiny high-frequency jitter)
+        let shiverX = 0;
+        let shiverY = 0;
+        let shiverRot = 0;
+
+        if (shiverStrength > 0) {
+            shiverX = (Math.random() - 0.5) * 4;     // ±2px
+            shiverY = (Math.random() - 0.5) * 4;
+            shiverRot = (Math.random() - 0.5) * 2;   // ±1°
+        }
+
+        logo.style.transform =
+            `translate(${currentX + shiverX}px, ${currentY + shiverY}px)
+             rotateX(${tiltY + shiverRot / 2}deg)
+             rotateY(${tiltX + shiverRot / 2}deg)
+             rotate(${shiverRot}deg)`;
 
         requestAnimationFrame(animate);
     }
