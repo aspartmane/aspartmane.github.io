@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>YEARN — Intro</title>
+<title>YEARN </title>
 
 <style>
     body {
@@ -11,7 +11,9 @@
         padding: 0;
         background: #000;
         overflow: hidden;
-        cursor: default;
+
+        /* custom fleshy cursor */
+        cursor: url("https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/cursor.png?raw=true") 0 0, auto;
     }
 
     /* Background */
@@ -25,36 +27,34 @@
         z-index: -10;
     }
 
-    /* LOGO — stretched side to side */
+    /* LOGO — centered + stretched */
     #logo {
         position: absolute;
         top: 50%;
         left: 50%;
-        transform: translate(-50%, -65%);
-        width: 80vw;      /* ← stretches to screen sides */
-        max-width: 900px; /* safety cap on large screens */
+        transform: translate(-50%, -60%);
+        width: 800px;      /* stretched more to the sides */
+        max-width: 95vw;   /* keeps it inside screen */
         image-rendering: pixelated;
     }
 
     /* HOLD Y — under the logo */
     #holdY {
         position: absolute;
-        top: calc(50% + 150px);
+        top: calc(50% + 180px);
         left: 50%;
         transform: translateX(-50%);
-        width: 290px;
+        width: 300px;
         image-rendering: pixelated;
-        opacity: 0.9;
     }
 </style>
-
 </head>
 <body>
 
 <!-- background -->
 <img id="bg" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/intro_flesh.png?raw=true" alt="Background">
 
-<!-- centered wide logo -->
+<!-- centered + stretched logo -->
 <img id="logo" src="https://github.com/aspartmane/aspartmane.github.io/blob/main/assets/logo.png?raw=true" alt="YEARN logo">
 
 <!-- hold Y -->
