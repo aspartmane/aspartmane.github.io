@@ -28,7 +28,7 @@
 
     /* BACKGROUND — slow veiny drift */
     #bg {
-        width: 110vw;              /* slightly oversized to allow movement */
+        width: 110vw;              
         height: 110vh;
         top: -5vh;
         left: -5vw;
@@ -86,6 +86,42 @@
         top: 80%;
         transform: translateX(-50%);
     }
+
+    /* FULLSCREEN BUTTONS */
+    #fullscreen-buttons {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 1000;
+    }
+
+    .fs-button {
+        width: 50px;
+        height: 50px;
+        background: radial-gradient(circle at 30% 30%, #7b0000, #2b0000);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 32px;
+        color: #ff9999;
+        font-weight: bold;
+        cursor: pointer;
+        user-select: none;
+        animation: heartbeat 1.2s infinite;
+        box-shadow: 0 0 12px rgba(255, 0, 0, 0.7), inset 0 0 10px rgba(255, 100, 100, 0.5);
+        filter: drop-shadow(0 0 6px crimson);
+    }
+
+    @keyframes heartbeat {
+        0%, 100% { transform: scale(1); }
+        25% { transform: scale(1.1); }
+        50% { transform: scale(1.15); }
+        75% { transform: scale(1.1); }
+    }
 </style>
 
 </head>
@@ -94,6 +130,39 @@
     <img id="bg" src="assets/intro_flesh.png" />
     <img id="logo" src="assets/logo.png" />
     <img id="holdY" src="assets/Y.png" />
+
+    <!-- Fullscreen buttons -->
+    <div id="fullscreen-buttons">
+        <div class="fs-button" id="altBtn">+</div>
+        <div class="fs-button" id="enterBtn">+</div>
+    </div>
+
+<script>
+const altBtn = document.getElementById('altBtn');
+const enterBtn = document.getElementById('enterBtn');
+
+function goFullscreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) elem.requestFullscreen();
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+}
+
+// Trigger fullscreen if both buttons pressed within 1 second
+let clicked = [];
+[altBtn, enterBtn].forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+        clicked.push(i);
+        setTimeout(() => clicked = [], 1000);
+        if (clicked.includes(0) && clicked.includes(1)) goFullscreen();
+    });
+});
+
+// Optional: also allow Alt + Enter keyboard shortcut
+document.addEventListener('keydown', (e) => {
+    if (e.altKey && e.key === 'Enter') goFullscreen();
+});
+</script>
 
 </body>
 </html>
