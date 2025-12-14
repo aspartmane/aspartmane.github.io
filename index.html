@@ -16,7 +16,7 @@
         height: 100%;
         overflow: hidden;
         background: black;
-        cursor: url("assets/cursor_64.png") 0 0, auto;
+        cursor: url("assets/cursor_64.png") 0 0, auto !important;
     }
 
     img {
@@ -78,15 +78,18 @@
         flex-direction: column;
         align-items: center;
         gap: 10px;
-        z-index: 1000;
+        z-index: 1001;
         font-family: 'Press Start 2P', cursive;
+        cursor: url("assets/cursor_64.png") 0 0, auto !important;
     }
 
     #fullscreen-icon {
         width: 50px;
         height: 50px;
         background: url("assets/fullscreen.png") no-repeat center/cover;
-        cursor: pointer;
+        cursor: url("assets/cursor_64.png") 0 0, auto !important;
+        z-index: 1002;
+        box-shadow: 0 0 8px rgba(255,255,255,0.6); /* subtle glow to stand out */
     }
 
     #fullscreen-buttons {
@@ -113,7 +116,7 @@
         justify-content: center;
         align-items: center;
         border-radius: 8px;
-        cursor: pointer;
+        cursor: url("assets/cursor_64.png") 0 0, auto !important;
         user-select: none;
         box-shadow: 0 0 10px rgba(255,0,0,0.7), inset 0 0 6px rgba(255,100,100,0.5);
     }
