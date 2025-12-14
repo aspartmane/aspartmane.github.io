@@ -1,3 +1,3 @@
 <p align="center">
-  <img src="./assets/intro_flesh.png" alt="flesh intro" width="100%">
+  <img src="assets/intro_flesh.png" width="100%" alt="intro background" />
 </p>
