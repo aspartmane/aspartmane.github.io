@@ -26,25 +26,46 @@
         position: absolute;
     }
 
+    /* BACKGROUND — subtle heartbeat stretch */
     #bg {
         width: 100vw;
         height: 100vh;
         object-fit: cover;
         top: 0;
         left: 0;
+        animation: bgPulse 6.5s infinite ease-in-out;
     }
 
-    /* Logo */
+    @keyframes bgPulse {
+        0%   { transform: scale(1); }
+        50%  { transform: scale(1.015); }
+        100% { transform: scale(1); }
+    }
+
+    /* YEARN LOGO — slight organic movement */
     #logo {
         width: 30vw;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -60%);
+        animation: logoBreathe 4.8s infinite ease-in-out;
     }
 
-    /* HOLD Y — bigger & clearer */
+    @keyframes logoBreathe {
+        0% {
+            transform: translate(-50%, -60%) scale(1);
+        }
+        50% {
+            transform: translate(-50%, -61%) scale(1.01);
+        }
+        100% {
+            transform: translate(-50%, -60%) scale(1);
+        }
+    }
+
+    /* HOLD Y */
     #holdY {
-        width: 160px;   /* increased from 120px */
+        width: 160px;
         left: 50%;
         top: 80%;
         transform: translateX(-50%);
