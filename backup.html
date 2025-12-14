@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Intro</title>
 
+<!-- Google Font: Press Start 2P -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 <style>
     html, body {
         margin: 0;
@@ -16,7 +19,6 @@
         cursor: url("assets/cursor_64.png") 0 0, auto;
     }
 
-    /* Make everything pixel-perfect */
     img {
         image-rendering: pixelated;
         image-rendering: crisp-edges;
@@ -27,36 +29,127 @@
     }
 
     #bg {
-        width: 100vw;
-        height: 100vh;
+        width: 110vw;
+        height: 110vh;
+        top: -5vh;
+        left: -5vw;
         object-fit: cover;
-        top: 0;
-        left: 0;
+        animation: bgDrift 18s infinite linear;
     }
 
-    /* Smaller logo */
+    @keyframes bgDrift {
+        0% { transform: translate(0px,0px) scale(1.02); }
+        25% { transform: translate(-6px,4px) scale(1.025); }
+        50% { transform: translate(4px,-6px) scale(1.02); }
+        75% { transform: translate(6px,2px) scale(1.03); }
+        100% { transform: translate(0px,0px) scale(1.02); }
+    }
+
     #logo {
         width: 30vw;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -60%);
+        animation: logoBreathe 4.8s infinite ease-in-out;
+        filter: drop-shadow(0 0 20px rgba(0,0,0,0.9))
+                drop-shadow(0 8px 18px rgba(60,0,0,0.6))
+                contrast(1.05);
     }
 
-    /* Bigger Y icon */
+    @keyframes logoBreathe {
+        0% { transform: translate(-50%, -60%) scale(1); }
+        50% { transform: translate(-50%, -61%) scale(1.01); }
+        100% { transform: translate(-50%, -60%) scale(1); }
+    }
+
     #holdY {
-        width: 120px;      /* was 70px — now bigger */
+        width: 160px;
         left: 50%;
         top: 80%;
         transform: translateX(-50%);
     }
-</style>
 
+    /* Fullscreen Buttons */
+    #fullscreen-buttons {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 1000;
+        font-family: 'Press Start 2P', cursive;
+    }
+
+    .fs-button {
+        width: 70px;
+        height: 70px;
+        background: radial-gradient(circle at 30% 30%, #7b0000, #2b0000);
+        color: #ff9999;
+        font-size: 14px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 8px;
+        cursor: pointer;
+        user-select: none;
+        box-shadow: 0 0 10px rgba(255,0,0,0.7), inset 0 0 6px rgba(255,100,100,0.5);
+        animation: heartbeat 1.2s infinite;
+    }
+
+    .plus-sign {
+        font-size: 24px;
+        color: #ff6666;
+        user-select: none;
+    }
+
+    @keyframes heartbeat {
+        0%, 100% { transform: scale(1); }
+        25% { transform: scale(1.05); }
+        50% { transform: scale(1.1); }
+        75% { transform: scale(1.05); }
+    }
+</style>
 </head>
 <body>
 
     <img id="bg" src="assets/intro_flesh.png" />
     <img id="logo" src="assets/logo.png" />
     <img id="holdY" src="assets/Y.png" />
+
+    <!-- Fullscreen buttons -->
+    <div id="fullscreen-buttons">
+        <div class="fs-button" id="altBtn">ALT</div>
+        <div class="plus-sign">+</div>
+        <div class="fs-button" id="enterBtn">ENTER</div>
+    </div>
+
+<script>
+const altBtn = document.getElementById('altBtn');
+const enterBtn = document.getElementById('enterBtn');
+
+function goFullscreen() {
+    const elem = document.documentElement;
+    if (elem.requestFullscreen) elem.requestFullscreen();
+    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+    else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+}
+
+// Click combo: trigger fullscreen if both buttons clicked within 1 second
+let clicked = [];
+[altBtn, enterBtn].forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+        clicked.push(i);
+        setTimeout(() => clicked = [], 1000);
+        if (clicked.includes(0) && clicked.includes(1)) goFullscreen();
+    });
+});
+
+// Keyboard shortcut: Alt + Enter
+document.addEventListener('keydown', (e) => {
+    if (e.altKey && e.key === 'Enter') goFullscreen();
+});
+</script>
 
 </body>
 </html>
