@@ -26,23 +26,32 @@
         position: absolute;
     }
 
-    /* BACKGROUND — subtle heartbeat stretch */
+    /* BACKGROUND — deeper, organic pulse */
     #bg {
         width: 100vw;
         height: 100vh;
         object-fit: cover;
         top: 0;
         left: 0;
-        animation: bgPulse 6.5s infinite ease-in-out;
+        animation: bgPulse 7.2s infinite ease-in-out;
     }
 
     @keyframes bgPulse {
-        0%   { transform: scale(1); }
-        50%  { transform: scale(1.015); }
-        100% { transform: scale(1); }
+        0% {
+            transform: scale(1) translate(0px, 0px);
+        }
+        40% {
+            transform: scale(1.02) translate(-2px, -1px);
+        }
+        70% {
+            transform: scale(1.015) translate(1px, 2px);
+        }
+        100% {
+            transform: scale(1) translate(0px, 0px);
+        }
     }
 
-    /* YEARN LOGO — slight organic movement */
+    /* YEARN LOGO — subtle breathing */
     #logo {
         width: 30vw;
         left: 50%;
