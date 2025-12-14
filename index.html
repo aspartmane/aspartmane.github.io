@@ -16,7 +16,7 @@
         height: 100%;
         overflow: hidden;
         background: black;
-        cursor: url("assets/cursor_64.png") 0 0, auto !important;
+        cursor: url("assets/cursor_64.png") 0 0, auto;
     }
 
     img {
@@ -69,40 +69,16 @@
         transform: translateX(-50%);
     }
 
-    /* Fullscreen Icon + Buttons */
-    #fullscreen-container {
+    /* Fullscreen Buttons */
+    #fullscreen-buttons {
         position: fixed;
         bottom: 20px;
         right: 20px;
         display: flex;
-        flex-direction: column;
         align-items: center;
         gap: 10px;
-        z-index: 1001;
+        z-index: 1000;
         font-family: 'Press Start 2P', cursive;
-        cursor: url("assets/cursor_64.png") 0 0, auto !important;
-    }
-
-    #fullscreen-icon {
-        width: 50px;
-        height: auto;
-        cursor: url("assets/cursor_64.png") 0 0, auto !important;
-        z-index: 1002;
-        pointer-events: auto;
-    }
-
-    #fullscreen-buttons {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transform: translateY(30px); /* hidden below */
-        opacity: 0;
-        transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-
-    #fullscreen-container:hover #fullscreen-buttons {
-        transform: translateY(0);
-        opacity: 1;
     }
 
     .fs-button {
@@ -115,7 +91,7 @@
         justify-content: center;
         align-items: center;
         border-radius: 8px;
-        cursor: url("assets/cursor_64.png") 0 0, auto !important;
+        cursor: pointer;
         user-select: none;
         box-shadow: 0 0 10px rgba(255,0,0,0.7), inset 0 0 6px rgba(255,100,100,0.5);
     }
@@ -133,19 +109,17 @@
     <img id="logo" src="assets/logo.png" />
     <img id="holdY" src="assets/Y.png" />
 
-    <!-- Fullscreen icon + buttons -->
-    <div id="fullscreen-container">
-        <img id="fullscreen-icon" src="assets/fullscreen.png" alt="Fullscreen"/>
-        <div id="fullscreen-buttons">
-            <div class="fs-button" id="altBtn">ALT</div>
-            <div class="plus-sign">+</div>
-            <div class="fs-button" id="enterBtn">ENTER</div>
-        </div>
+    <!-- Fullscreen buttons -->
+    <div id="fullscreen-buttons">
+        <div class="fs-button" id="altBtn">ALT</div>
+        <div class="plus-sign">+</div>
+        <div class="fs-button" id="enterBtn">ENTER</div>
     </div>
 
 <script>
 const altBtn = document.getElementById('altBtn');
 const enterBtn = document.getElementById('enterBtn');
+
 let isFullscreen = false;
 
 function toggleFullscreen() {
