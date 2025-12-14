@@ -84,7 +84,7 @@
     .fs-button {
         width: 70px;
         height: 70px;
-        background: radial-gradient(circle at 30% 30%, #7b0000, #2b0000);
+        background: url("assets/button_background.png") no-repeat center/cover;
         color: #ff9999;
         font-size: 14px;
         display: flex;
@@ -94,20 +94,12 @@
         cursor: pointer;
         user-select: none;
         box-shadow: 0 0 10px rgba(255,0,0,0.7), inset 0 0 6px rgba(255,100,100,0.5);
-        animation: heartbeat 1.2s infinite;
     }
 
     .plus-sign {
         font-size: 24px;
         color: #ff6666;
         user-select: none;
-    }
-
-    @keyframes heartbeat {
-        0%, 100% { transform: scale(1); }
-        25% { transform: scale(1.05); }
-        50% { transform: scale(1.1); }
-        75% { transform: scale(1.05); }
     }
 </style>
 </head>
@@ -128,26 +120,36 @@
 const altBtn = document.getElementById('altBtn');
 const enterBtn = document.getElementById('enterBtn');
 
-function goFullscreen() {
-    const elem = document.documentElement;
-    if (elem.requestFullscreen) elem.requestFullscreen();
-    else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-    else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+let isFullscreen = false;
+
+function toggleFullscreen() {
+    if (!isFullscreen) {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) elem.requestFullscreen();
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+        else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+        isFullscreen = true;
+    } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+        else if (document.msExitFullscreen) document.msExitFullscreen();
+        isFullscreen = false;
+    }
 }
 
-// Click combo: trigger fullscreen if both buttons clicked within 1 second
+// Click combo: trigger fullscreen toggle if both buttons clicked within 1 second
 let clicked = [];
 [altBtn, enterBtn].forEach((btn, i) => {
     btn.addEventListener('click', () => {
         clicked.push(i);
         setTimeout(() => clicked = [], 1000);
-        if (clicked.includes(0) && clicked.includes(1)) goFullscreen();
+        if (clicked.includes(0) && clicked.includes(1)) toggleFullscreen();
     });
 });
 
 // Keyboard shortcut: Alt + Enter
 document.addEventListener('keydown', (e) => {
-    if (e.altKey && e.key === 'Enter') goFullscreen();
+    if (e.altKey && e.key === 'Enter') toggleFullscreen();
 });
 </script>
 
