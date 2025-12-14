@@ -85,11 +85,10 @@
 
     #fullscreen-icon {
         width: 50px;
-        height: 50px;
-        background: url("assets/fullscreen.png") no-repeat center/cover;
+        height: auto;
         cursor: url("assets/cursor_64.png") 0 0, auto !important;
         z-index: 1002;
-        box-shadow: 0 0 8px rgba(255,255,255,0.6); /* subtle glow to stand out */
+        pointer-events: auto;
     }
 
     #fullscreen-buttons {
@@ -136,7 +135,7 @@
 
     <!-- Fullscreen icon + buttons -->
     <div id="fullscreen-container">
-        <div id="fullscreen-icon"></div>
+        <img id="fullscreen-icon" src="assets/fullscreen.png" alt="Fullscreen"/>
         <div id="fullscreen-buttons">
             <div class="fs-button" id="altBtn">ALT</div>
             <div class="plus-sign">+</div>
