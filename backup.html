@@ -3,92 +3,60 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>YEARN — Intro</title>
+<title>Intro</title>
 
 <style>
-    body {
+    html, body {
         margin: 0;
         padding: 0;
+        width: 100%;
+        height: 100%;
         overflow: hidden;
-        background: #000;
-
-        /* raw fleshy background (no edits) */
-        background-image: url("assets/intro_flesh.png");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        cursor: default; /* cursor visible */
+        background: black;
+        cursor: url("assets/cursor_64.png") 0 0, auto;
     }
 
-    /* LOGO */
-    #logo {
-        width: 320px;
+    /* Make everything pixel-perfect */
+    img {
         image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        user-select: none;
+        -webkit-user-drag: none;
+        pointer-events: none;
         position: absolute;
-
-        /* stretched + darker to blend with flesh */
-        transform: scaleX(1.25);
-        filter: brightness(0.75) contrast(1.1) drop-shadow(0 0 6px #3a0000aa);
-
-        transition: transform 0.12s ease-out, filter 0.12s ease-out;
-
-        animation: heartbeat 2.8s infinite ease-in-out;
     }
 
-    @keyframes heartbeat {
-        0%   { transform: scaleX(1.25) scale(1); }
-        12%  { transform: scaleX(1.27) scale(1.10); }
-        20%  { transform: scaleX(1.23) scale(0.97); }
-        28%  { transform: scaleX(1.26) scale(1.05); }
-        100% { transform: scaleX(1.25) scale(1); }
+    #bg {
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        top: 0;
+        left: 0;
+    }
+
+    /* Smaller logo */
+    #logo {
+        width: 30vw;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -60%);
+    }
+
+    /* Bigger Y icon */
+    #holdY {
+        width: 120px;      /* was 70px — now bigger */
+        left: 50%;
+        top: 80%;
+        transform: translateX(-50%);
     }
 </style>
+
 </head>
 <body>
 
-<img id="logo" src="assets/logo.png" alt="YEARN Logo">
-
-<script>
-    const logo = document.getElementById("logo");
-
-    // cursor movement reaction
-    document.addEventListener("mousemove", (e) => {
-        const x = (e.clientX / window.innerWidth - 0.5) * 12;
-        const y = (e.clientY / window.innerHeight - 0.5) * 12;
-
-        let baseTransform = `translate(${x}px, ${y}px) scaleX(1.25)`;
-
-        const rect = logo.getBoundingClientRect();
-        const dx = e.clientX - (rect.left + rect.width / 2);
-        const dy = e.clientY - (rect.top + rect.height / 2);
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < 180) {
-            const intensity = 1 - distance / 180;
-
-            const shiverX = (Math.random() - 0.5) * 6 * intensity;
-            const shiverY = (Math.random() - 0.5) * 6 * intensity;
-
-            baseTransform += ` translate(${shiverX}px, ${shiverY}px)`;
-
-            const recoil = 1 + intensity * 0.1;
-            baseTransform += ` scale(${recoil})`;
-
-            logo.style.filter = `brightness(${0.75 - intensity * 0.2}) 
-                                 contrast(1.15) 
-                                 drop-shadow(0 0 ${8 + intensity * 6}px #450000aa)`;
-        } else {
-            logo.style.filter = `brightness(0.75) contrast(1.1) drop-shadow(0 0 6px #3a0000aa)`;
-        }
-
-        logo.style.transform = baseTransform;
-    });
-</script>
+    <img id="bg" src="assets/intro_flesh.png" />
+    <img id="logo" src="assets/logo.png" />
+    <img id="holdY" src="assets/Y.png" />
 
 </body>
 </html>
