@@ -5,116 +5,162 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Intro</title>
 
-<!-- Google Font: Press Start 2P -->
+<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
-    html, body {
-        margin: 0;
-        padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-        background: black;
-        cursor: url("assets/cursor_64.png") 0 0, auto;
-    }
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: black;
+    cursor: url("assets/cursor_64.png") 0 0, auto;
+}
 
-    img {
-        image-rendering: pixelated;
-        image-rendering: crisp-edges;
-        user-select: none;
-        -webkit-user-drag: none;
-        pointer-events: none;
-        position: absolute;
-    }
+/* Global image rules */
+img {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+    position: absolute;
+}
 
-    #bg {
-        width: 110vw;
-        height: 110vh;
-        top: -5vh;
-        left: -5vw;
-        object-fit: cover;
-        animation: bgDrift 18s infinite linear;
-    }
+/* Background flesh */
+#bg {
+    width: 110vw;
+    height: 110vh;
+    top: -5vh;
+    left: -5vw;
+    object-fit: cover;
+    animation: bgDrift 18s infinite linear;
+}
 
-    @keyframes bgDrift {
-        0% { transform: translate(0px,0px) scale(1.02); }
-        25% { transform: translate(-6px,4px) scale(1.025); }
-        50% { transform: translate(4px,-6px) scale(1.02); }
-        75% { transform: translate(6px,2px) scale(1.03); }
-        100% { transform: translate(0px,0px) scale(1.02); }
-    }
+@keyframes bgDrift {
+    0%   { transform: translate(0px,0px) scale(1.02); }
+    25%  { transform: translate(-6px,4px) scale(1.025); }
+    50%  { transform: translate(4px,-6px) scale(1.02); }
+    75%  { transform: translate(6px,2px) scale(1.03); }
+    100% { transform: translate(0px,0px) scale(1.02); }
+}
 
-    #logo {
-        width: 30vw;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -60%);
-        animation: logoBreathe 4.8s infinite ease-in-out;
-        filter: drop-shadow(0 0 20px rgba(0,0,0,0.9))
-                drop-shadow(0 8px 18px rgba(60,0,0,0.6))
-                contrast(1.05);
-    }
+/* Logo */
+#logo {
+    width: 30vw;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -60%);
+    animation: logoBreathe 4.8s infinite ease-in-out;
+    filter:
+        drop-shadow(0 0 20px rgba(0,0,0,0.9))
+        drop-shadow(0 8px 18px rgba(60,0,0,0.6))
+        contrast(1.05);
+}
 
-    @keyframes logoBreathe {
-        0% { transform: translate(-50%, -60%) scale(1); }
-        50% { transform: translate(-50%, -61%) scale(1.01); }
-        100% { transform: translate(-50%, -60%) scale(1); }
-    }
+@keyframes logoBreathe {
+    0%   { transform: translate(-50%, -60%) scale(1); }
+    50%  { transform: translate(-50%, -61%) scale(1.01); }
+    100% { transform: translate(-50%, -60%) scale(1); }
+}
 
-    #holdY {
-        width: 160px;
-        left: 50%;
-        top: 80%;
-        transform: translateX(-50%);
-    }
+/* Hold Y */
+#holdY {
+    width: 160px;
+    left: 50%;
+    top: 80%;
+    transform: translateX(-50%);
+}
 
-    /* Fullscreen Buttons */
-    #fullscreen-buttons {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        z-index: 1000;
-        font-family: 'Press Start 2P', cursive;
-    }
+/* ───────────── FULLSCREEN HOVER ZONE ───────────── */
 
-    .fs-button {
-        width: 70px;
-        height: 70px;
-        background: url("assets/button_background.png") no-repeat center/cover;
-        color: #ff9999;
-        font-size: 14px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: 8px;
-        cursor: pointer;
-        user-select: none;
-        box-shadow: 0 0 10px rgba(255,0,0,0.7), inset 0 0 6px rgba(255,100,100,0.5);
-    }
+#fs-zone {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 140px;
+    height: 140px;
+    z-index: 1000;
+}
 
-    .plus-sign {
-        font-size: 24px;
-        color: #ff6666;
-        user-select: none;
-    }
+/* Pixel fullscreen icon */
+#fs-icon {
+    bottom: 20px;
+    right: 20px;
+    width: 48px;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* Buttons container */
+#fullscreen-buttons {
+    position: absolute;
+    bottom: 20px;
+    right: 80px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Press Start 2P', cursive;
+
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+}
+
+/* Buttons */
+.fs-button {
+    width: 70px;
+    height: 70px;
+    background: url("assets/button_background.png") no-repeat center/cover;
+    color: #ff9999;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    box-shadow:
+        0 0 10px rgba(255,0,0,0.7),
+        inset 0 0 6px rgba(255,100,100,0.5);
+    pointer-events: auto;
+}
+
+.plus-sign {
+    font-size: 24px;
+    color: #ff6666;
+    user-select: none;
+}
+
+/* Reveal on hover */
+#fs-zone:hover #fs-icon,
+#fs-zone:hover #fullscreen-buttons {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* ─────────────────────────────────────────────── */
 </style>
 </head>
 <body>
 
-    <img id="bg" src="assets/intro_flesh.png" />
-    <img id="logo" src="assets/logo.png" />
-    <img id="holdY" src="assets/Y.png" />
+<img id="bg" src="assets/intro_flesh.png" />
+<img id="logo" src="assets/logo.png" />
+<img id="holdY" src="assets/Y.png" />
 
-    <!-- Fullscreen buttons -->
+<!-- Fullscreen hover UI -->
+<div id="fs-zone">
+    <img id="fs-icon" src="assets/fullscreen.png" />
     <div id="fullscreen-buttons">
         <div class="fs-button" id="altBtn">ALT</div>
         <div class="plus-sign">+</div>
         <div class="fs-button" id="enterBtn">ENTER</div>
     </div>
+</div>
 
 <script>
 const altBtn = document.getElementById('altBtn');
@@ -137,7 +183,7 @@ function toggleFullscreen() {
     }
 }
 
-// Click combo: trigger fullscreen toggle if both buttons clicked within 1 second
+/* Click combo logic */
 let clicked = [];
 [altBtn, enterBtn].forEach((btn, i) => {
     btn.addEventListener('click', () => {
@@ -147,7 +193,7 @@ let clicked = [];
     });
 });
 
-// Keyboard shortcut: Alt + Enter
+/* Keyboard shortcut */
 document.addEventListener('keydown', (e) => {
     if (e.altKey && e.key === 'Enter') toggleFullscreen();
 });
