@@ -38,10 +38,10 @@ img {
 }
 
 @keyframes bgDrift {
-    0%   { transform: translate(0,0) scale(1.02); }
-    25%  { transform: translate(-6px,4px) scale(1.025); }
-    50%  { transform: translate(4px,-6px) scale(1.02); }
-    75%  { transform: translate(6px,2px) scale(1.03); }
+    0% { transform: translate(0,0) scale(1.02); }
+    25% { transform: translate(-6px,4px) scale(1.025); }
+    50% { transform: translate(4px,-6px) scale(1.02); }
+    75% { transform: translate(6px,2px) scale(1.03); }
     100% { transform: translate(0,0) scale(1.02); }
 }
 
@@ -59,8 +59,8 @@ img {
 }
 
 @keyframes logoBreathe {
-    0%   { transform: translate(-50%, -60%) scale(1); }
-    50%  { transform: translate(-50%, -61%) scale(1.01); }
+    0% { transform: translate(-50%, -60%) scale(1); }
+    50% { transform: translate(-50%, -61%) scale(1.01); }
     100% { transform: translate(-50%, -60%) scale(1); }
 }
 
@@ -72,7 +72,7 @@ img {
     transform: translateX(-50%);
 }
 
-/* ───────── FULLSCREEN CORNER ───────── */
+/* ───── FULLSCREEN CORNER ───── */
 
 #fs-zone {
     position: fixed;
@@ -81,27 +81,30 @@ img {
     width: 180px;
     height: 180px;
     z-index: 1000;
+    cursor: url("assets/cursor_64.png") 0 0, auto;
 }
 
-/* Fullscreen icon (BIGGER) */
+#fs-zone * {
+    cursor: url("assets/cursor_64.png") 0 0, auto;
+}
+
+/* Icon */
 #fs-icon {
     bottom: 24px;
     right: 24px;
-    width: 72px; /* bigger */
+    width: 72px;
     opacity: 0;
     transform: scale(0.6);
-    transition: opacity 0.12s linear;
 }
 
-/* Jumpscare twitch */
 #fs-icon.twitch {
     animation: twitchIn 0.18s steps(1) forwards;
 }
 
 @keyframes twitchIn {
-    0%   { transform: scale(0.3) rotate(0deg); }
-    40%  { transform: scale(1.25) rotate(2deg); }
-    70%  { transform: scale(0.95) rotate(-1deg); }
+    0% { transform: scale(0.3) rotate(0deg); }
+    40% { transform: scale(1.25) rotate(2deg); }
+    70% { transform: scale(0.95) rotate(-1deg); }
     100% { transform: scale(1) rotate(0deg); }
 }
 
@@ -131,10 +134,6 @@ img {
     justify-content: center;
     align-items: center;
     border-radius: 8px;
-    cursor: pointer;
-    box-shadow:
-        0 0 10px rgba(255,0,0,0.7),
-        inset 0 0 6px rgba(255,100,100,0.5);
     pointer-events: auto;
 }
 
@@ -143,7 +142,7 @@ img {
     color: #ff6666;
 }
 
-/* Hover reveal */
+/* Reveal */
 #fs-zone:hover #fs-icon {
     opacity: 1;
 }
@@ -177,12 +176,13 @@ const enterBtn = document.getElementById('enterBtn');
 
 let isFullscreen = false;
 let scareArmed = true;
+let cursorTwitchInterval = null;
 
-/* Jumpscare trigger */
+/* ICON JUMPSCARE */
 fsZone.addEventListener('mouseenter', () => {
     if (scareArmed) {
         fsIcon.classList.remove('twitch');
-        void fsIcon.offsetWidth; // force reflow
+        void fsIcon.offsetWidth;
         fsIcon.classList.add('twitch');
         scareArmed = false;
     }
@@ -190,9 +190,41 @@ fsZone.addEventListener('mouseenter', () => {
 
 fsZone.addEventListener('mouseleave', () => {
     scareArmed = true;
+    stopCursorTwitch();
 });
 
-/* Fullscreen logic */
+/* CURSOR TWITCH */
+function startCursorTwitch() {
+    if (cursorTwitchInterval) return;
+
+    const offsets = [
+        [0,0],[2,1],[-2,-1],[1,-2],[-1,2],[0,0]
+    ];
+    let i = 0;
+
+    cursorTwitchInterval = setInterval(() => {
+        const [x,y] = offsets[i % offsets.length];
+        document.body.style.cursor =
+            `url("assets/cursor_64.png") ${x} ${y}, auto`;
+        i++;
+    }, 30);
+}
+
+function stopCursorTwitch() {
+    clearInterval(cursorTwitchInterval);
+    cursorTwitchInterval = null;
+    document.body.style.cursor =
+        `url("assets/cursor_64.png") 0 0, auto`;
+}
+
+/* Apply twitch on click */
+[altBtn, enterBtn].forEach(btn => {
+    btn.addEventListener('mousedown', startCursorTwitch);
+    btn.addEventListener('mouseup', stopCursorTwitch);
+    btn.addEventListener('mouseleave', stopCursorTwitch);
+});
+
+/* Fullscreen */
 function toggleFullscreen() {
     if (!isFullscreen) {
         document.documentElement.requestFullscreen();
