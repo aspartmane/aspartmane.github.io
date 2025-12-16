@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Intro</title>
 
-<!-- Google Font -->
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
 <style>
@@ -19,7 +18,6 @@ html, body {
     cursor: url("assets/cursor_64.png") 0 0, auto;
 }
 
-/* Global image rules */
 img {
     image-rendering: pixelated;
     image-rendering: crisp-edges;
@@ -29,7 +27,7 @@ img {
     position: absolute;
 }
 
-/* Background flesh */
+/* Background */
 #bg {
     width: 110vw;
     height: 110vh;
@@ -40,11 +38,11 @@ img {
 }
 
 @keyframes bgDrift {
-    0%   { transform: translate(0px,0px) scale(1.02); }
+    0%   { transform: translate(0,0) scale(1.02); }
     25%  { transform: translate(-6px,4px) scale(1.025); }
     50%  { transform: translate(4px,-6px) scale(1.02); }
     75%  { transform: translate(6px,2px) scale(1.03); }
-    100% { transform: translate(0px,0px) scale(1.02); }
+    100% { transform: translate(0,0) scale(1.02); }
 }
 
 /* Logo */
@@ -74,44 +72,55 @@ img {
     transform: translateX(-50%);
 }
 
-/* ───────────── FULLSCREEN HOVER ZONE ───────────── */
+/* ───────── FULLSCREEN CORNER ───────── */
 
 #fs-zone {
     position: fixed;
     bottom: 0;
     right: 0;
-    width: 140px;
-    height: 140px;
+    width: 180px;
+    height: 180px;
     z-index: 1000;
 }
 
-/* Pixel fullscreen icon */
+/* Fullscreen icon (BIGGER) */
 #fs-icon {
-    bottom: 20px;
-    right: 20px;
-    width: 48px;
+    bottom: 24px;
+    right: 24px;
+    width: 72px; /* bigger */
     opacity: 0;
-    transform: scale(0.95);
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    transform: scale(0.6);
+    transition: opacity 0.12s linear;
 }
 
-/* Buttons container */
+/* Jumpscare twitch */
+#fs-icon.twitch {
+    animation: twitchIn 0.18s steps(1) forwards;
+}
+
+@keyframes twitchIn {
+    0%   { transform: scale(0.3) rotate(0deg); }
+    40%  { transform: scale(1.25) rotate(2deg); }
+    70%  { transform: scale(0.95) rotate(-1deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Buttons */
 #fullscreen-buttons {
     position: absolute;
-    bottom: 20px;
-    right: 80px;
+    bottom: 28px;
+    right: 110px;
     display: flex;
     align-items: center;
     gap: 10px;
     font-family: 'Press Start 2P', cursive;
 
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.9);
     transition: opacity 0.25s ease, transform 0.25s ease;
     pointer-events: none;
 }
 
-/* Buttons */
 .fs-button {
     width: 70px;
     height: 70px;
@@ -123,7 +132,6 @@ img {
     align-items: center;
     border-radius: 8px;
     cursor: pointer;
-    user-select: none;
     box-shadow:
         0 0 10px rgba(255,0,0,0.7),
         inset 0 0 6px rgba(255,100,100,0.5);
@@ -133,28 +141,27 @@ img {
 .plus-sign {
     font-size: 24px;
     color: #ff6666;
-    user-select: none;
 }
 
-/* Reveal on hover */
-#fs-zone:hover #fs-icon,
+/* Hover reveal */
+#fs-zone:hover #fs-icon {
+    opacity: 1;
+}
+
 #fs-zone:hover #fullscreen-buttons {
     opacity: 1;
     transform: scale(1);
 }
-
-/* ─────────────────────────────────────────────── */
 </style>
 </head>
 <body>
 
-<img id="bg" src="assets/intro_flesh.png" />
-<img id="logo" src="assets/logo.png" />
-<img id="holdY" src="assets/Y.png" />
+<img id="bg" src="assets/intro_flesh.png">
+<img id="logo" src="assets/logo.png">
+<img id="holdY" src="assets/Y.png">
 
-<!-- Fullscreen hover UI -->
 <div id="fs-zone">
-    <img id="fs-icon" src="assets/fullscreen.png" />
+    <img id="fs-icon" src="assets/fullscreen.png">
     <div id="fullscreen-buttons">
         <div class="fs-button" id="altBtn">ALT</div>
         <div class="plus-sign">+</div>
@@ -163,27 +170,40 @@ img {
 </div>
 
 <script>
+const fsZone = document.getElementById('fs-zone');
+const fsIcon = document.getElementById('fs-icon');
 const altBtn = document.getElementById('altBtn');
 const enterBtn = document.getElementById('enterBtn');
 
 let isFullscreen = false;
+let scareArmed = true;
 
+/* Jumpscare trigger */
+fsZone.addEventListener('mouseenter', () => {
+    if (scareArmed) {
+        fsIcon.classList.remove('twitch');
+        void fsIcon.offsetWidth; // force reflow
+        fsIcon.classList.add('twitch');
+        scareArmed = false;
+    }
+});
+
+fsZone.addEventListener('mouseleave', () => {
+    scareArmed = true;
+});
+
+/* Fullscreen logic */
 function toggleFullscreen() {
     if (!isFullscreen) {
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) elem.requestFullscreen();
-        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-        else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+        document.documentElement.requestFullscreen();
         isFullscreen = true;
     } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-        else if (document.msExitFullscreen) document.msExitFullscreen();
+        document.exitFullscreen();
         isFullscreen = false;
     }
 }
 
-/* Click combo logic */
+/* Click combo */
 let clicked = [];
 [altBtn, enterBtn].forEach((btn, i) => {
     btn.addEventListener('click', () => {
@@ -193,7 +213,7 @@ let clicked = [];
     });
 });
 
-/* Keyboard shortcut */
+/* Keyboard */
 document.addEventListener('keydown', (e) => {
     if (e.altKey && e.key === 'Enter') toggleFullscreen();
 });
