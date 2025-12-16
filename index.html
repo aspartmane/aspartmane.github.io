@@ -18,6 +18,11 @@ html, body {
     cursor: url("assets/cursor_64.png") 0 0, auto;
 }
 
+/* Force cursor everywhere */
+* {
+    cursor: url("assets/cursor_64.png") 0 0, auto;
+}
+
 img {
     image-rendering: pixelated;
     image-rendering: crisp-edges;
@@ -72,7 +77,7 @@ img {
     transform: translateX(-50%);
 }
 
-/* ───── FULLSCREEN CORNER ───── */
+/* ───── FULLSCREEN ZONE ───── */
 
 #fs-zone {
     position: fixed;
@@ -81,20 +86,14 @@ img {
     width: 180px;
     height: 180px;
     z-index: 1000;
-    cursor: url("assets/cursor_64.png") 0 0, auto;
 }
 
-#fs-zone * {
-    cursor: url("assets/cursor_64.png") 0 0, auto;
-}
-
-/* Icon */
+/* Fullscreen pixel */
 #fs-icon {
     bottom: 24px;
     right: 24px;
     width: 72px;
     opacity: 0;
-    transform: scale(0.6);
 }
 
 #fs-icon.twitch {
@@ -103,8 +102,8 @@ img {
 
 @keyframes twitchIn {
     0% { transform: scale(0.3) rotate(0deg); }
-    40% { transform: scale(1.25) rotate(2deg); }
-    70% { transform: scale(0.95) rotate(-1deg); }
+    40% { transform: scale(1.25) rotate(3deg); }
+    70% { transform: scale(0.9) rotate(-2deg); }
     100% { transform: scale(1) rotate(0deg); }
 }
 
@@ -114,10 +113,8 @@ img {
     bottom: 28px;
     right: 110px;
     display: flex;
-    align-items: center;
     gap: 10px;
     font-family: 'Press Start 2P', cursive;
-
     opacity: 0;
     transform: scale(0.9);
     transition: opacity 0.25s ease, transform 0.25s ease;
@@ -129,11 +126,9 @@ img {
     height: 70px;
     background: url("assets/button_background.png") no-repeat center/cover;
     color: #ff9999;
-    font-size: 14px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 8px;
     pointer-events: auto;
 }
 
@@ -142,7 +137,7 @@ img {
     color: #ff6666;
 }
 
-/* Reveal */
+/* Reveal UI */
 #fs-zone:hover #fs-icon {
     opacity: 1;
 }
@@ -169,16 +164,16 @@ img {
 </div>
 
 <script>
-const fsZone = document.getElementById('fs-zone');
-const fsIcon = document.getElementById('fs-icon');
-const altBtn = document.getElementById('altBtn');
+const fsZone  = document.getElementById('fs-zone');
+const fsIcon  = document.getElementById('fs-icon');
+const altBtn  = document.getElementById('altBtn');
 const enterBtn = document.getElementById('enterBtn');
 
 let isFullscreen = false;
 let scareArmed = true;
-let cursorTwitchInterval = null;
+let cursorInterval = null;
 
-/* ICON JUMPSCARE */
+/* ───── ICON FLINCH (once per entry) ───── */
 fsZone.addEventListener('mouseenter', () => {
     if (scareArmed) {
         fsIcon.classList.remove('twitch');
@@ -186,6 +181,7 @@ fsZone.addEventListener('mouseenter', () => {
         fsIcon.classList.add('twitch');
         scareArmed = false;
     }
+    startCursorTwitch();
 });
 
 fsZone.addEventListener('mouseleave', () => {
@@ -193,38 +189,32 @@ fsZone.addEventListener('mouseleave', () => {
     stopCursorTwitch();
 });
 
-/* CURSOR TWITCH */
+/* ───── EXTREME CURSOR TWITCH ───── */
 function startCursorTwitch() {
-    if (cursorTwitchInterval) return;
+    if (cursorInterval) return;
 
     const offsets = [
-        [0,0],[2,1],[-2,-1],[1,-2],[-1,2],[0,0]
+        [0,0],[8,6],[-9,-7],[7,-10],[-8,9],
+        [12,3],[-12,-4],[5,11],[-6,-11]
     ];
     let i = 0;
 
-    cursorTwitchInterval = setInterval(() => {
+    cursorInterval = setInterval(() => {
         const [x,y] = offsets[i % offsets.length];
         document.body.style.cursor =
             `url("assets/cursor_64.png") ${x} ${y}, auto`;
         i++;
-    }, 30);
+    }, 16);
 }
 
 function stopCursorTwitch() {
-    clearInterval(cursorTwitchInterval);
-    cursorTwitchInterval = null;
+    clearInterval(cursorInterval);
+    cursorInterval = null;
     document.body.style.cursor =
         `url("assets/cursor_64.png") 0 0, auto`;
 }
 
-/* Apply twitch on click */
-[altBtn, enterBtn].forEach(btn => {
-    btn.addEventListener('mousedown', startCursorTwitch);
-    btn.addEventListener('mouseup', stopCursorTwitch);
-    btn.addEventListener('mouseleave', stopCursorTwitch);
-});
-
-/* Fullscreen */
+/* Fullscreen logic */
 function toggleFullscreen() {
     if (!isFullscreen) {
         document.documentElement.requestFullscreen();
