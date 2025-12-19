@@ -43,10 +43,10 @@ img {
 }
 
 @keyframes bgDrift {
-    0% { transform: translate(0,0) scale(1.02); }
-    25% { transform: translate(-6px,4px) scale(1.025); }
-    50% { transform: translate(4px,-6px) scale(1.02); }
-    75% { transform: translate(6px,2px) scale(1.03); }
+    0%   { transform: translate(0,0) scale(1.02); }
+    25%  { transform: translate(-6px,4px) scale(1.025); }
+    50%  { transform: translate(4px,-6px) scale(1.02); }
+    75%  { transform: translate(6px,2px) scale(1.03); }
     100% { transform: translate(0,0) scale(1.02); }
 }
 
@@ -64,8 +64,8 @@ img {
 }
 
 @keyframes logoBreathe {
-    0% { transform: translate(-50%, -60%) scale(1); }
-    50% { transform: translate(-50%, -61%) scale(1.01); }
+    0%   { transform: translate(-50%, -60%) scale(1); }
+    50%  { transform: translate(-50%, -61%) scale(1.01); }
     100% { transform: translate(-50%, -60%) scale(1); }
 }
 
@@ -94,17 +94,6 @@ img {
     right: 24px;
     width: 72px;
     opacity: 0;
-}
-
-#fs-icon.twitch {
-    animation: twitchIn 0.18s steps(1) forwards;
-}
-
-@keyframes twitchIn {
-    0% { transform: scale(0.3) rotate(0deg); }
-    40% { transform: scale(1.25) rotate(3deg); }
-    70% { transform: scale(0.9) rotate(-2deg); }
-    100% { transform: scale(1) rotate(0deg); }
 }
 
 /* Buttons */
@@ -148,6 +137,7 @@ img {
 }
 </style>
 </head>
+
 <body>
 
 <img id="bg" src="assets/intro_flesh.png">
@@ -164,73 +154,113 @@ img {
 </div>
 
 <script>
-const fsZone  = document.getElementById('fs-zone');
-const fsIcon  = document.getElementById('fs-icon');
-const altBtn  = document.getElementById('altBtn');
+/* ───── ELEMENTS ───── */
+const fsZone   = document.getElementById('fs-zone');
+const altBtn   = document.getElementById('altBtn');
 const enterBtn = document.getElementById('enterBtn');
 
+/* ───── STATE ───── */
 let isFullscreen = false;
-let scareArmed = true;
-let cursorInterval = null;
+let insideZone = false;
 
-/* ───── ICON FLINCH (once per entry) ───── */
-fsZone.addEventListener('mouseenter', () => {
-    if (scareArmed) {
-        fsIcon.classList.remove('twitch');
-        void fsIcon.offsetWidth;
-        fsIcon.classList.add('twitch');
-        scareArmed = false;
+let lastMoveTime = Date.now();
+let cursorLoop = null;
+
+let dragging = false;
+let intensity = 0;
+let offsetX = 0;
+let offsetY = 0;
+
+/* direction → down-right */
+const target = { x: 1, y: 1 };
+
+/* ───── MOUSE TRACKING ───── */
+document.addEventListener('mousemove', () => {
+    lastMoveTime = Date.now();
+
+    if (dragging) {
+        dragging = false;
+        intensity += 0.15; // resisting makes it worse
     }
-    startCursorTwitch();
+});
+
+/* ───── ZONE ENTRY ───── */
+fsZone.addEventListener('mouseenter', () => {
+    insideZone = true;
 });
 
 fsZone.addEventListener('mouseleave', () => {
-    scareArmed = true;
-    stopCursorTwitch();
+    insideZone = false;
+    stopCursor();
 });
 
-/* ───── EXTREME CURSOR TWITCH ───── */
-function startCursorTwitch() {
-    if (cursorInterval) return;
+/* ───── CURSOR CONTROL ───── */
+function startCursor() {
+    if (cursorLoop) return;
 
-    const offsets = [
-        [0,0],[8,6],[-9,-7],[7,-10],[-8,9],
-        [12,3],[-12,-4],[5,11],[-6,-11]
-    ];
-    let i = 0;
+    cursorLoop = setInterval(() => {
+        const idle = Date.now() - lastMoveTime;
 
-    cursorInterval = setInterval(() => {
-        const [x,y] = offsets[i % offsets.length];
+        /* wait for hesitation */
+        if (!dragging && idle > 400 && insideZone) {
+            dragging = true;
+        }
+
+        if (!dragging) return;
+
+        /* escalation */
+        intensity = Math.min(intensity + 0.004, 1.3);
+
+        /* slow drag */
+        offsetX += target.x * (0.35 + intensity * 0.9);
+        offsetY += target.y * (0.35 + intensity * 0.9);
+
+        /* twitch */
+        const twitchX = (Math.random() - 0.5) * intensity * 6;
+        const twitchY = (Math.random() - 0.5) * intensity * 6;
+
         document.body.style.cursor =
-            `url("assets/cursor_64.png") ${x} ${y}, auto`;
-        i++;
+            `url("assets/cursor_64.png") ${Math.round(offsetX + twitchX)} ${Math.round(offsetY + twitchY)}, auto`;
+
     }, 16);
 }
 
-function stopCursorTwitch() {
-    clearInterval(cursorInterval);
-    cursorInterval = null;
+function stopCursor() {
+    clearInterval(cursorLoop);
+    cursorLoop = null;
+
+    dragging = false;
+    intensity = 0;
+    offsetX = 0;
+    offsetY = 0;
+
     document.body.style.cursor =
         `url("assets/cursor_64.png") 0 0, auto`;
 }
 
-/* Fullscreen logic */
+/* keep loop alive when hovering */
+setInterval(() => {
+    if (insideZone && !cursorLoop) startCursor();
+}, 100);
+
+/* ───── FULLSCREEN ───── */
 function toggleFullscreen() {
     if (!isFullscreen) {
         document.documentElement.requestFullscreen();
         isFullscreen = true;
+        stopCursor(); // ← MERCY
     } else {
         document.exitFullscreen();
         isFullscreen = false;
     }
 }
 
-/* Click combo */
+/* Button combo */
 let clicked = [];
 [altBtn, enterBtn].forEach((btn, i) => {
     btn.addEventListener('click', () => {
         clicked.push(i);
-        setTimeout(() => clicked = [], 1000);
+        setTimeout(() => clicked = [], 800);
         if (clicked.includes(0) && clicked.includes(1)) toggleFullscreen();
     });
 });
