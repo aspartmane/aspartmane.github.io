@@ -16,23 +16,27 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 900px;
-      height: 700px;
-      animation: floatAll 5s ease-in-out infinite;
+      width: 1100px;
+      height: 850px;
     }
 
     .heart img {
       position: absolute;
-      width: 150px;
-      height: 150px;
+      width: 160px;
+      height: 160px;
       object-fit: contain;
+
+      /* SAME float for everyone */
+      animation: spaceFloat 6s ease-in-out infinite;
     }
 
-    /* everyone floats together */
-    @keyframes floatAll {
-      0%   { transform: translate(-50%, -50%) translateY(0); }
-      50%  { transform: translate(-50%, -50%) translateY(-15px); }
-      100% { transform: translate(-50%, -50%) translateY(0); }
+    /* floating in space, not bouncing */
+    @keyframes spaceFloat {
+      0%   { transform: translate(0px, 0px); }
+      25%  { transform: translate(10px, -14px); }
+      50%  { transform: translate(-12px, -20px); }
+      75%  { transform: translate(8px, -10px); }
+      100% { transform: translate(0px, 0px); }
     }
   </style>
 </head>
@@ -41,28 +45,28 @@
 
   <div class="heart">
 
-    <!-- TOP ROW (rounded lobes) -->
-    <img src="assets/tata1.webp" style="top: 0px;   left: 240px;">
-    <img src="assets/tata2.webp" style="top: 0px;   left: 360px;">
-    <img src="assets/tata3.webp" style="top: 0px;   left: 480px;">
+    <!-- TOP LOBES -->
+    <img src="assets/tata1.webp" style="top: 0px;   left: 300px;">
+    <img src="assets/tata2.webp" style="top: 0px;   left: 470px;">
+    <img src="assets/tata3.webp" style="top: 0px;   left: 640px;">
 
-    <!-- SECOND ROW -->
-    <img src="assets/tata4.webp" style="top: 120px; left: 160px;">
-    <img src="assets/tata5.webp" style="top: 120px; left: 320px;">
-    <img src="assets/tata.webp"  style="top: 120px; left: 480px;">
-    <img src="assets/tata6.webp" style="top: 120px; left: 640px;">
+    <!-- UPPER BODY -->
+    <img src="assets/tata4.webp" style="top: 160px; left: 200px;">
+    <img src="assets/tata5.webp" style="top: 160px; left: 380px;">
+    <img src="assets/tata.webp"  style="top: 160px; left: 560px;">
+    <img src="assets/tata6.webp" style="top: 160px; left: 740px;">
 
-    <!-- THIRD ROW -->
-    <img src="assets/tata7.webp" style="top: 260px; left: 240px;">
-    <img src="assets/tata8.webp" style="top: 260px; left: 400px;">
-    <img src="assets/tata9.webp" style="top: 260px; left: 560px;">
+    <!-- MID BODY -->
+    <img src="assets/tata7.webp" style="top: 340px; left: 300px;">
+    <img src="assets/tata8.webp" style="top: 340px; left: 500px;">
+    <img src="assets/tata9.webp" style="top: 340px; left: 700px;">
 
-    <!-- LOWER -->
-    <img src="assets/tata1.webp" style="top: 400px; left: 320px;">
-    <img src="assets/tata2.webp" style="top: 400px; left: 480px;">
+    <!-- LOWER BODY -->
+    <img src="assets/tata1.webp" style="top: 520px; left: 420px;">
+    <img src="assets/tata2.webp" style="top: 520px; left: 620px;">
 
     <!-- POINT -->
-    <img src="assets/tata3.webp" style="top: 540px; left: 400px;">
+    <img src="assets/tata3.webp" style="top: 700px; left: 520px;">
 
   </div>
 
