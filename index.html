@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>For Dad</title>
-
   <style>
     body {
       margin: 0;
@@ -11,57 +10,61 @@
       overflow: hidden;
     }
 
-    .heart {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      width: 720px;
-      height: 600px;
-    }
-
     .heart img {
       position: absolute;
-      width: 120px;
-      height: 120px;
+      width: 100px;
+      height: 100px;
       object-fit: contain;
       animation: float 4s ease-in-out infinite;
     }
 
-    /* floating animation with slight random offsets */
     @keyframes float {
-      0%   { transform: translateY(0) translateX(0); }
-      25%  { transform: translateY(-10px) translateX(5px); }
-      50%  { transform: translateY(-5px) translateX(-5px); }
-      75%  { transform: translateY(-15px) translateX(3px); }
-      100% { transform: translateY(0) translateX(0); }
+      0% { transform: translate(0px, 0px); }
+      25% { transform: translate(5px, -5px); }
+      50% { transform: translate(-5px, -10px); }
+      75% { transform: translate(3px, -5px); }
+      100% { transform: translate(0px, 0px); }
     }
   </style>
 </head>
-
 <body>
 
-  <div class="heart">
-    <!-- TOP CURVES -->
-    <img src="assets/tata1.webp" style="top: 0px; left: 150px; animation-delay: 0s;">
-    <img src="assets/tata2.webp" style="top: 0px; left: 390px; animation-delay: 0.5s;">
+  <div class="heart" id="heart-container"></div>
 
-    <!-- UPPER MIDDLE -->
-    <img src="assets/tata3.webp" style="top: 100px; left: 90px; animation-delay: 1s;">
-    <img src="assets/tata4.webp" style="top: 100px; left: 450px; animation-delay: 1.5s;">
+  <script>
+    const container = document.getElementById('heart-container');
+    const images = [
+      'assets/tata1.webp',
+      'assets/tata2.webp',
+      'assets/tata3.webp',
+      'assets/tata4.webp',
+      'assets/tata5.webp',
+      'assets/tata.webp',
+      'assets/tata6.webp',
+      'assets/tata7.webp',
+      'assets/tata8.webp',
+      'assets/tata9.webp'
+    ];
 
-    <!-- CENTER -->
-    <img src="assets/tata5.webp" style="top: 200px; left: 30px; animation-delay: 2s;">
-    <img src="assets/tata.webp"  style="top: 200px; left: 300px; animation-delay: 2.5s;">
-    <img src="assets/tata6.webp" style="top: 200px; left: 570px; animation-delay: 3s;">
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    const scale = 15; // size of heart
 
-    <!-- LOWER -->
-    <img src="assets/tata7.webp" style="top: 320px; left: 150px; animation-delay: 3.5s;">
-    <img src="assets/tata8.webp" style="top: 320px; left: 450px; animation-delay: 4s;">
+    // Heart curve parametric equation
+    // x = 16 sin^3(t), y = 13 cos(t) - 5 cos(2t) - 2 cos(3t) - cos(4t)
+    for (let i = 0; i < images.length; i++) {
+      const t = Math.PI - (i / (images.length - 1)) * 2 * Math.PI;
+      const x = 16 * Math.pow(Math.sin(t), 3) * scale;
+      const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)) * scale;
 
-    <!-- POINT -->
-    <img src="assets/tata9.webp" style="top: 450px; left: 300px; animation-delay: 4.5s;">
-  </div>
+      const img = document.createElement('img');
+      img.src = images[i];
+      img.style.left = `${centerX + x - 50}px`; // subtract half width
+      img.style.top = `${centerY + y - 50}px`; // subtract half height
+      img.style.animationDelay = `${i * 0.3}s`;
+      container.appendChild(img);
+    }
+  </script>
 
 </body>
 </html>
