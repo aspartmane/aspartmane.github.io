@@ -12,12 +12,15 @@
     }
 
     .heart {
-      position: relative;
-      width: 500px;
-      height: 420px;
-      margin: auto;
-      top: 65%;
-      transform: translateY(-50%);
+      position: absolute;
+      left: 50%;
+      top: 50%;
+
+      /* center horizontally, move DOWN vertically */
+      transform: translate(-50%, -10%);
+
+      width: 520px;
+      height: 440px;
     }
 
     .heart img {
@@ -25,7 +28,7 @@
       width: 90px;
       height: 90px;
 
-      /* keep images normal, not edited */
+      /* keep original image shape */
       object-fit: contain;
 
       animation: float 5s ease-in-out infinite;
@@ -33,7 +36,7 @@
 
     @keyframes float {
       0%   { transform: translateY(0); }
-      50%  { transform: translateY(-16px); }
+      50%  { transform: translateY(-18px); }
       100% { transform: translateY(0); }
     }
   </style>
@@ -42,16 +45,16 @@
 <body>
 
   <div class="heart">
-    <img src="assets/tata.webp"   style="top: 160px; left: 205px;">
-    <img src="assets/tata1.webp"  style="top: 60px;  left: 95px;">
-    <img src="assets/tata2.webp"  style="top: 60px;  left: 315px;">
-    <img src="assets/tata3.webp"  style="top: 120px; left: 15px;">
-    <img src="assets/tata4.webp"  style="top: 120px; left: 395px;">
-    <img src="assets/tata5.webp"  style="top: 240px; left: 70px;">
-    <img src="assets/tata6.webp"  style="top: 240px; left: 340px;">
-    <img src="assets/tata7.webp"  style="top: 310px; left: 150px;">
-    <img src="assets/tata8.webp"  style="top: 310px; left: 260px;">
-    <img src="assets/tata9.webp"  style="top: 370px; left: 205px;">
+    <img src="assets/tata.webp"   style="top: 180px; left: 215px;">
+    <img src="assets/tata1.webp"  style="top: 70px;  left: 110px;">
+    <img src="assets/tata2.webp"  style="top: 70px;  left: 330px;">
+    <img src="assets/tata3.webp"  style="top: 130px; left: 20px;">
+    <img src="assets/tata4.webp"  style="top: 130px; left: 420px;">
+    <img src="assets/tata5.webp"  style="top: 260px; left: 80px;">
+    <img src="assets/tata6.webp"  style="top: 260px; left: 360px;">
+    <img src="assets/tata7.webp"  style="top: 340px; left: 165px;">
+    <img src="assets/tata8.webp"  style="top: 340px; left: 285px;">
+    <img src="assets/tata9.webp"  style="top: 410px; left: 215px;">
   </div>
 
 </body>
