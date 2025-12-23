@@ -1,275 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>YEARN</title>
+  <meta charset="UTF-8">
+  <title>Merry Christmas</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
 
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #ffb6c1, #ffc0cb);
+      font-family: "Arial", sans-serif;
+    }
 
-<style>
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: black;
-    cursor: url("assets/cursor_64.png") 0 0, auto;
-}
-
-/* Force cursor everywhere */
-* {
-    cursor: url("assets/cursor_64.png") 0 0, auto;
-}
-
-img {
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
-    user-select: none;
-    -webkit-user-drag: none;
-    pointer-events: none;
-    position: absolute;
-}
-
-/* Background */
-#bg {
-    width: 110vw;
-    height: 110vh;
-    top: -5vh;
-    left: -5vw;
-    object-fit: cover;
-    animation: bgDrift 18s infinite linear;
-}
-
-@keyframes bgDrift {
-    0%   { transform: translate(0,0) scale(1.02); }
-    25%  { transform: translate(-6px,4px) scale(1.025); }
-    50%  { transform: translate(4px,-6px) scale(1.02); }
-    75%  { transform: translate(6px,2px) scale(1.03); }
-    100% { transform: translate(0,0) scale(1.02); }
-}
-
-/* Logo */
-#logo {
-    width: 30vw;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -60%);
-    animation: logoBreathe 4.8s infinite ease-in-out;
-    filter:
-        drop-shadow(0 0 20px rgba(0,0,0,0.9))
-        drop-shadow(0 8px 18px rgba(60,0,0,0.6))
-        contrast(1.05);
-}
-
-@keyframes logoBreathe {
-    0%   { transform: translate(-50%, -60%) scale(1); }
-    50%  { transform: translate(-50%, -61%) scale(1.01); }
-    100% { transform: translate(-50%, -60%) scale(1); }
-}
-
-/* Hold Y */
-#holdY {
-    width: 160px;
-    left: 50%;
-    top: 80%;
-    transform: translateX(-50%);
-}
-
-/* ───── FULLSCREEN ZONE ───── */
-
-#fs-zone {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 180px;
-    height: 180px;
-    z-index: 1000;
-}
-
-/* Fullscreen pixel */
-#fs-icon {
-    bottom: 24px;
-    right: 24px;
-    width: 72px;
-    opacity: 0;
-}
-
-/* Buttons */
-#fullscreen-buttons {
-    position: absolute;
-    bottom: 28px;
-    right: 110px;
-    display: flex;
-    gap: 10px;
-    font-family: 'Press Start 2P', cursive;
-    opacity: 0;
-    transform: scale(0.9);
-    transition: opacity 0.25s ease, transform 0.25s ease;
-    pointer-events: none;
-}
-
-.fs-button {
-    width: 70px;
-    height: 70px;
-    background: url("assets/button_background.png") no-repeat center/cover;
-    color: #ff9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    pointer-events: auto;
-}
-
-.plus-sign {
-    font-size: 24px;
-    color: #ff6666;
-}
-
-/* Reveal UI */
-#fs-zone:hover #fs-icon {
-    opacity: 1;
-}
-
-#fs-zone:hover #fullscreen-buttons {
-    opacity: 1;
-    transform: scale(1);
-}
-</style>
+    h1 {
+      color: #ffffff;
+      font-size: 4rem;
+      letter-spacing: 2px;
+      text-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+  </style>
 </head>
-
 <body>
-
-<img id="bg" src="assets/intro_flesh.png">
-<img id="logo" src="assets/logo.png">
-<img id="holdY" src="assets/Y.png">
-
-<div id="fs-zone">
-    <img id="fs-icon" src="assets/fullscreen.png">
-    <div id="fullscreen-buttons">
-        <div class="fs-button" id="altBtn">ALT</div>
-        <div class="plus-sign">+</div>
-        <div class="fs-button" id="enterBtn">ENTER</div>
-    </div>
-</div>
-
-<script>
-/* ───── ELEMENTS ───── */
-const fsZone   = document.getElementById('fs-zone');
-const altBtn   = document.getElementById('altBtn');
-const enterBtn = document.getElementById('enterBtn');
-
-/* ───── STATE ───── */
-let isFullscreen = false;
-let insideZone = false;
-
-let lastMoveTime = Date.now();
-let cursorLoop = null;
-
-let dragging = false;
-let intensity = 0;
-let offsetX = 0;
-let offsetY = 0;
-
-/* direction → down-right */
-const target = { x: 1, y: 1 };
-
-/* ───── MOUSE TRACKING ───── */
-document.addEventListener('mousemove', () => {
-    lastMoveTime = Date.now();
-
-    if (dragging) {
-        dragging = false;
-        intensity += 0.15; // resisting makes it worse
-    }
-});
-
-/* ───── ZONE ENTRY ───── */
-fsZone.addEventListener('mouseenter', () => {
-    insideZone = true;
-});
-
-fsZone.addEventListener('mouseleave', () => {
-    insideZone = false;
-    stopCursor();
-});
-
-/* ───── CURSOR CONTROL ───── */
-function startCursor() {
-    if (cursorLoop) return;
-
-    cursorLoop = setInterval(() => {
-        const idle = Date.now() - lastMoveTime;
-
-        /* wait for hesitation */
-        if (!dragging && idle > 400 && insideZone) {
-            dragging = true;
-        }
-
-        if (!dragging) return;
-
-        /* escalation */
-        intensity = Math.min(intensity + 0.004, 1.3);
-
-        /* slow drag */
-        offsetX += target.x * (0.35 + intensity * 0.9);
-        offsetY += target.y * (0.35 + intensity * 0.9);
-
-        /* twitch */
-        const twitchX = (Math.random() - 0.5) * intensity * 6;
-        const twitchY = (Math.random() - 0.5) * intensity * 6;
-
-        document.body.style.cursor =
-            `url("assets/cursor_64.png") ${Math.round(offsetX + twitchX)} ${Math.round(offsetY + twitchY)}, auto`;
-
-    }, 16);
-}
-
-function stopCursor() {
-    clearInterval(cursorLoop);
-    cursorLoop = null;
-
-    dragging = false;
-    intensity = 0;
-    offsetX = 0;
-    offsetY = 0;
-
-    document.body.style.cursor =
-        `url("assets/cursor_64.png") 0 0, auto`;
-}
-
-/* keep loop alive when hovering */
-setInterval(() => {
-    if (insideZone && !cursorLoop) startCursor();
-}, 100);
-
-/* ───── FULLSCREEN ───── */
-function toggleFullscreen() {
-    if (!isFullscreen) {
-        document.documentElement.requestFullscreen();
-        isFullscreen = true;
-        stopCursor(); // ← MERCY
-    } else {
-        document.exitFullscreen();
-        isFullscreen = false;
-    }
-}
-
-/* Button combo */
-let clicked = [];
-[altBtn, enterBtn].forEach((btn, i) => {
-    btn.addEventListener('click', () => {
-        clicked.push(i);
-        setTimeout(() => clicked = [], 800);
-        if (clicked.includes(0) && clicked.includes(1)) toggleFullscreen();
-    });
-});
-
-/* Keyboard */
-document.addEventListener('keydown', (e) => {
-    if (e.altKey && e.key === 'Enter') toggleFullscreen();
-});
-</script>
-
+  <h1>Merry Christmas 🎄</h1>
 </body>
 </html>
