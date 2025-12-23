@@ -26,17 +26,20 @@
       height: 160px;
       object-fit: contain;
 
-      /* SAME float for everyone */
-      animation: spaceFloat 6s ease-in-out infinite;
+      /* everyone floats the SAME, in place */
+      animation: floatInPlace 5s ease-in-out infinite;
     }
 
-    /* floating in space, not bouncing */
-    @keyframes spaceFloat {
-      0%   { transform: translate(0px, 0px); }
-      25%  { transform: translate(10px, -14px); }
-      50%  { transform: translate(-12px, -20px); }
-      75%  { transform: translate(8px, -10px); }
-      100% { transform: translate(0px, 0px); }
+    @keyframes floatInPlace {
+      0% {
+        transform: translateY(0) scale(1);
+      }
+      50% {
+        transform: translateY(-12px) scale(1.02);
+      }
+      100% {
+        transform: translateY(0) scale(1);
+      }
     }
   </style>
 </head>
