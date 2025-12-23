@@ -16,30 +16,24 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: 1100px;
-      height: 850px;
+      width: 1000px;
+      height: 800px;
     }
 
     .heart img {
       position: absolute;
-      width: 160px;
-      height: 160px;
+      width: 120px;   /* smaller again */
+      height: 120px;
       object-fit: contain;
 
-      /* everyone floats the SAME, in place */
-      animation: floatInPlace 5s ease-in-out infinite;
+      /* gentle, vertical only */
+      animation: gentleFloat 6s ease-in-out infinite;
     }
 
-    @keyframes floatInPlace {
-      0% {
-        transform: translateY(0) scale(1);
-      }
-      50% {
-        transform: translateY(-12px) scale(1.02);
-      }
-      100% {
-        transform: translateY(0) scale(1);
-      }
+    @keyframes gentleFloat {
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(-6px); }
+      100% { transform: translateY(0); }
     }
   </style>
 </head>
@@ -50,26 +44,26 @@
 
     <!-- TOP LOBES -->
     <img src="assets/tata1.webp" style="top: 0px;   left: 300px;">
-    <img src="assets/tata2.webp" style="top: 0px;   left: 470px;">
-    <img src="assets/tata3.webp" style="top: 0px;   left: 640px;">
+    <img src="assets/tata2.webp" style="top: 0px;   left: 460px;">
+    <img src="assets/tata3.webp" style="top: 0px;   left: 620px;">
 
     <!-- UPPER BODY -->
-    <img src="assets/tata4.webp" style="top: 160px; left: 200px;">
-    <img src="assets/tata5.webp" style="top: 160px; left: 380px;">
-    <img src="assets/tata.webp"  style="top: 160px; left: 560px;">
-    <img src="assets/tata6.webp" style="top: 160px; left: 740px;">
+    <img src="assets/tata4.webp" style="top: 150px; left: 210px;">
+    <img src="assets/tata5.webp" style="top: 150px; left: 380px;">
+    <img src="assets/tata.webp"  style="top: 150px; left: 550px;">
+    <img src="assets/tata6.webp" style="top: 150px; left: 720px;">
 
     <!-- MID BODY -->
-    <img src="assets/tata7.webp" style="top: 340px; left: 300px;">
-    <img src="assets/tata8.webp" style="top: 340px; left: 500px;">
-    <img src="assets/tata9.webp" style="top: 340px; left: 700px;">
+    <img src="assets/tata7.webp" style="top: 320px; left: 300px;">
+    <img src="assets/tata8.webp" style="top: 320px; left: 480px;">
+    <img src="assets/tata9.webp" style="top: 320px; left: 660px;">
 
     <!-- LOWER BODY -->
-    <img src="assets/tata1.webp" style="top: 520px; left: 420px;">
-    <img src="assets/tata2.webp" style="top: 520px; left: 620px;">
+    <img src="assets/tata1.webp" style="top: 500px; left: 390px;">
+    <img src="assets/tata2.webp" style="top: 500px; left: 550px;">
 
     <!-- POINT -->
-    <img src="assets/tata3.webp" style="top: 700px; left: 520px;">
+    <img src="assets/tata3.webp" style="top: 650px; left: 470px;">
 
   </div>
 
