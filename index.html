@@ -15,10 +15,7 @@
       position: absolute;
       left: 50%;
       top: 50%;
-
-      /* centered and higher */
-      transform: translate(-50%, -45%);
-
+      transform: translate(-50%, -50%);
       width: 720px;
       height: 600px;
     }
@@ -27,15 +24,17 @@
       position: absolute;
       width: 120px;
       height: 120px;
-
       object-fit: contain;
-      animation: float 6s ease-in-out infinite;
+      animation: float 4s ease-in-out infinite;
     }
 
+    /* floating animation with slight random offsets */
     @keyframes float {
-      0%   { transform: translateY(0); }
-      50%  { transform: translateY(-12px); }
-      100% { transform: translateY(0); }
+      0%   { transform: translateY(0) translateX(0); }
+      25%  { transform: translateY(-10px) translateX(5px); }
+      50%  { transform: translateY(-5px) translateX(-5px); }
+      75%  { transform: translateY(-15px) translateX(3px); }
+      100% { transform: translateY(0) translateX(0); }
     }
   </style>
 </head>
@@ -43,27 +42,25 @@
 <body>
 
   <div class="heart">
+    <!-- TOP CURVES -->
+    <img src="assets/tata1.webp" style="top: 0px; left: 150px; animation-delay: 0s;">
+    <img src="assets/tata2.webp" style="top: 0px; left: 390px; animation-delay: 0.5s;">
 
-    <!-- TOP CURVE -->
-    <img src="assets/tata1.webp" style="top: 0px;   left: 180px;">
-    <img src="assets/tata2.webp" style="top: 0px;   left: 420px;">
+    <!-- UPPER MIDDLE -->
+    <img src="assets/tata3.webp" style="top: 100px; left: 90px; animation-delay: 1s;">
+    <img src="assets/tata4.webp" style="top: 100px; left: 450px; animation-delay: 1.5s;">
 
-    <!-- UPPER CURVE -->
-    <img src="assets/tata3.webp" style="top: 100px; left: 80px;">
-    <img src="assets/tata4.webp" style="top: 100px; left: 520px;">
+    <!-- CENTER -->
+    <img src="assets/tata5.webp" style="top: 200px; left: 30px; animation-delay: 2s;">
+    <img src="assets/tata.webp"  style="top: 200px; left: 300px; animation-delay: 2.5s;">
+    <img src="assets/tata6.webp" style="top: 200px; left: 570px; animation-delay: 3s;">
 
-    <!-- MID CURVE -->
-    <img src="assets/tata5.webp" style="top: 200px; left: 0px;">
-    <img src="assets/tata.webp"  style="top: 200px; left: 300px;">
-    <img src="assets/tata6.webp" style="top: 200px; left: 600px;">
-
-    <!-- LOWER CURVE -->
-    <img src="assets/tata7.webp" style="top: 330px; left: 160px;">
-    <img src="assets/tata8.webp" style="top: 330px; left: 440px;">
+    <!-- LOWER -->
+    <img src="assets/tata7.webp" style="top: 320px; left: 150px; animation-delay: 3.5s;">
+    <img src="assets/tata8.webp" style="top: 320px; left: 450px; animation-delay: 4s;">
 
     <!-- POINT -->
-    <img src="assets/tata9.webp" style="top: 460px; left: 300px;">
-
+    <img src="assets/tata9.webp" style="top: 450px; left: 300px; animation-delay: 4.5s;">
   </div>
 
 </body>
