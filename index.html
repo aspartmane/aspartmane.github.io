@@ -1,12 +1,58 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <title>For Dad</title>
+
   <style>
     body {
+      margin: 0;
       background-color: black;
+      overflow: hidden;
+    }
+
+    .heart {
+      position: relative;
+      width: 400px;
+      height: 360px;
+      margin: auto;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .heart img {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 10px;
+
+      animation: float 4s ease-in-out infinite;
+    }
+
+    /* Floating animation */
+    @keyframes float {
+      0%   { transform: translateY(0); }
+      50%  { transform: translateY(-12px); }
+      100% { transform: translateY(0); }
     }
   </style>
 </head>
+
 <body>
+
+  <div class="heart">
+    <img src="assets/tata.webp"   style="top: 120px; left: 160px;">
+    <img src="assets/tata1.webp"  style="top: 40px;  left: 80px;">
+    <img src="assets/tata2.webp"  style="top: 40px;  left: 240px;">
+    <img src="assets/tata3.webp"  style="top: 100px; left: 20px;">
+    <img src="assets/tata4.webp"  style="top: 100px; left: 300px;">
+    <img src="assets/tata5.webp"  style="top: 200px; left: 60px;">
+    <img src="assets/tata6.webp"  style="top: 200px; left: 260px;">
+    <img src="assets/tata7.webp"  style="top: 260px; left: 120px;">
+    <img src="assets/tata8.webp"  style="top: 260px; left: 200px;">
+    <img src="assets/tata9.webp"  style="top: 320px; left: 160px;">
+  </div>
+
 </body>
 </html>
