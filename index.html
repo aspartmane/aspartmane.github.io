@@ -49,17 +49,27 @@
 <script>
   const container = document.getElementById('circleContainer');
   const images = container.querySelectorAll('img');
-  const radius = 250; // radius of the circle
+  const radius = 250;
   const centerX = container.offsetWidth / 2;
   const centerY = container.offsetHeight / 2;
+  let angleOffset = 0;
 
-  images.forEach((img, i) => {
-    const angle = (i / images.length) * 2 * Math.PI; // divide circle evenly
-    const x = centerX + radius * Math.cos(angle);
-    const y = centerY + radius * Math.sin(angle);
-    img.style.left = x + 'px';
-    img.style.top = y + 'px';
-  });
+  function animate() {
+    angleOffset += 0.1; // step rotation (higher = faster, smaller step = smoother)
+    
+    images.forEach((img, i) => {
+      // 8-bit style: round the angle to simulate stepping
+      const angle = Math.round(((i / images.length) * 2 * Math.PI + angleOffset) * 8) / 8;
+      const x = centerX + radius * Math.cos(angle);
+      const y = centerY + radius * Math.sin(angle);
+      img.style.left = x + 'px';
+      img.style.top = y + 'px';
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
 </script>
 
 </body>
