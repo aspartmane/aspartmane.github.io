@@ -55,10 +55,10 @@
   let angleOffset = 0;
 
   function animate() {
-    angleOffset += 0.1; // step rotation (higher = faster, smaller step = smoother)
-    
+    angleOffset += 0.02; // slow rotation
+
     images.forEach((img, i) => {
-      // 8-bit style: round the angle to simulate stepping
+      // 8-bit style stepping
       const angle = Math.round(((i / images.length) * 2 * Math.PI + angleOffset) * 8) / 8;
       const x = centerX + radius * Math.cos(angle);
       const y = centerY + radius * Math.sin(angle);
