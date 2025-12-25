@@ -27,7 +27,7 @@
     height: 120px;
     object-fit: contain;
     transform: translate(-50%, -50%);
-    image-rendering: pixelated; /* makes it look retro 8-bit */
+    image-rendering: pixelated; /* 8-bit retro look */
   }
 </style>
 </head>
@@ -59,9 +59,9 @@
   function animate() {
     frameCounter++;
 
-    // Move only every 5 frames for ultra-retro stepping
+    // Move every 5 frames for retro stepping
     if (frameCounter % 5 === 0) {
-      angleOffset += 0.002; // super slow rotation
+      angleOffset += 0.005; // slightly faster rotation
     }
 
     images.forEach((img, i) => {
