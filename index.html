@@ -15,48 +15,52 @@
     overflow: hidden;
   }
 
-  .heart {
+  .circle {
     position: relative;
-    width: 700px;
-    height: 650px;
+    width: 600px;
+    height: 600px;
   }
 
-  .heart img {
+  .circle img {
     position: absolute;
     width: 120px;
     height: 120px;
     object-fit: contain;
+    transform: translate(-50%, -50%);
   }
 </style>
 </head>
 
 <body>
 
-<div class="heart">
-
-  <!-- TOP CURVE (2) -->
-  <img src="assets/tata1.webp" style="top: 20px; left: 210px;">
-  <img src="assets/tata2.webp" style="top: 20px; left: 370px;">
-
-  <!-- UPPER CURVE (2) -->
-  <img src="assets/tata3.webp" style="top: 120px; left: 120px;">
-  <img src="assets/tata4.webp" style="top: 120px; left: 460px;">
-
-  <!-- WIDEST POINT (2) -->
-  <img src="assets/tata5.webp" style="top: 250px; left: 40px;">
-  <img src="assets/tata6.webp" style="top: 250px; left: 540px;">
-
-  <!-- LOWER CURVE (2) -->
-  <img src="assets/tata7.webp" style="top: 380px; left: 170px;">
-  <img src="assets/tata8.webp" style="top: 380px; left: 410px;">
-
-  <!-- TAPER (1) -->
-  <img src="assets/tata9.webp" style="top: 500px; left: 300px;">
-
-  <!-- POINT (1) -->
-  <img src="assets/tata10.webp" style="top: 600px; left: 300px;">
-
+<div class="circle" id="circleContainer">
+  <img src="assets/tata1.webp">
+  <img src="assets/tata2.webp">
+  <img src="assets/tata3.webp">
+  <img src="assets/tata4.webp">
+  <img src="assets/tata5.webp">
+  <img src="assets/tata6.webp">
+  <img src="assets/tata7.webp">
+  <img src="assets/tata8.webp">
+  <img src="assets/tata9.webp">
+  <img src="assets/tata10.webp">
 </div>
+
+<script>
+  const container = document.getElementById('circleContainer');
+  const images = container.querySelectorAll('img');
+  const radius = 250; // radius of the circle
+  const centerX = container.offsetWidth / 2;
+  const centerY = container.offsetHeight / 2;
+
+  images.forEach((img, i) => {
+    const angle = (i / images.length) * 2 * Math.PI; // divide circle evenly
+    const x = centerX + radius * Math.cos(angle);
+    const y = centerY + radius * Math.sin(angle);
+    img.style.left = x + 'px';
+    img.style.top = y + 'px';
+  });
+</script>
 
 </body>
 </html>
