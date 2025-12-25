@@ -1,1 +1,66 @@
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>For Dad</title> <style> body { margin: 0; background-color: white; overflow: hidden; } .heart { position: absolute; left: 50%; top: 50%; /* centered and higher */ transform: translate(-50%, -45%); width: 720px; height: 600px; } .heart img { position: absolute; width: 120px; height: 120px; object-fit: contain; animation: float 6s ease-in-out infinite; } @keyframes float { 0% { transform: translateY(0); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0); } } </style> </head> <body> <div class="heart"> <!-- TOP CURVE --> <img src="assets/tata1.webp" style="top: 0px; left: 180px;"> <img src="assets/tata2.webp" style="top: 0px; left: 420px;"> <!-- UPPER CURVE --> <img src="assets/tata3.webp" style="top: 100px; left: 80px;"> <img src="assets/tata4.webp" style="top: 100px; left: 520px;"> <!-- MID CURVE --> <img src="assets/tata5.webp" style="top: 200px; left: 0px;"> <img src="assets/tata.webp" style="top: 200px; left: 300px;"> <img src="assets/tata6.webp" style="top: 200px; left: 600px;"> <!-- LOWER CURVE --> <img src="assets/tata7.webp" style="top: 330px; left: 160px;"> <img src="assets/tata8.webp" style="top: 330px; left: 440px;"> <!-- POINT --> <img src="assets/tata9.webp" style="top: 460px; left: 300px;"> </div> </body> </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>For Dad</title>
+
+  <style>
+    body {
+      margin: 0;
+      background: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .heart {
+      position: relative;
+      width: 600px;
+      height: 600px;
+    }
+
+    .photo {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 120px;
+      height: 120px;
+      transform-origin: center -220px;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    @keyframes float {
+      0%   { transform: rotate(var(--r)) translateY(0); }
+      50%  { transform: rotate(var(--r)) translateY(-10px); }
+      100% { transform: rotate(var(--r)) translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="heart">
+    <div class="photo" style="--r: 0deg;"><img src="assets/tata1.webp"></div>
+    <div class="photo" style="--r: 30deg;"><img src="assets/tata2.webp"></div>
+    <div class="photo" style="--r: 60deg;"><img src="assets/tata3.webp"></div>
+    <div class="photo" style="--r: 90deg;"><img src="assets/tata4.webp"></div>
+    <div class="photo" style="--r: 120deg;"><img src="assets/tata5.webp"></div>
+    <div class="photo" style="--r: 150deg;"><img src="assets/tata6.webp"></div>
+    <div class="photo" style="--r: 180deg;"><img src="assets/tata.webp"></div>
+    <div class="photo" style="--r: 210deg;"><img src="assets/tata7.webp"></div>
+    <div class="photo" style="--r: 240deg;"><img src="assets/tata8.webp"></div>
+    <div class="photo" style="--r: 270deg;"><img src="assets/tata9.webp"></div>
+    <div class="photo" style="--r: 300deg;"><img src="assets/tata10.webp"></div>
+    <div class="photo" style="--r: 330deg;"><img src="assets/tata11.webp"></div>
+  </div>
+
+</body>
+</html>
