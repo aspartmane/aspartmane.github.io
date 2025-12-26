@@ -13,6 +13,21 @@
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    position: relative;
+  }
+
+  /* top hanging lights */
+  .top-lights {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    max-height: 150px;
+    object-fit: cover;
+    z-index: 5;
+    pointer-events: none; /* so it doesn't interfere with hover */
+    opacity: 0.95;
   }
 
   .circle {
@@ -20,9 +35,9 @@
     width: 700px;
     height: 700px;
     perspective: 1200px;
-    /* glow effect behind the images */
     box-shadow: 0 0 100px 50px rgba(255, 223, 150, 0.15) inset;
     border-radius: 50%;
+    z-index: 1;
   }
 
   /* center image */
@@ -34,7 +49,7 @@
     height: 220px;
     object-fit: contain;
     transform: translate(-50%, -50%);
-    z-index: 1;
+    z-index: 2;
     opacity: 0.95;
   }
 
@@ -52,7 +67,7 @@
       box-shadow 0.25s ease,
       scale 0.25s ease;
     cursor: pointer;
-    z-index: 2;
+    z-index: 3;
   }
 
   .circle img.orbit.hovered {
@@ -64,6 +79,9 @@
 </head>
 
 <body>
+
+<!-- top hanging lights -->
+<img src="assets/lights.png" class="top-lights" alt="Hanging Lights">
 
 <div class="circle" id="circleContainer">
 
