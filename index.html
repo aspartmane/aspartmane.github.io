@@ -24,13 +24,12 @@
 
   .circle img {
     position: absolute;
-    width: 150px;
-    height: 150px;
+    width: 120px;   /* smaller idle size */
+    height: 120px;
     object-fit: contain;
     image-rendering: pixelated;
     transform:
       translate(-50%, -50%)
-      scale(1)
       rotateX(0deg)
       rotateY(0deg);
     transition:
@@ -107,7 +106,6 @@
     }
 
     images.forEach((img, i) => {
-      // smooth interpolation (this is the magic)
       img.rx += (img.trx - img.rx) * 0.18;
       img.ry += (img.try - img.ry) * 0.18;
 
