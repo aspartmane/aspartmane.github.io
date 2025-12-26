@@ -19,7 +19,7 @@
     position: relative;
     width: 700px;
     height: 700px;
-    perspective: 1000px; /* enables fake 3D */
+    perspective: 1200px;
   }
 
   .circle img {
@@ -34,19 +34,15 @@
       rotateX(0deg)
       rotateY(0deg);
     transition:
-      transform 0.25s ease,
-      box-shadow 0.25s ease;
+      box-shadow 0.25s ease,
+      scale 0.25s ease;
     cursor: pointer;
   }
 
   .circle img.hovered {
-    transform:
-      translate(-50%, -50%)
-      scale(1.7)
-      rotateX(var(--rx))
-      rotateY(var(--ry));
+    scale: 1.7;
     z-index: 20;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    box-shadow: 0 25px 45px rgba(0,0,0,0.18);
   }
 </style>
 </head>
@@ -78,6 +74,11 @@
   let paused = false;
 
   images.forEach(img => {
+    img.rx = 0;
+    img.ry = 0;
+    img.trx = 0;
+    img.try = 0;
+
     img.addEventListener('mouseenter', () => {
       paused = true;
       img.classList.add('hovered');
@@ -86,8 +87,8 @@
     img.addEventListener('mouseleave', () => {
       paused = false;
       img.classList.remove('hovered');
-      img.style.setProperty('--rx', '0deg');
-      img.style.setProperty('--ry', '0deg');
+      img.trx = 0;
+      img.try = 0;
     });
 
     img.addEventListener('mousemove', e => {
@@ -95,11 +96,8 @@
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
 
-      const rotateY = ((x / rect.width) - 0.5) * 20;
-      const rotateX = -((y / rect.height) - 0.5) * 20;
-
-      img.style.setProperty('--rx', `${rotateX}deg`);
-      img.style.setProperty('--ry', `${rotateY}deg`);
+      img.try = ((x / rect.width) - 0.5) * 30;
+      img.trx = -((y / rect.height) - 0.5) * 30;
     });
   });
 
@@ -109,11 +107,16 @@
     }
 
     images.forEach((img, i) => {
+      // smooth interpolation (this is the magic)
+      img.rx += (img.trx - img.rx) * 0.18;
+      img.ry += (img.try - img.ry) * 0.18;
+
+      img.style.transform =
+        `translate(-50%, -50%) rotateX(${img.rx}deg) rotateY(${img.ry}deg)`;
+
       const angle = (i / images.length) * 2 * Math.PI + angleOffset;
-      const x = centerX + radius * Math.cos(angle);
-      const y = centerY + radius * Math.sin(angle);
-      img.style.left = x + 'px';
-      img.style.top = y + 'px';
+      img.style.left = centerX + radius * Math.cos(angle) + 'px';
+      img.style.top  = centerY + radius * Math.sin(angle) + 'px';
     });
 
     requestAnimationFrame(animate);
