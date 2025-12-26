@@ -17,24 +17,36 @@
 
   .circle {
     position: relative;
-    width: 600px;
-    height: 600px;
+    width: 700px;
+    height: 700px;
+    perspective: 1000px; /* enables fake 3D */
   }
 
   .circle img {
     position: absolute;
-    width: 120px;
-    height: 120px;
+    width: 150px;
+    height: 150px;
     object-fit: contain;
-    transform: translate(-50%, -50%) scale(1);
     image-rendering: pixelated;
-    transition: transform 0.25s steps(4, end);
+    transform:
+      translate(-50%, -50%)
+      scale(1)
+      rotateX(0deg)
+      rotateY(0deg);
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
     cursor: pointer;
   }
 
-  .circle img:hover {
-    transform: translate(-50%, -50%) scale(1.5);
-    z-index: 10;
+  .circle img.hovered {
+    transform:
+      translate(-50%, -50%)
+      scale(1.7)
+      rotateX(var(--rx))
+      rotateY(var(--ry));
+    z-index: 20;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
   }
 </style>
 </head>
@@ -57,7 +69,8 @@
 <script>
   const container = document.getElementById('circleContainer');
   const images = container.querySelectorAll('img');
-  const radius = 250;
+
+  const radius = 300;
   const centerX = container.offsetWidth / 2;
   const centerY = container.offsetHeight / 2;
 
@@ -67,10 +80,26 @@
   images.forEach(img => {
     img.addEventListener('mouseenter', () => {
       paused = true;
+      img.classList.add('hovered');
     });
 
     img.addEventListener('mouseleave', () => {
       paused = false;
+      img.classList.remove('hovered');
+      img.style.setProperty('--rx', '0deg');
+      img.style.setProperty('--ry', '0deg');
+    });
+
+    img.addEventListener('mousemove', e => {
+      const rect = img.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const rotateY = ((x / rect.width) - 0.5) * 20;
+      const rotateX = -((y / rect.height) - 0.5) * 20;
+
+      img.style.setProperty('--rx', `${rotateX}deg`);
+      img.style.setProperty('--ry', `${rotateY}deg`);
     });
   });
 
