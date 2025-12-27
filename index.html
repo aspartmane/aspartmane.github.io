@@ -16,21 +16,20 @@
     position: relative;
   }
 
-  /* top stretched lights */
+  /* top stretched lights banner */
   .top-lights {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: auto;
-    max-height: 200px; /* adjust if needed */
+    height: 250px; /* taller for full banner effect */
     object-fit: cover;
     z-index: 5;
     pointer-events: none;
     opacity: 0.95;
   }
 
-  /* center row container */
+  /* horizontal row container */
   .row-container {
     position: absolute;
     top: 50%;
@@ -44,11 +43,11 @@
   }
 
   .row-container img.orbit {
-    width: 160px;
-    height: 160px;
+    width: 200px; /* bigger images */
+    height: 200px;
     object-fit: contain;
     image-rendering: pixelated;
-    margin-right: 16px;
+    margin-right: 24px; /* more spacing */
     transform: rotateX(0deg) rotateY(0deg);
     transition: box-shadow 0.25s ease, scale 0.25s ease;
     cursor: pointer;
@@ -89,7 +88,7 @@
 
 <body>
 
-<!-- top stretched lights -->
+<!-- top stretched lights banner -->
 <img src="assets/lights.png" class="top-lights" alt="Hanging Lights">
 
 <!-- horizontal row container -->
@@ -121,7 +120,7 @@
 
   // Initialize positions
   images.forEach((img, i) => {
-    positions.push(i * (160 + 16)); // width + spacing
+    positions.push(i * (200 + 24)); // new width + new spacing
   });
 
   // Handle hover tilt effect
@@ -151,7 +150,7 @@
   });
 
   function animate() {
-    const time = Date.now() * 0.002; // for subtle wave
+    const time = Date.now() * 0.002; // subtle wave
 
     images.forEach((img, i) => {
       // 3D tilt smoothing
@@ -162,14 +161,13 @@
       // Move images horizontally
       positions[i] += speed;
       if (positions[i] > window.innerWidth) {
-        positions[i] = -160 - 16; // wrap to left
+        positions[i] = -200 - 24; // wrap to left
       }
       img.style.position = 'absolute';
       img.style.left = positions[i] + 'px';
 
       // Subtle vertical wave
       const waveAmplitude = 10; // pixels
-      const waveFrequency = 0.5; // how fast it moves
       const yOffset = Math.sin(time + i * 0.5) * waveAmplitude;
       img.style.top = `calc(50% + ${yOffset}px)`;
       img.style.transform += ' translateY(-50%)';
