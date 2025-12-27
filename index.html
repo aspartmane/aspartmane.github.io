@@ -32,8 +32,8 @@
 
   .circle {
     position: relative;
-    width: 550px;  /* smaller than before */
-    height: 550px; /* smaller than before */
+    width: 550px;
+    height: 550px;
     perspective: 1200px;
     border-radius: 50%;
     z-index: 1;
@@ -74,6 +74,18 @@
     z-index: 10;
     box-shadow: 0 25px 45px rgba(0,0,0,0.18);
   }
+
+  /* bottom-right presents */
+  .presents {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 120px; /* initial size, can adjust later */
+    height: auto;
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0.95;
+  }
 </style>
 </head>
 
@@ -100,6 +112,9 @@
   <img src="assets/tata10.webp" class="orbit">
 
 </div>
+
+<!-- bottom-right presents -->
+<img src="assets/presents.png" class="presents" alt="Presents">
 
 <script>
   const container = document.getElementById('circleContainer');
