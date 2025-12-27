@@ -30,11 +30,11 @@
   }
 
   .row-container img.orbit {
-    width: 120px;
-    height: 120px;
+    width: 160px; /* bigger than before */
+    height: 160px; /* keep aspect ratio */
     object-fit: contain;
     image-rendering: pixelated;
-    margin-right: 8px; /* ~0.5 cm */
+    margin-right: 16px; /* more space between images */
     transform: rotateX(0deg) rotateY(0deg);
     transition: box-shadow 0.25s ease, scale 0.25s ease;
     cursor: pointer;
@@ -70,26 +70,10 @@
     pointer-events: none;
     opacity: 0.95;
   }
-
-  /* center image (tree) */
-  .center-image {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 220px;
-    height: 220px;
-    object-fit: contain;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-    opacity: 0.95;
-  }
 </style>
 </head>
 
 <body>
-
-<!-- center image -->
-<img src="assets/tree.jpg" class="center-image" alt="Tree">
 
 <!-- horizontal row container -->
 <div class="row-container" id="rowContainer">
@@ -120,8 +104,7 @@
 
   // Initialize positions
   images.forEach((img, i) => {
-    const rect = img.getBoundingClientRect();
-    positions.push(i * (rect.width + 8)); // 8px margin
+    positions.push(i * (160 + 16)); // new width + new spacing
   });
 
   // Handle hover tilt effect
@@ -160,7 +143,7 @@
       // Move images horizontally
       positions[i] += speed;
       if (positions[i] > window.innerWidth) {
-        positions[i] = -img.width - 8; // wrap to left
+        positions[i] = -160 - 16; // wrap to left
       }
       img.style.position = 'absolute';
       img.style.left = positions[i] + 'px';
