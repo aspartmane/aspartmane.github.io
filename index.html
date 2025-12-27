@@ -47,16 +47,19 @@
     box-shadow: 0 25px 45px rgba(0,0,0,0.18);
   }
 
-  /* top lights image */
-  .top-lights {
+  /* lights row container */
+  .lights-row {
     position: absolute;
     top: 0;
-    left: 50%;
-    width: auto;
-    height: 200px; /* adjust as needed */
-    transform: translateX(-50%);
+    left: 0;
+    display: flex;
     z-index: 5;
     pointer-events: none;
+  }
+
+  .lights-row img {
+    height: 200px; /* adjust as needed */
+    width: auto;
     opacity: 0.95;
   }
 
@@ -88,8 +91,17 @@
 
 <body>
 
-<!-- top lights -->
-<img src="assets/lights.png" class="top-lights" alt="Lights">
+<!-- duplicated lights across the top -->
+<div class="lights-row" id="lightsRow">
+  <img src="assets/lights.png" alt="Lights">
+  <img src="assets/lights.png" alt="Lights">
+  <img src="assets/lights.png" alt="Lights">
+  <img src="assets/lights.png" alt="Lights">
+  <img src="assets/lights.png" alt="Lights">
+  <img src="assets/lights.png" alt="Lights">
+  <img src="assets/lights.png" alt="Lights">
+  <img src="assets/lights.png" alt="Lights">
+</div>
 
 <!-- horizontal row container -->
 <div class="row-container" id="rowContainer">
