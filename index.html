@@ -13,6 +13,29 @@
     position: relative;
   }
 
+  /* ========== INTRO SCREEN ========== */
+  .intro {
+    position: fixed;
+    inset: 0;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 2s ease;
+  }
+
+  .intro.fade-out {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .intro img {
+    width: 420px;
+    image-rendering: pixelated;
+  }
+
   /* ========== LIGHTS ========== */
   .lights-row {
     position: absolute;
@@ -29,7 +52,7 @@
     opacity: 0.95;
   }
 
-  /* ========== MOVING IMAGE CHAIN ========== */
+  /* ========== MOVING CHAIN ========== */
   .row-container {
     position: absolute;
     top: 50%;
@@ -57,15 +80,6 @@
   }
 
   /* ========== PRESENTS ========== */
-  .presents-right {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 350px;
-    z-index: 3;
-    pointer-events: none;
-  }
-
   .presents-left {
     position: absolute;
     bottom: 0;
@@ -75,7 +89,16 @@
     pointer-events: none;
   }
 
-  /* ========== TREE (NEW) ========== */
+  .presents-right {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 350px;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* ========== TREE ========== */
   .tree {
     position: absolute;
     bottom: 0;
@@ -89,6 +112,11 @@
 </head>
 
 <body>
+
+<!-- INTRO -->
+<div class="intro" id="intro">
+  <img src="assets/wish.png" alt="Happy Christmas">
+</div>
 
 <!-- LIGHTS -->
 <div class="lights-row" id="lightsRow"></div>
@@ -108,16 +136,23 @@
 </div>
 
 <!-- PRESENTS -->
-<img src="assets/presents.png" class="presents-right">
 <img src="assets/presents2.png" class="presents-left">
+<img src="assets/presents.png" class="presents-right">
 
 <!-- TREE -->
 <img src="assets/tree.png" class="tree">
 
 <script>
-  /* ===== IMAGE CHAIN FIX (NO OVERLAP) ===== */
+  /* ===== INTRO FADE ===== */
+  const intro = document.getElementById('intro');
+
+  setTimeout(() => {
+    intro.classList.add('fade-out');
+  }, 5000);
+
+  /* ===== IMAGE CHAIN ===== */
   const images = document.querySelectorAll('.orbit');
-  const spacing = 260; // BIGGER spacing = no stacking
+  const spacing = 260;
   let positions = [];
 
   images.forEach((img, i) => {
@@ -142,7 +177,6 @@
 
     images.forEach((img, i) => {
       positions[i] += 0.5;
-
       if (positions[i] > window.innerWidth + spacing) {
         positions[i] = -spacing;
       }
@@ -161,7 +195,7 @@
 
   animate();
 
-  /* ===== AUTO-FILL LIGHTS ===== */
+  /* ===== AUTO LIGHTS ===== */
   const lightsRow = document.getElementById('lightsRow');
   const testImg = new Image();
   testImg.src = 'assets/lights.png';
