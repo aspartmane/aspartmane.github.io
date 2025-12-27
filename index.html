@@ -9,45 +9,11 @@
     margin: 0;
     background: white;
     height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     overflow: hidden;
     position: relative;
   }
 
-  /* horizontal row container */
-  .row-container {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    transform: translateY(-50%);
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    pointer-events: none;
-  }
-
-  .row-container img.orbit {
-    width: 200px; /* bigger images */
-    height: 200px;
-    object-fit: contain;
-    image-rendering: pixelated;
-    margin-right: 24px; /* spacing */
-    transform: rotateX(0deg) rotateY(0deg);
-    transition: box-shadow 0.25s ease, scale 0.25s ease;
-    cursor: pointer;
-    pointer-events: auto;
-  }
-
-  .row-container img.orbit.hovered {
-    scale: 1.7;
-    z-index: 10;
-    box-shadow: 0 25px 45px rgba(0,0,0,0.18);
-  }
-
-  /* lights row container */
+  /* ========== LIGHTS ========== */
   .lights-row {
     position: absolute;
     top: 0;
@@ -58,43 +24,76 @@
   }
 
   .lights-row img {
-    height: 200px; /* adjust as needed */
+    height: 200px;
     width: auto;
     opacity: 0.95;
   }
 
-  /* bottom-right presents */
+  /* ========== MOVING IMAGE CHAIN ========== */
+  .row-container {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .orbit {
+    position: absolute;
+    width: 210px;
+    height: 210px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: box-shadow 0.25s ease, scale 0.25s ease;
+  }
+
+  .orbit.hovered {
+    scale: 1.7;
+    z-index: 10;
+    box-shadow: 0 25px 45px rgba(0,0,0,0.18);
+  }
+
+  /* ========== PRESENTS ========== */
   .presents-right {
     position: absolute;
     bottom: 0;
     right: 0;
     width: 350px;
-    height: auto;
-    z-index: 4;
+    z-index: 3;
     pointer-events: none;
-    opacity: 0.95;
   }
 
-  /* bottom-left presents */
   .presents-left {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 350px;
-    height: auto;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* ========== TREE (NEW) ========== */
+  .tree {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 260px;
     z-index: 4;
     pointer-events: none;
-    opacity: 0.95;
   }
 </style>
 </head>
 
 <body>
 
-<!-- lights row container -->
+<!-- LIGHTS -->
 <div class="lights-row" id="lightsRow"></div>
 
-<!-- horizontal row container -->
+<!-- IMAGE CHAIN -->
 <div class="row-container" id="rowContainer">
   <img src="assets/tata1.webp" class="orbit">
   <img src="assets/tata2.webp" class="orbit">
@@ -108,72 +107,53 @@
   <img src="assets/tata10.webp" class="orbit">
 </div>
 
-<!-- bottom-right presents -->
-<img src="assets/presents.png" class="presents-right" alt="Presents">
+<!-- PRESENTS -->
+<img src="assets/presents.png" class="presents-right">
+<img src="assets/presents2.png" class="presents-left">
 
-<!-- bottom-left presents -->
-<img src="assets/presents2.png" class="presents-left" alt="Presents 2">
+<!-- TREE -->
+<img src="assets/tree.png" class="tree">
 
 <script>
-  const rowContainer = document.getElementById('rowContainer');
-  const images = rowContainer.querySelectorAll('.orbit');
-
-  let speed = 0.5; // pixels per frame
+  /* ===== IMAGE CHAIN FIX (NO OVERLAP) ===== */
+  const images = document.querySelectorAll('.orbit');
+  const spacing = 260; // BIGGER spacing = no stacking
   let positions = [];
 
-  // Initialize positions
   images.forEach((img, i) => {
-    positions.push(i * (200 + 24)); // width + spacing
-  });
+    positions[i] = i * spacing;
+    img.rx = img.ry = img.trx = img.try = 0;
 
-  // Handle hover tilt effect
-  images.forEach(img => {
-    img.rx = 0;
-    img.ry = 0;
-    img.trx = 0;
-    img.try = 0;
-
-    img.addEventListener('mouseenter', () => {
-      img.classList.add('hovered');
-    });
-
+    img.addEventListener('mouseenter', () => img.classList.add('hovered'));
     img.addEventListener('mouseleave', () => {
       img.classList.remove('hovered');
-      img.trx = 0;
-      img.try = 0;
+      img.trx = img.try = 0;
     });
 
     img.addEventListener('mousemove', e => {
-      const rect = img.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      img.try = ((x / rect.width) - 0.5) * 30;
-      img.trx = -((y / rect.height) - 0.5) * 30;
+      const r = img.getBoundingClientRect();
+      img.try = ((e.clientX - r.left) / r.width - 0.5) * 30;
+      img.trx = -((e.clientY - r.top) / r.height - 0.5) * 30;
     });
   });
 
   function animate() {
-    const time = Date.now() * 0.002; // subtle wave
+    const time = Date.now() * 0.002;
 
     images.forEach((img, i) => {
-      // 3D tilt smoothing
-      img.rx += (img.trx - img.rx) * 0.18;
-      img.ry += (img.try - img.ry) * 0.18;
-      img.style.transform = `rotateX(${img.rx}deg) rotateY(${img.ry}deg)`;
+      positions[i] += 0.5;
 
-      // Move images horizontally
-      positions[i] += speed;
-      if (positions[i] > window.innerWidth) {
-        positions[i] = -200 - 24; // wrap to left
+      if (positions[i] > window.innerWidth + spacing) {
+        positions[i] = -spacing;
       }
-      img.style.position = 'absolute';
-      img.style.left = positions[i] + 'px';
 
-      // Subtle vertical wave
-      const waveAmplitude = 10; // pixels
-      const yOffset = Math.sin(time + i * 0.5) * waveAmplitude;
-      img.style.top = `calc(50% + ${yOffset}px)`;
-      img.style.transform += ' translateY(-50%)';
+      img.rx += (img.trx - img.rx) * 0.15;
+      img.ry += (img.try - img.ry) * 0.15;
+
+      img.style.left = positions[i] + 'px';
+      img.style.top = `calc(50% + ${Math.sin(time + i) * 10}px)`;
+      img.style.transform =
+        `translateY(-50%) rotateX(${img.rx}deg) rotateY(${img.ry}deg)`;
     });
 
     requestAnimationFrame(animate);
@@ -181,21 +161,21 @@
 
   animate();
 
-  // --- duplicate lights across the top ---
+  /* ===== AUTO-FILL LIGHTS ===== */
   const lightsRow = document.getElementById('lightsRow');
-  const screenWidth = window.innerWidth;
-  const lightImg = new Image();
-  lightImg.src = 'assets/lights.png';
-  lightImg.onload = () => {
-    const imgWidth = lightImg.width * (200 / lightImg.height); // scale to height 200px
-    const count = Math.ceil(screenWidth / imgWidth) + 2; // enough to cover width
+  const testImg = new Image();
+  testImg.src = 'assets/lights.png';
+
+  testImg.onload = () => {
+    const scaledWidth = testImg.width * (200 / testImg.height);
+    const count = Math.ceil(window.innerWidth / scaledWidth) + 2;
 
     for (let i = 0; i < count; i++) {
       const img = document.createElement('img');
       img.src = 'assets/lights.png';
       lightsRow.appendChild(img);
     }
-  }
+  };
 </script>
 
 </body>
