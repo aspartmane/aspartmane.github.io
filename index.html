@@ -21,10 +21,9 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100%;      /* stretch to full width */
-    height: auto;     /* keep aspect ratio */
-    max-height: 250px; /* adjust if needed */
-    object-fit: cover;
+    width: 100%;        /* stretch full width */
+    height: 250px;      /* fixed height */
+    object-fit: cover;   /* fill width, crop if needed */
     z-index: 5;
     pointer-events: none;
     opacity: 0.95;
@@ -44,11 +43,11 @@
   }
 
   .row-container img.orbit {
-    width: 200px; /* bigger images */
+    width: 200px;
     height: 200px;
     object-fit: contain;
     image-rendering: pixelated;
-    margin-right: 24px; /* spacing */
+    margin-right: 24px;
     transform: rotateX(0deg) rotateY(0deg);
     transition: box-shadow 0.25s ease, scale 0.25s ease;
     cursor: pointer;
