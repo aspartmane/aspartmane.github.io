@@ -16,20 +16,6 @@
     position: relative;
   }
 
-  /* top hanging lights */
-  .top-lights {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: auto;
-    max-height: 150px;
-    object-fit: cover;
-    z-index: 5;
-    pointer-events: none;
-    opacity: 0.95;
-  }
-
   .circle {
     position: relative;
     width: 550px;
@@ -76,24 +62,32 @@
   }
 
   /* bottom-right presents */
-  .presents {
+  .presents-right {
     position: absolute;
-    bottom: 20px;
-    right: 20px;
-    width: 350px; /* much bigger now */
+    bottom: 0;
+    right: 0;
+    width: 350px; /* big size */
     height: auto;
     z-index: 4;
     pointer-events: none;
     opacity: 0.95;
-    transform: translateZ(0); /* keep it smooth */
+  }
+
+  /* bottom-left presents */
+  .presents-left {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 350px; /* same size */
+    height: auto;
+    z-index: 4;
+    pointer-events: none;
+    opacity: 0.95;
   }
 </style>
 </head>
 
 <body>
-
-<!-- top hanging lights -->
-<img src="assets/lights.png" class="top-lights" alt="Hanging Lights">
 
 <div class="circle" id="circleContainer">
 
@@ -115,13 +109,16 @@
 </div>
 
 <!-- bottom-right presents -->
-<img src="assets/presents.png" class="presents" alt="Presents">
+<img src="assets/presents.png" class="presents-right" alt="Presents">
+
+<!-- bottom-left presents -->
+<img src="assets/presents2.png" class="presents-left" alt="Presents 2">
 
 <script>
   const container = document.getElementById('circleContainer');
   const images = container.querySelectorAll('.orbit');
 
-  const radius = 250; // slightly smaller radius
+  const radius = 250;
   const centerX = container.offsetWidth / 2;
   const centerY = container.offsetHeight / 2;
 
