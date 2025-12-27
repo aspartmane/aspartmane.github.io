@@ -13,7 +13,7 @@
     position: relative;
   }
 
-  /* ========== INTRO SCREEN ========== */
+  /* ========== INTRO ========== */
   .intro {
     position: fixed;
     inset: 0;
@@ -52,7 +52,7 @@
     opacity: 0.95;
   }
 
-  /* ========== MOVING CHAIN ========== */
+  /* ========== IMAGE CHAIN ========== */
   .row-container {
     position: absolute;
     top: 50%;
@@ -122,7 +122,7 @@
 <div class="lights-row" id="lightsRow"></div>
 
 <!-- IMAGE CHAIN -->
-<div class="row-container" id="rowContainer">
+<div class="row-container">
   <img src="assets/tata1.webp" class="orbit">
   <img src="assets/tata2.webp" class="orbit">
   <img src="assets/tata3.webp" class="orbit">
@@ -143,20 +143,19 @@
 <img src="assets/tree.png" class="tree">
 
 <script>
-  /* ===== INTRO FADE ===== */
+  /* ========== INTRO FADE ========== */
   const intro = document.getElementById('intro');
-
   setTimeout(() => {
     intro.classList.add('fade-out');
   }, 5000);
 
-  /* ===== IMAGE CHAIN ===== */
+  /* ========== IMAGE CHAIN (NO OVERLAP EVER) ========== */
   const images = document.querySelectorAll('.orbit');
   const spacing = 260;
-  let positions = [];
+  const totalWidth = images.length * spacing;
+  let offset = 0;
 
-  images.forEach((img, i) => {
-    positions[i] = i * spacing;
+  images.forEach(img => {
     img.rx = img.ry = img.trx = img.try = 0;
 
     img.addEventListener('mouseenter', () => img.classList.add('hovered'));
@@ -174,17 +173,17 @@
 
   function animate() {
     const time = Date.now() * 0.002;
+    offset += 0.5;
 
     images.forEach((img, i) => {
-      positions[i] += 0.5;
-      if (positions[i] > window.innerWidth + spacing) {
-        positions[i] = -spacing;
-      }
+      const x =
+        (i * spacing + offset) %
+        (window.innerWidth + totalWidth) - spacing;
 
       img.rx += (img.trx - img.rx) * 0.15;
       img.ry += (img.try - img.ry) * 0.15;
 
-      img.style.left = positions[i] + 'px';
+      img.style.left = x + 'px';
       img.style.top = `calc(50% + ${Math.sin(time + i) * 10}px)`;
       img.style.transform =
         `translateY(-50%) rotateX(${img.rx}deg) rotateY(${img.ry}deg)`;
@@ -195,7 +194,7 @@
 
   animate();
 
-  /* ===== AUTO LIGHTS ===== */
+  /* ========== AUTO-FILL LIGHTS ========== */
   const lightsRow = document.getElementById('lightsRow');
   const testImg = new Image();
   testImg.src = 'assets/lights.png';
