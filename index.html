@@ -91,17 +91,8 @@
 
 <body>
 
-<!-- duplicated lights across the top -->
-<div class="lights-row" id="lightsRow">
-  <img src="assets/lights.png" alt="Lights">
-  <img src="assets/lights.png" alt="Lights">
-  <img src="assets/lights.png" alt="Lights">
-  <img src="assets/lights.png" alt="Lights">
-  <img src="assets/lights.png" alt="Lights">
-  <img src="assets/lights.png" alt="Lights">
-  <img src="assets/lights.png" alt="Lights">
-  <img src="assets/lights.png" alt="Lights">
-</div>
+<!-- lights row container -->
+<div class="lights-row" id="lightsRow"></div>
 
 <!-- horizontal row container -->
 <div class="row-container" id="rowContainer">
@@ -189,6 +180,22 @@
   }
 
   animate();
+
+  // --- duplicate lights across the top ---
+  const lightsRow = document.getElementById('lightsRow');
+  const screenWidth = window.innerWidth;
+  const lightImg = new Image();
+  lightImg.src = 'assets/lights.png';
+  lightImg.onload = () => {
+    const imgWidth = lightImg.width * (200 / lightImg.height); // scale to height 200px
+    const count = Math.ceil(screenWidth / imgWidth) + 2; // enough to cover width
+
+    for (let i = 0; i < count; i++) {
+      const img = document.createElement('img');
+      img.src = 'assets/lights.png';
+      lightsRow.appendChild(img);
+    }
+  }
 </script>
 
 </body>
