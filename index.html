@@ -1,147 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Pro Taťku</title>
-
-<style>
-  body {
-    margin: 0;
-    background: white;
-    height: 100vh;
-    overflow: hidden;
-    position: relative;
-  }
-
-  /* ========== INTRO ========== */
-  .intro {
-    position: fixed;
-    inset: 0;
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    opacity: 1;
-    transition: opacity 2s ease;
-  }
-
-  .intro.fade-out {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .intro img {
-    width: 420px;
-    image-rendering: pixelated;
-  }
-
-  /* ========== LIGHTS ========== */
-  .lights-row {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    z-index: 5;
-    pointer-events: none;
-  }
-
-  .lights-row img {
-    height: 200px;
-    width: auto;
-    opacity: 0.95;
-  }
-
-  /* ========== IMAGE CHAIN ========== */
-  .row-container {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    transform: translateY(-50%);
-    pointer-events: none;
-  }
-
-  .orbit {
-    position: absolute;
-    width: 210px;
-    height: 210px;
-    object-fit: contain;
-    image-rendering: pixelated;
-    cursor: pointer;
-    pointer-events: auto;
-    transition: box-shadow 0.25s ease, scale 0.25s ease;
-  }
-
-  .orbit.hovered {
-    scale: 1.7;
-    z-index: 10;
-    box-shadow: 0 25px 45px rgba(0,0,0,0.18);
-  }
-
-  /* ========== PRESENTS ========== */
-  .presents-left {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 350px;
-    z-index: 3;
-    pointer-events: none;
-  }
-
-  .presents-right {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 350px;
-    z-index: 3;
-    pointer-events: none;
-  }
-
-  /* ========== TREE ========== */
-  .tree {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 260px;
-    z-index: 4;
-    pointer-events: none;
-  }
-</style>
-</head>
-
-<body>
-
-<!-- INTRO -->
-<div class="intro" id="intro">
-  <img src="assets/wish.png" alt="Happy Christmas">
-</div>
-
-<!-- LIGHTS -->
-<div class="lights-row" id="lightsRow"></div>
-
-<!-- IMAGE CHAIN -->
-<div class="row-container">
-  <img src="assets/tata1.webp" class="orbit">
-  <img src="assets/tata2.webp" class="orbit">
-  <img src="assets/tata3.webp" class="orbit">
-  <img src="assets/tata4.webp" class="orbit">
-  <img src="assets/tata5.webp" class="orbit">
-  <img src="assets/tata6.webp" class="orbit">
-  <img src="assets/tata7.webp" class="orbit">
-  <img src="assets/tata8.webp" class="orbit">
-  <img src="assets/tata9.webp" class="orbit">
-  <img src="assets/tata10.webp" class="orbit">
-</div>
-
-<!-- PRESENTS -->
-<img src="assets/presents2.png" class="presents-left">
-<img src="assets/presents.png" class="presents-right">
-
-<!-- TREE -->
-<img src="assets/tree.png" class="tree">
-
 <script>
   /* ========== INTRO FADE ========== */
   const intro = document.getElementById('intro');
@@ -149,13 +5,16 @@
     intro.classList.add('fade-out');
   }, 5000);
 
-  /* ========== IMAGE CHAIN (NO OVERLAP EVER) ========== */
+  /* ========== IMAGE CHAIN — TRUE ENDLESS TELEPORT ========== */
   const images = document.querySelectorAll('.orbit');
-  const spacing = 260;
-  const totalWidth = images.length * spacing;
-  let offset = 0;
+  const spacing = 260;        // distance between images
+  const speed = 0.5;          // movement speed
+  let positions = [];
 
-  images.forEach(img => {
+  // initial positions (laid out left → right)
+  images.forEach((img, i) => {
+    positions[i] = i * spacing;
+
     img.rx = img.ry = img.trx = img.try = 0;
 
     img.addEventListener('mouseenter', () => img.classList.add('hovered'));
@@ -173,17 +32,22 @@
 
   function animate() {
     const time = Date.now() * 0.002;
-    offset += 0.5;
 
     images.forEach((img, i) => {
-      const x =
-        (i * spacing + offset) %
-        (window.innerWidth + totalWidth) - spacing;
+      // move right
+      positions[i] += speed;
 
+      // TELEPORT to left when fully off screen
+      if (positions[i] > window.innerWidth + spacing) {
+        const minPos = Math.min(...positions);
+        positions[i] = minPos - spacing;
+      }
+
+      // tilt smoothing
       img.rx += (img.trx - img.rx) * 0.15;
       img.ry += (img.try - img.ry) * 0.15;
 
-      img.style.left = x + 'px';
+      img.style.left = positions[i] + 'px';
       img.style.top = `calc(50% + ${Math.sin(time + i) * 10}px)`;
       img.style.transform =
         `translateY(-50%) rotateX(${img.rx}deg) rotateY(${img.ry}deg)`;
@@ -210,6 +74,3 @@
     }
   };
 </script>
-
-</body>
-</html>
