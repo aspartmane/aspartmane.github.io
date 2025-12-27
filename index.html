@@ -16,46 +16,32 @@
     position: relative;
   }
 
-  .circle {
-    position: relative;
-    width: 550px;
-    height: 550px;
-    perspective: 1200px;
-    border-radius: 50%;
-    z-index: 1;
-  }
-
-  /* center image */
-  .center-image {
+  /* center row container */
+  .row-container {
     position: absolute;
     top: 50%;
-    left: 50%;
-    width: 220px;
-    height: 220px;
-    object-fit: contain;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-    opacity: 0.95;
+    left: 0;
+    width: 100%;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    pointer-events: none;
   }
 
-  .circle img.orbit {
-    position: absolute;
+  .row-container img.orbit {
     width: 120px;
     height: 120px;
     object-fit: contain;
     image-rendering: pixelated;
-    transform:
-      translate(-50%, -50%)
-      rotateX(0deg)
-      rotateY(0deg);
-    transition:
-      box-shadow 0.25s ease,
-      scale 0.25s ease;
+    margin-right: 8px; /* ~0.5 cm */
+    transform: rotateX(0deg) rotateY(0deg);
+    transition: box-shadow 0.25s ease, scale 0.25s ease;
     cursor: pointer;
-    z-index: 3;
+    pointer-events: auto; /* so hover works */
   }
 
-  .circle img.orbit.hovered {
+  .row-container img.orbit.hovered {
     scale: 1.7;
     z-index: 10;
     box-shadow: 0 25px 45px rgba(0,0,0,0.18);
@@ -66,7 +52,7 @@
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 350px; /* big size */
+    width: 350px;
     height: auto;
     z-index: 4;
     pointer-events: none;
@@ -78,10 +64,23 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 350px; /* same size */
+    width: 350px;
     height: auto;
     z-index: 4;
     pointer-events: none;
+    opacity: 0.95;
+  }
+
+  /* center image (tree) */
+  .center-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 220px;
+    height: 220px;
+    object-fit: contain;
+    transform: translate(-50%, -50%);
+    z-index: 2;
     opacity: 0.95;
   }
 </style>
@@ -89,12 +88,11 @@
 
 <body>
 
-<div class="circle" id="circleContainer">
+<!-- center image -->
+<img src="assets/tree.jpg" class="center-image" alt="Tree">
 
-  <!-- center image -->
-  <img src="assets/tree.jpg" class="center-image" alt="Tree">
-
-  <!-- orbiting images -->
+<!-- horizontal row container -->
+<div class="row-container" id="rowContainer">
   <img src="assets/tata1.webp" class="orbit">
   <img src="assets/tata2.webp" class="orbit">
   <img src="assets/tata3.webp" class="orbit">
@@ -105,7 +103,6 @@
   <img src="assets/tata8.webp" class="orbit">
   <img src="assets/tata9.webp" class="orbit">
   <img src="assets/tata10.webp" class="orbit">
-
 </div>
 
 <!-- bottom-right presents -->
@@ -115,16 +112,19 @@
 <img src="assets/presents2.png" class="presents-left" alt="Presents 2">
 
 <script>
-  const container = document.getElementById('circleContainer');
-  const images = container.querySelectorAll('.orbit');
+  const rowContainer = document.getElementById('rowContainer');
+  const images = rowContainer.querySelectorAll('.orbit');
 
-  const radius = 250;
-  const centerX = container.offsetWidth / 2;
-  const centerY = container.offsetHeight / 2;
+  let speed = 0.5; // pixels per frame
+  let positions = [];
 
-  let angleOffset = 0;
-  let paused = false;
+  // Initialize positions
+  images.forEach((img, i) => {
+    const rect = img.getBoundingClientRect();
+    positions.push(i * (rect.width + 8)); // 8px margin
+  });
 
+  // Handle hover tilt effect
   images.forEach(img => {
     img.rx = 0;
     img.ry = 0;
@@ -132,12 +132,10 @@
     img.try = 0;
 
     img.addEventListener('mouseenter', () => {
-      paused = true;
       img.classList.add('hovered');
     });
 
     img.addEventListener('mouseleave', () => {
-      paused = false;
       img.classList.remove('hovered');
       img.trx = 0;
       img.try = 0;
@@ -147,27 +145,27 @@
       const rect = img.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-
       img.try = ((x / rect.width) - 0.5) * 30;
       img.trx = -((y / rect.height) - 0.5) * 30;
     });
   });
 
   function animate() {
-    if (!paused) {
-      angleOffset += 0.003;
-    }
-
     images.forEach((img, i) => {
+      // 3D tilt smoothing
       img.rx += (img.trx - img.rx) * 0.18;
       img.ry += (img.try - img.ry) * 0.18;
+      img.style.transform = `rotateX(${img.rx}deg) rotateY(${img.ry}deg)`;
 
-      img.style.transform =
-        `translate(-50%, -50%) rotateX(${img.rx}deg) rotateY(${img.ry}deg)`;
-
-      const angle = (i / images.length) * 2 * Math.PI + angleOffset;
-      img.style.left = centerX + radius * Math.cos(angle) + 'px';
-      img.style.top  = centerY + radius * Math.sin(angle) + 'px';
+      // Move images horizontally
+      positions[i] += speed;
+      if (positions[i] > window.innerWidth) {
+        positions[i] = -img.width - 8; // wrap to left
+      }
+      img.style.position = 'absolute';
+      img.style.left = positions[i] + 'px';
+      img.style.top = '50%';
+      img.style.transform += ' translateY(-50%)';
     });
 
     requestAnimationFrame(animate);
