@@ -16,6 +16,20 @@
     position: relative;
   }
 
+  /* top stretched lights */
+  .top-lights {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    max-height: 200px; /* adjust if needed */
+    object-fit: cover;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0.95;
+  }
+
   /* center row container */
   .row-container {
     position: absolute;
@@ -30,15 +44,15 @@
   }
 
   .row-container img.orbit {
-    width: 160px; /* bigger than before */
-    height: 160px; /* keep aspect ratio */
+    width: 160px;
+    height: 160px;
     object-fit: contain;
     image-rendering: pixelated;
-    margin-right: 16px; /* more space between images */
+    margin-right: 16px;
     transform: rotateX(0deg) rotateY(0deg);
     transition: box-shadow 0.25s ease, scale 0.25s ease;
     cursor: pointer;
-    pointer-events: auto; /* so hover works */
+    pointer-events: auto;
   }
 
   .row-container img.orbit.hovered {
@@ -75,6 +89,9 @@
 
 <body>
 
+<!-- top stretched lights -->
+<img src="assets/lights.png" class="top-lights" alt="Hanging Lights">
+
 <!-- horizontal row container -->
 <div class="row-container" id="rowContainer">
   <img src="assets/tata1.webp" class="orbit">
@@ -104,7 +121,7 @@
 
   // Initialize positions
   images.forEach((img, i) => {
-    positions.push(i * (160 + 16)); // new width + new spacing
+    positions.push(i * (160 + 16)); // width + spacing
   });
 
   // Handle hover tilt effect
@@ -134,6 +151,8 @@
   });
 
   function animate() {
+    const time = Date.now() * 0.002; // for subtle wave
+
     images.forEach((img, i) => {
       // 3D tilt smoothing
       img.rx += (img.trx - img.rx) * 0.18;
@@ -147,7 +166,12 @@
       }
       img.style.position = 'absolute';
       img.style.left = positions[i] + 'px';
-      img.style.top = '50%';
+
+      // Subtle vertical wave
+      const waveAmplitude = 10; // pixels
+      const waveFrequency = 0.5; // how fast it moves
+      const yOffset = Math.sin(time + i * 0.5) * waveAmplitude;
+      img.style.top = `calc(50% + ${yOffset}px)`;
       img.style.transform += ' translateY(-50%)';
     });
 
