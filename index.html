@@ -1,20 +1,168 @@
-<script>
-  /* ========== INTRO FADE ========== */
-  const intro = document.getElementById('intro');
-  setTimeout(() => {
-    intro.classList.add('fade-out');
-  }, 5000);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pro Taťku</title>
 
-  /* ========== IMAGE CHAIN — TRUE ENDLESS TELEPORT ========== */
+<style>
+  body {
+    margin: 0;
+    background: white;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    font-family: sans-serif;
+  }
+
+  /* ===== INTRO ===== */
+  #intro {
+    position: fixed;
+    inset: 0;
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    transition: opacity 1.5s ease;
+  }
+
+  #intro.fade-out {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #intro img {
+    width: 500px;
+    image-rendering: pixelated;
+  }
+
+  /* ===== LIGHTS ===== */
+  .lights-row {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    height: 200px;
+    z-index: 5;
+    pointer-events: none;
+  }
+
+  .lights-row img {
+    height: 200px;
+    width: auto;
+  }
+
+  /* ===== IMAGE CHAIN ===== */
+  .row-container {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 300px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .orbit {
+    position: absolute;
+    width: 260px;   /* 🔥 BIGGER */
+    height: 260px;
+    object-fit: contain;
+    image-rendering: pixelated;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: box-shadow 0.25s ease, scale 0.25s ease;
+  }
+
+  .orbit.hovered {
+    scale: 1.6;
+    z-index: 10;
+    box-shadow: 0 30px 55px rgba(0,0,0,0.25);
+  }
+
+  /* ===== BOTTOM DECOR ===== */
+  .presents-right,
+  .presents-left {
+    position: absolute;
+    bottom: 0;
+    width: 360px;
+    pointer-events: none;
+    z-index: 4;
+  }
+
+  .presents-right { right: 0; }
+  .presents-left  { left: 0; }
+
+  .tree {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    pointer-events: none;
+    z-index: 3;
+  }
+</style>
+</head>
+
+<body>
+
+<!-- INTRO -->
+<div id="intro">
+  <img src="assets/wish.png" alt="Wish">
+</div>
+
+<!-- LIGHTS -->
+<div class="lights-row" id="lightsRow"></div>
+
+<!-- IMAGE CHAIN -->
+<div class="row-container" id="rowContainer">
+  <img src="assets/tata1.webp" class="orbit">
+  <img src="assets/tata2.webp" class="orbit">
+  <img src="assets/tata3.webp" class="orbit">
+  <img src="assets/tata4.webp" class="orbit">
+  <img src="assets/tata5.webp" class="orbit">
+  <img src="assets/tata6.webp" class="orbit">
+  <img src="assets/tata7.webp" class="orbit">
+  <img src="assets/tata8.webp" class="orbit">
+  <img src="assets/tata9.webp" class="orbit">
+  <img src="assets/tata10.webp" class="orbit">
+</div>
+
+<!-- BOTTOM -->
+<img src="assets/presents.png" class="presents-right">
+<img src="assets/presents2.png" class="presents-left">
+<img src="assets/tree.png" class="tree">
+
+<script>
+  /* ===== INTRO FADE ===== */
+  const intro = document.getElementById('intro');
+  setTimeout(() => intro.classList.add('fade-out'), 5000);
+
+  /* ===== LIGHT DUPLICATION ===== */
+  const lightsRow = document.getElementById('lightsRow');
+  const lightTest = new Image();
+  lightTest.src = 'assets/lights.png';
+
+  lightTest.onload = () => {
+    const scaledWidth = lightTest.width * (200 / lightTest.height);
+    const count = Math.ceil(window.innerWidth / scaledWidth) + 3;
+
+    for (let i = 0; i < count; i++) {
+      const img = document.createElement('img');
+      img.src = 'assets/lights.png';
+      lightsRow.appendChild(img);
+    }
+  };
+
+  /* ===== ENDLESS IMAGE CHAIN ===== */
   const images = document.querySelectorAll('.orbit');
-  const spacing = 260;        // distance between images
-  const speed = 0.5;          // movement speed
+  const spacing = 300;  // more space
+  const speed = 0.6;
   let positions = [];
 
-  // initial positions (laid out left → right)
   images.forEach((img, i) => {
     positions[i] = i * spacing;
-
     img.rx = img.ry = img.trx = img.try = 0;
 
     img.addEventListener('mouseenter', () => img.classList.add('hovered'));
@@ -34,21 +182,18 @@
     const time = Date.now() * 0.002;
 
     images.forEach((img, i) => {
-      // move right
       positions[i] += speed;
 
-      // TELEPORT to left when fully off screen
       if (positions[i] > window.innerWidth + spacing) {
-        const minPos = Math.min(...positions);
-        positions[i] = minPos - spacing;
+        positions[i] = Math.min(...positions) - spacing;
       }
 
-      // tilt smoothing
       img.rx += (img.trx - img.rx) * 0.15;
       img.ry += (img.try - img.ry) * 0.15;
 
       img.style.left = positions[i] + 'px';
-      img.style.top = `calc(50% + ${Math.sin(time + i) * 10}px)`;
+      img.style.top =
+        `calc(50% + ${Math.sin(time + i * 0.6) * 10}px)`;
       img.style.transform =
         `translateY(-50%) rotateX(${img.rx}deg) rotateY(${img.ry}deg)`;
     });
@@ -57,20 +202,7 @@
   }
 
   animate();
-
-  /* ========== AUTO-FILL LIGHTS ========== */
-  const lightsRow = document.getElementById('lightsRow');
-  const testImg = new Image();
-  testImg.src = 'assets/lights.png';
-
-  testImg.onload = () => {
-    const scaledWidth = testImg.width * (200 / testImg.height);
-    const count = Math.ceil(window.innerWidth / scaledWidth) + 2;
-
-    for (let i = 0; i < count; i++) {
-      const img = document.createElement('img');
-      img.src = 'assets/lights.png';
-      lightsRow.appendChild(img);
-    }
-  };
 </script>
+
+</body>
+</html>
