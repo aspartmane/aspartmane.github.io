@@ -16,6 +16,20 @@
     position: relative;
   }
 
+  /* top stretched lights banner */
+  .top-lights {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;      /* stretch to full width */
+    height: auto;     /* keep aspect ratio */
+    max-height: 250px; /* adjust if needed */
+    object-fit: cover;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0.95;
+  }
+
   /* horizontal row container */
   .row-container {
     position: absolute;
@@ -47,19 +61,6 @@
     box-shadow: 0 25px 45px rgba(0,0,0,0.18);
   }
 
-  /* top lights image */
-  .top-lights {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: auto;
-    height: 200px; /* adjust as needed */
-    transform: translateX(-50%);
-    z-index: 5;
-    pointer-events: none;
-    opacity: 0.95;
-  }
-
   /* bottom-right presents */
   .presents-right {
     position: absolute;
@@ -88,8 +89,8 @@
 
 <body>
 
-<!-- top lights -->
-<img src="assets/lights.png" class="top-lights" alt="Lights">
+<!-- top stretched lights banner -->
+<img src="assets/lights.png" class="top-lights" alt="Hanging Lights">
 
 <!-- horizontal row container -->
 <div class="row-container" id="rowContainer">
