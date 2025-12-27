@@ -16,19 +16,6 @@
     position: relative;
   }
 
-  /* top stretched lights banner */
-  .top-lights {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 250px; /* taller for full banner effect */
-    object-fit: cover;
-    z-index: 5;
-    pointer-events: none;
-    opacity: 0.95;
-  }
-
   /* horizontal row container */
   .row-container {
     position: absolute;
@@ -47,7 +34,7 @@
     height: 200px;
     object-fit: contain;
     image-rendering: pixelated;
-    margin-right: 24px; /* more spacing */
+    margin-right: 24px; /* spacing */
     transform: rotateX(0deg) rotateY(0deg);
     transition: box-shadow 0.25s ease, scale 0.25s ease;
     cursor: pointer;
@@ -58,6 +45,19 @@
     scale: 1.7;
     z-index: 10;
     box-shadow: 0 25px 45px rgba(0,0,0,0.18);
+  }
+
+  /* top lights image */
+  .top-lights {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: auto;
+    height: 200px; /* adjust as needed */
+    transform: translateX(-50%);
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0.95;
   }
 
   /* bottom-right presents */
@@ -88,8 +88,8 @@
 
 <body>
 
-<!-- top stretched lights banner -->
-<img src="https://raw.githubusercontent.com/aspartmane/aspartmane.github.io/main/assets/lights.png" class="top-lights" alt="Hanging Lights">
+<!-- top lights -->
+<img src="assets/lights.png" class="top-lights" alt="Lights">
 
 <!-- horizontal row container -->
 <div class="row-container" id="rowContainer">
@@ -120,7 +120,7 @@
 
   // Initialize positions
   images.forEach((img, i) => {
-    positions.push(i * (200 + 24)); // new width + new spacing
+    positions.push(i * (200 + 24)); // width + spacing
   });
 
   // Handle hover tilt effect
